@@ -19,7 +19,10 @@
             <thead class="bg-slate-50 border-b border-slate-100">
                 <tr>
                     <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Tgl Masuk</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Waktu Keluar</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Jam Keluar</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Guru</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Kelas</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Mapel</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
                     <th class="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Aksi</th>
                 </tr>
@@ -28,8 +31,13 @@
                 @forelse($data as $row)
                 <tr class="hover:bg-slate-50/70 transition-colors">
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $row->absenMasuk->tanggal ?? '-' }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $row->jam_keluar }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $row->status }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700 font-bold text-rose-600">{{ $row->jam_keluar }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $row->absenMasuk->guru->name ?? '-' }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $row->absenMasuk->kelas->name ?? '-' }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $row->absenMasuk->jadwalAjar->mapel->name ?? '-' }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">
+                        <span class="inline-block px-2.5 py-1 bg-brand-50 text-brand-700 text-[10px] font-bold uppercase tracking-wider rounded-md">{{ $row->status }}</span>
+                    </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
                         <a href="{{ route('absenkeluar.edit', $row->id) }}" class="text-blue-600 hover:text-blue-800 font-semibold">Edit</a>
                         <form method="POST" action="{{ route('absenkeluar.destroy', $row->id) }}" class="inline" onsubmit="return confirm('Hapus data ini?')">

@@ -19,7 +19,7 @@
             <thead class="bg-slate-50 border-b border-slate-100">
                 <tr>
                     <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Nama</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">NISN</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">nik</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Kelas</th>
                     <th class="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Aksi</th>
                 </tr>
@@ -28,7 +28,7 @@
                 @forelse($data as $row)
                 <tr class="hover:bg-slate-50/70 transition-colors">
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $row->name }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $row->nisn }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $row->nik }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $row->kelas->name ?? '-' }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
                         <a href="{{ route('ketuakelas.edit', $row->id) }}" class="text-blue-600 hover:text-blue-800 font-semibold">Edit</a>

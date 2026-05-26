@@ -7,7 +7,11 @@ class AbsenKeluarController extends Controller
 {
     public function index()
     {
-        $data = AbsenKeluar::latest()->paginate(15);
+        $data = AbsenKeluar::with([
+            'absenMasuk.guru', 
+            'absenMasuk.kelas', 
+            'absenMasuk.jadwalAjar.mapel'
+        ])->latest()->paginate(15);
         return view('admin.absenkeluar', compact('data'));
     }
 

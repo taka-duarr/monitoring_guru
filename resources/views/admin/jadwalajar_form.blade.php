@@ -9,6 +9,46 @@
         @if(isset($data)) @method('PUT') @endif
         
         <div class="mb-4">
+            <label class="block text-sm font-medium text-slate-700 mb-1">Guru Pengajar</label>
+            <select name="guru_id" class="w-full rounded-lg border-slate-300 border px-4 py-2 focus:ring-brand-500 focus:border-brand-500" required>
+                <option value="">-- Pilih Guru --</option>
+                @foreach($gurus as $g)
+                <option value="{{ $g->id }}" @if(old('guru_id', $data->guru_id ?? '') == $g->id) selected @endif>{{ $g->name }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-slate-700 mb-1">Mata Pelajaran</label>
+            <select name="mapel_id" class="w-full rounded-lg border-slate-300 border px-4 py-2 focus:ring-brand-500 focus:border-brand-500" required>
+                <option value="">-- Pilih Mata Pelajaran --</option>
+                @foreach($mapels as $m)
+                <option value="{{ $m->id }}" @if(old('mapel_id', $data->mapel_id ?? '') == $m->id) selected @endif>{{ $m->name }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-slate-700 mb-1">Kelas</label>
+            <select name="kelas_id" class="w-full rounded-lg border-slate-300 border px-4 py-2 focus:ring-brand-500 focus:border-brand-500" required>
+                <option value="">-- Pilih Kelas --</option>
+                @foreach($kelas as $k)
+                <option value="{{ $k->id }}" @if(old('kelas_id', $data->kelas_id ?? '') == $k->id) selected @endif>{{ $k->name }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-slate-700 mb-1">Ruangan</label>
+            <select name="ruangan_id" class="w-full rounded-lg border-slate-300 border px-4 py-2 focus:ring-brand-500 focus:border-brand-500" required>
+                <option value="">-- Pilih Ruangan --</option>
+                @foreach($ruangans as $r)
+                <option value="{{ $r->id }}" @if(old('ruangan_id', $data->ruangan_id ?? '') == $r->id) selected @endif>{{ $r->name }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <div class="mb-4">
             <label class="block text-sm font-medium text-slate-700 mb-1">Hari</label>
             <select name="hari" class="w-full rounded-lg border-slate-300 border px-4 py-2 focus:ring-brand-500 focus:border-brand-500" required>
                 <option value="Senin" @if(old('hari', $data->hari ?? '') == 'Senin') selected @endif>Senin</option>

@@ -61,7 +61,7 @@ class DatabaseSeeder extends Seeder
         $ketua1 = KetuaKelas::create([
             'id' => Str::uuid(),
             'name' => 'Andi',
-            'nisn' => '888888',
+            'nik' => '888888',
             'password' => Hash::make('888888'),
             'kelas_id' => null,
         ]);
@@ -69,7 +69,7 @@ class DatabaseSeeder extends Seeder
         $ketua2 = KetuaKelas::create([
             'id' => Str::uuid(),
             'name' => 'Siti',
-            'nisn' => '999999',
+            'nik' => '999999',
             'password' => Hash::make('999999'),
             'kelas_id' => null,
         ]);

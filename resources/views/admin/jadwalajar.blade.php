@@ -19,6 +19,10 @@
             <thead class="bg-slate-50 border-b border-slate-100">
                 <tr>
                     <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Hari</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Guru</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Mapel</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Kelas</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Ruangan</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Jam Mulai</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Jam Selesai</th>
                     <th class="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Aksi</th>
@@ -27,7 +31,11 @@
             <tbody class="divide-y divide-slate-100">
                 @forelse($data as $row)
                 <tr class="hover:bg-slate-50/70 transition-colors">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $row->hari }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-700">{{ $row->hari }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $row->guru->name ?? '-' }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $row->mapel->name ?? '-' }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $row->kelas->name ?? '-' }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $row->ruangan->name ?? '-' }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $row->jam_mulai }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $row->jam_selesai }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">

@@ -7,7 +7,7 @@ return new class extends Migration {
         Schema::create('ketua_kelas', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('name');
-            $table->string('nisn')->unique();
+            $table->string('nik')->unique();
             $table->string('password');
             $table->uuid('kelas_id')->nullable();
             $table->timestamps();

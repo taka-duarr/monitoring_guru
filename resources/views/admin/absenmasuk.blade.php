@@ -1,15 +1,15 @@
 @extends('layouts.admin')
-@section('title', 'Absen Masuk - Monitoring Guru')
-@section('page_title', 'Data Absen Masuk')
+@section('title', 'Rekap Absensi - Monitoring Guru')
+@section('page_title', 'Data Rekap Absensi')
 
 @section('content')
 <div class="bg-white shadow-sm rounded-2xl overflow-hidden border border-slate-100">
     <div class="p-6 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
         <div>
-            <h3 class="text-lg font-bold text-slate-800">Daftar Absen Masuk</h3>
+            <h3 class="text-lg font-bold text-slate-800">Daftar Rekap Absensi</h3>
             <p class="text-sm text-slate-500 mt-0.5">Total: <strong>{{ $data->total() }}</strong> data</p>
         </div>
-        <a href="{{ route('absenmasuk.create') }}" class="inline-flex items-center px-4 py-2 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 transition-colors shadow-sm">
+        <a href="{{ route('absenmasuk.create') }}" class="hidden items-center px-4 py-2 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 transition-colors shadow-sm">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
             Tambah Data
         </a>
@@ -19,15 +19,34 @@
             <thead class="bg-slate-50 border-b border-slate-100">
                 <tr>
                     <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Tanggal</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Guru</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Kelas / Mapel</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Jam Masuk</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Jam Keluar</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
                     <th class="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Aksi</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
                 @forelse($data as $row)
                 <tr class="hover:bg-slate-50/70 transition-colors">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $row->tanggal }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $row->jam_masuk }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ \Carbon\Carbon::parse($row->tanggal)->translatedFormat('d M Y') }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-800 font-bold">{{ $row->guru->name ?? '-' }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">
+                        <div class="font-medium text-slate-800">{{ $row->kelas->name ?? '-' }}</div>
+                        <div class="text-xs text-slate-500">{{ $row->jadwalAjar->mapel->name ?? '-' }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700 font-bold text-emerald-600">{{ $row->jam_masuk }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700 font-bold {{ $row->absenKeluar ? 'text-rose-600' : 'text-slate-300' }}">
+                        {{ $row->absenKeluar->jam_keluar ?? '--:--:--' }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">
+                        @if($row->absenKeluar)
+                        <span class="inline-block px-2.5 py-1 bg-emerald-50 text-emerald-700 text-[10px] font-bold uppercase tracking-wider rounded-md">Selesai</span>
+                        @else
+                        <span class="inline-block px-2.5 py-1 bg-amber-50 text-amber-700 text-[10px] font-bold uppercase tracking-wider rounded-md">Belum Keluar</span>
+                        @endif
+                    </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
                         <a href="{{ route('absenmasuk.edit', $row->id) }}" class="text-blue-600 hover:text-blue-800 font-semibold">Edit</a>
                         <form method="POST" action="{{ route('absenmasuk.destroy', $row->id) }}" class="inline" onsubmit="return confirm('Hapus data ini?')">

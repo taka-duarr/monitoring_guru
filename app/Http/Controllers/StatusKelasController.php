@@ -7,7 +7,7 @@ class StatusKelasController extends Controller
 {
     public function index()
     {
-        $data = StatusKelas::latest()->paginate(15);
+        $data = StatusKelas::with('kelas')->latest()->paginate(15);
         return view('admin.statuskelas', compact('data'));
     }
 

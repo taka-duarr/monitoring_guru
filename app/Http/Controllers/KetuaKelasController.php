@@ -21,7 +21,7 @@ class KetuaKelasController extends Controller
     {
         $data = $request->except('_token');
         if (empty($data['password'])) {
-            $data['password'] = bcrypt($data['nisn']);
+            $data['password'] = bcrypt($data['nik']);
         } else {
             $data['password'] = bcrypt($data['password']);
         }

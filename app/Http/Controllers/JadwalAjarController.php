@@ -7,14 +7,17 @@ class JadwalAjarController extends Controller
 {
     public function index()
     {
-        $data = JadwalAjar::latest()->paginate(15);
+        $data = JadwalAjar::with(['guru', 'mapel', 'kelas', 'ruangan'])->latest()->paginate(15);
         return view('admin.jadwalajar', compact('data'));
     }
 
     public function create()
     {
-        
-        return view('admin.jadwalajar_form');
+        $gurus = \App\Models\Guru::where('jabatan', 'guru')->get();
+        $mapels = \App\Models\Mapel::all();
+        $kelas = \App\Models\Kelas::all();
+        $ruangans = \App\Models\Ruangan::all();
+        return view('admin.jadwalajar_form', compact('gurus', 'mapels', 'kelas', 'ruangans'));
     }
 
     public function store(Request $request)
@@ -28,8 +31,11 @@ class JadwalAjarController extends Controller
     public function edit($id)
     {
         $data = JadwalAjar::findOrFail($id);
-        
-        return view('admin.jadwalajar_form', compact('data'));
+        $gurus = \App\Models\Guru::where('jabatan', 'guru')->get();
+        $mapels = \App\Models\Mapel::all();
+        $kelas = \App\Models\Kelas::all();
+        $ruangans = \App\Models\Ruangan::all();
+        return view('admin.jadwalajar_form', compact('data', 'gurus', 'mapels', 'kelas', 'ruangans'));
     }
 
     public function update(Request $request, $id)

@@ -5,11 +5,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class AuthController extends Controller
+class SiswaAuthController extends Controller
 {
     public function showLogin()
     {
-        return view('auth.login');
+        return view('siswa.login');
     }
 
     public function login(Request $request)
@@ -19,29 +19,22 @@ class AuthController extends Controller
             'password' => ['required'],
         ]);
 
-        if (Auth::attempt($credentials, $request->boolean('remember'))) {
+        if (Auth::guard('siswa')->attempt($credentials)) {
             $request->session()->regenerate();
-            $role = Auth::user()->jabatan;
-            if ($role === 'admin') {
-                return redirect()->intended('/admin/dashboard');
-            } elseif ($role === 'guru') {
-                return redirect()->intended('/guru/dashboard');
-            }
-            return redirect('/');
+            return redirect()->route('siswa.dashboard');
         }
 
         return back()->withErrors([
-            'nik' => 'Kredensial yang diberikan tidak cocok dengan catatan kami.',
+            'nik' => 'NIK Ketua Kelas tidak ditemukan atau password salah.',
         ])->onlyInput('nik');
     }
 
     public function logout(Request $request)
     {
-        Auth::logout();
-
+        Auth::guard('siswa')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect('/siswa/login');
     }
 }

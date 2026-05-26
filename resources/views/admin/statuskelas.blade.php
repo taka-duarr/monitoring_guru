@@ -18,18 +18,38 @@
         <table class="w-full">
             <thead class="bg-slate-50 border-b border-slate-100">
                 <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Kelas</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Ruangan</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Mapel</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Pengajar</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Aktif (1/0)</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
                     <th class="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Aksi</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
                 @forelse($data as $row)
                 <tr class="hover:bg-slate-50/70 transition-colors">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $row->mapel }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $row->pengajar }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $row->is_active }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-800 font-bold">{{ $row->kelas->name ?? '-' }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $row->ruangan ?? '-' }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm {{ $row->is_active ? 'text-slate-700' : 'text-slate-300 italic' }}">
+                        {{ $row->is_active ? ($row->mapel ?? '-') : '-' }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm {{ $row->is_active ? 'text-slate-700' : 'text-slate-300 italic' }}">
+                        {{ $row->is_active ? ($row->pengajar ?? '-') : '-' }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">
+                        @if($row->is_active)
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-700 text-[10px] font-bold uppercase tracking-wider rounded-md border border-emerald-200">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                Sedang Belajar
+                            </span>
+                        @else
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-slate-50 text-slate-500 text-[10px] font-bold uppercase tracking-wider rounded-md border border-slate-200">
+                                <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                                Kosong
+                            </span>
+                        @endif
+                    </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
                         <a href="{{ route('statuskelas.edit', $row->id) }}" class="text-blue-600 hover:text-blue-800 font-semibold">Edit</a>
                         <form method="POST" action="{{ route('statuskelas.destroy', $row->id) }}" class="inline" onsubmit="return confirm('Hapus data ini?')">

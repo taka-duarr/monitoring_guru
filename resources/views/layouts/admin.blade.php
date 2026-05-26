@@ -40,7 +40,7 @@
         </div>
         
         <div class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
-            <a href="{{ route('dashboard') }}" class="flex items-center px-3 py-2.5 rounded-lg {{ request()->routeIs('dashboard') ? 'bg-brand-50 text-brand-700 font-semibold' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium' }} transition-colors">
+            <a href="{{ route('admin.dashboard') }}" class="flex items-center px-3 py-2.5 rounded-lg {{ request()->routeIs('admin.dashboard') ? 'bg-brand-50 text-brand-700 font-semibold' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium' }} transition-colors">
                 <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                 Dashboard
             </a>
@@ -86,12 +86,7 @@
 
             <a href="{{ route('absenmasuk.index') }}" class="flex items-center px-3 py-2.5 rounded-lg {{ request()->routeIs('absenmasuk.*') ? 'bg-brand-50 text-brand-700 font-semibold' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium' }} transition-colors">
                 <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path></svg>
-                Absen Masuk
-            </a>
-
-            <a href="{{ route('absenkeluar.index') }}" class="flex items-center px-3 py-2.5 rounded-lg {{ request()->routeIs('absenkeluar.*') ? 'bg-brand-50 text-brand-700 font-semibold' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium' }} transition-colors">
-                <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-                Absen Keluar
+                Rekap Absensi
             </a>
 
             <a href="{{ route('izin.index') }}" class="flex items-center px-3 py-2.5 rounded-lg {{ request()->routeIs('izin.*') ? 'bg-brand-50 text-brand-700 font-semibold' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium' }} transition-colors">
@@ -142,48 +137,41 @@
 
         <!-- Content area -->
         <div class="flex-1 overflow-y-auto p-6 bg-slate-50/50">
-            <!-- Toast Notifications -->
+            <!-- SweetAlert2 Notifications -->
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
             @if(session('success'))
-            <div id="toast-success" class="fixed top-4 right-4 z-50 flex items-center w-full max-w-xs p-4 space-x-3 text-slate-800 bg-white rounded-xl shadow-lg border-l-4 border-brand-500 transform transition-all duration-500 translate-x-0" role="alert">
-                <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-brand-600 bg-brand-100 rounded-lg">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                </div>
-                <div class="ml-3 text-sm font-medium">{{ session('success') }}</div>
-                <button type="button" onclick="document.getElementById('toast-success').style.display='none'" class="ml-auto -mx-1.5 -my-1.5 bg-white text-slate-400 hover:text-slate-900 rounded-lg focus:ring-2 focus:ring-slate-300 p-1.5 hover:bg-slate-100 inline-flex h-8 w-8 justify-center items-center">
-                    <span class="sr-only">Close</span>
-                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-            </div>
             <script>
-                setTimeout(() => {
-                    const toast = document.getElementById('toast-success');
-                    if(toast) {
-                        toast.classList.add('translate-x-full', 'opacity-0');
-                        setTimeout(() => toast.remove(), 500);
-                    }
-                }, 4000);
+                document.addEventListener('DOMContentLoaded', function () {
+                    console.log('Menampilkan notifikasi success');
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: '{!! session("success") !!}',
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true
+                    });
+                });
             </script>
             @endif
             
             @if(session('error'))
-            <div id="toast-error" class="fixed top-4 right-4 z-50 flex items-center w-full max-w-xs p-4 space-x-3 text-slate-800 bg-white rounded-xl shadow-lg border-l-4 border-red-500 transform transition-all duration-500 translate-x-0" role="alert">
-                <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-red-600 bg-red-100 rounded-lg">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </div>
-                <div class="ml-3 text-sm font-medium">{{ session('error') }}</div>
-                <button type="button" onclick="document.getElementById('toast-error').style.display='none'" class="ml-auto -mx-1.5 -my-1.5 bg-white text-slate-400 hover:text-slate-900 rounded-lg focus:ring-2 focus:ring-slate-300 p-1.5 hover:bg-slate-100 inline-flex h-8 w-8 justify-center items-center">
-                    <span class="sr-only">Close</span>
-                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-            </div>
             <script>
-                setTimeout(() => {
-                    const toast = document.getElementById('toast-error');
-                    if(toast) {
-                        toast.classList.add('translate-x-full', 'opacity-0');
-                        setTimeout(() => toast.remove(), 500);
-                    }
-                }, 4000);
+                document.addEventListener('DOMContentLoaded', function () {
+                    console.log('Menampilkan notifikasi error');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: '{!! addslashes(session('error')) !!}',
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 4000,
+                        timerProgressBar: true
+                    });
+                });
             </script>
             @endif
 
