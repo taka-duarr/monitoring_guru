@@ -18,27 +18,33 @@
         <table class="w-full">
             <thead class="bg-slate-50 border-b border-slate-100">
                 <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">No</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Kelas</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Ruangan</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Mapel</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Pengajar</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status (Live)</th>
                     <th class="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Aksi</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
                 @forelse($data as $row)
+                @php
+                    $status = $row->live_status;
+                    $isActive = $status ? $status->is_active : false;
+                @endphp
                 <tr class="hover:bg-slate-50/70 transition-colors">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-800 font-bold">{{ $row->kelas->name ?? '-' }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $row->ruangan ?? '-' }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm {{ $row->is_active ? 'text-slate-700' : 'text-slate-300 italic' }}">
-                        {{ $row->is_active ? ($row->mapel ?? '-') : '-' }}
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{{ $loop->iteration + ($data->firstItem() - 1) }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-800 font-bold">{{ $row->name }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $isActive ? ($status->ruangan ?? '-') : '-' }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm {{ $isActive ? 'text-slate-700' : 'text-slate-300 italic' }}">
+                        {{ $isActive ? ($status->mapel ?? '-') : '-' }}
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm {{ $row->is_active ? 'text-slate-700' : 'text-slate-300 italic' }}">
-                        {{ $row->is_active ? ($row->pengajar ?? '-') : '-' }}
+                    <td class="px-6 py-4 whitespace-nowrap text-sm {{ $isActive ? 'text-slate-700' : 'text-slate-300 italic' }}">
+                        {{ $isActive ? ($status->pengajar ?? '-') : '-' }}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">
-                        @if($row->is_active)
+                        @if($isActive)
                             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-700 text-[10px] font-bold uppercase tracking-wider rounded-md border border-emerald-200">
                                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                                 Sedang Belajar
@@ -51,11 +57,15 @@
                         @endif
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
-                        <a href="{{ route('statuskelas.edit', $row->id) }}" class="text-blue-600 hover:text-blue-800 font-semibold">Edit</a>
-                        <form method="POST" action="{{ route('statuskelas.destroy', $row->id) }}" class="inline" onsubmit="return confirm('Hapus data ini?')">
+                        @if($status)
+                        <a href="{{ route('statuskelas.edit', $status->id) }}" class="text-blue-600 hover:text-blue-800 font-semibold">Edit Log</a>
+                        <form method="POST" action="{{ route('statuskelas.destroy', $status->id) }}" class="inline" onsubmit="return confirm('Hapus data log kelas ini?')">
                             @csrf @method('DELETE')
-                            <button type="submit" class="text-red-500 hover:text-red-700 font-semibold">Hapus</button>
+                            <button type="submit" class="text-red-500 hover:text-red-700 font-semibold">Reset</button>
                         </form>
+                        @else
+                        <span class="text-slate-300 italic text-xs">Belum ada aktivitas</span>
+                        @endif
                     </td>
                 </tr>
                 @empty

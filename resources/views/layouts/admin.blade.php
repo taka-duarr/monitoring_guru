@@ -36,7 +36,7 @@
     <!-- Sidebar -->
     <aside class="w-64 bg-white border-r border-slate-200 flex flex-col shadow-sm z-10 hidden md:flex">
         <div class="h-16 flex items-center px-6 border-b border-slate-100">
-            <h1 class="font-heading text-xl font-bold text-brand-600 tracking-tight">SMK Hebat</h1>
+            <h1 class="font-heading text-xl font-bold text-brand-600 tracking-tight">SMKN 2 SURABAYA</h1>
         </div>
         
         <div class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
@@ -169,6 +169,23 @@
                         position: 'top-end',
                         showConfirmButton: false,
                         timer: 4000,
+                        timerProgressBar: true
+                    });
+                });
+            </script>
+            @endif
+
+            @if($errors->any())
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Data Tidak Valid',
+                        html: '{!! implode("<br>", $errors->all()) !!}',
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 5000,
                         timerProgressBar: true
                     });
                 });

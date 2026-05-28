@@ -18,6 +18,7 @@
         <table class="w-full">
             <thead class="bg-slate-50 border-b border-slate-100">
                 <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">No</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Hari</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Guru</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Mapel</th>
@@ -31,6 +32,7 @@
             <tbody class="divide-y divide-slate-100">
                 @forelse($data as $row)
                 <tr class="hover:bg-slate-50/70 transition-colors">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{{ $loop->iteration + ($data->firstItem() - 1) }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-700">{{ $row->hari }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $row->guru->name ?? '-' }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $row->mapel->name ?? '-' }}</td>

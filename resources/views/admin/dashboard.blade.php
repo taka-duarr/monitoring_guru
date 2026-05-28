@@ -42,7 +42,7 @@
     <div class="relative z-10">
         <h2 class="text-3xl font-heading font-bold mb-2">Selamat datang kembali, {{ Auth::user()->name }}! 👋</h2>
         <p class="text-brand-100 text-lg max-w-2xl">
-            Aplikasi Monitoring Guru kini berjalan dengan Custom UI yang sangat ringan dan mulus.
+            By TAKA Dev 
         </p>
     </div>
 </div>

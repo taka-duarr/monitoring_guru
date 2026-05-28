@@ -7,7 +7,17 @@ class StatusKelasController extends Controller
 {
     public function index()
     {
-        $data = StatusKelas::with('kelas')->latest()->paginate(15);
+        $today = \Carbon\Carbon::today();
+        // Ambil SEMUA kelas agar kepala sekolah bisa melihat daftar lengkap
+        $data = \App\Models\Kelas::orderBy('name', 'asc')->paginate(20);
+        
+        foreach ($data as $kelas) {
+            $status = StatusKelas::where('kelas_id', $kelas->id)
+                                 ->whereDate('created_at', $today)
+                                 ->first();
+            $kelas->live_status = $status;
+        }
+
         return view('admin.statuskelas', compact('data'));
     }
 

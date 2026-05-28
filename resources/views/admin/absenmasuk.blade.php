@@ -18,6 +18,7 @@
         <table class="w-full">
             <thead class="bg-slate-50 border-b border-slate-100">
                 <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">No</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Tanggal</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Guru</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Kelas / Mapel</th>
@@ -30,6 +31,7 @@
             <tbody class="divide-y divide-slate-100">
                 @forelse($data as $row)
                 <tr class="hover:bg-slate-50/70 transition-colors">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{{ $loop->iteration + ($data->firstItem() - 1) }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ \Carbon\Carbon::parse($row->tanggal)->translatedFormat('d M Y') }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-800 font-bold">{{ $row->guru->name ?? '-' }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">

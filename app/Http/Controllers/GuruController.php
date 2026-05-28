@@ -19,6 +19,14 @@ class GuruController extends Controller
 
     public function store(Request $request)
     {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'nik' => 'required|numeric|unique:gurus,nik',
+            'jabatan' => 'required'
+        ], [
+            'nik.unique' => 'NIK sudah terdaftar, silakan gunakan NIK lain.'
+        ]);
+
         $data = $request->except('_token');
         if (empty($data['password'])) {
             $data['password'] = bcrypt($data['nik']);
@@ -38,13 +46,26 @@ class GuruController extends Controller
 
     public function update(Request $request, $id)
     {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'nik' => 'required|numeric|unique:gurus,nik,' . $id,
+            'jabatan' => 'required'
+        ], [
+            'nik.unique' => 'NIK sudah terdaftar, silakan gunakan NIK lain.'
+        ]);
+
         $record = Guru::findOrFail($id);
         $data = $request->except(['_token', '_method']);
-        if (isset($data['password']) && $data['password']) {
+        
+        // Reset password jika NIK diubah
+        if (isset($data['nik']) && $data['nik'] !== $record->nik) {
+            $data['password'] = bcrypt($data['nik']);
+        } elseif (isset($data['password']) && $data['password']) {
             $data['password'] = bcrypt($data['password']);
         } else {
             unset($data['password']);
         }
+        
         $record->update($data);
         return redirect()->route('guru.index')->with('success', 'Data berhasil diubah');
     }

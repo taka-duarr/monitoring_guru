@@ -14,7 +14,7 @@
         </div>
         <div class="mb-4">
             <label class="block text-sm font-medium text-slate-700 mb-1">NIK</label>
-            <input type="text" name="nik" value="{{ old('nik', $data->nik ?? '') }}" class="w-full rounded-lg border-slate-300 border px-4 py-2 focus:ring-brand-500 focus:border-brand-500" required>
+            <input type="number" name="nik" value="{{ old('nik', $data->nik ?? '') }}" class="w-full rounded-lg border-slate-300 border px-4 py-2 focus:ring-brand-500 focus:border-brand-500" required>
         </div>
         <div class="mb-4">
             <label class="block text-sm font-medium text-slate-700 mb-1">Jabatan</label>
