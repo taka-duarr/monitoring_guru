@@ -20,7 +20,8 @@
                 <tr>
                     <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">No</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Nama Kelas</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">grade</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Angkatan</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Grade</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Jurusan</th>
                     <th class="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Aksi</th>
                 </tr>
@@ -29,10 +30,12 @@
                 @forelse($data as $row)
                 <tr class="hover:bg-slate-50/70 transition-colors">
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{{ $loop->iteration + ($data->firstItem() - 1) }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $row->name }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-800">{{ $row->name }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $row->angkatan->name ?? '-' }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $row->grade }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $row->jurusan->name ?? '-' }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
+                        <a href="{{ route('kelas.murid.index', $row->id) }}" class="text-teal-600 hover:text-teal-800 font-semibold">Murid</a>
                         <a href="{{ route('kelas.edit', $row->id) }}" class="text-blue-600 hover:text-blue-800 font-semibold">Edit</a>
                         <form method="POST" action="{{ route('kelas.destroy', $row->id) }}" class="inline" onsubmit="return confirm('Hapus data ini?')">
                             @csrf @method('DELETE')

@@ -50,6 +50,7 @@
                         @endif
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
+                        <a href="{{ route('absenmasuk.murid', $row->id) }}" class="text-teal-600 hover:text-teal-800 font-semibold">Lihat Murid</a>
                         <a href="{{ route('absenmasuk.edit', $row->id) }}" class="text-blue-600 hover:text-blue-800 font-semibold">Edit</a>
                         <form method="POST" action="{{ route('absenmasuk.destroy', $row->id) }}" class="inline" onsubmit="return confirm('Hapus data ini?')">
                             @csrf @method('DELETE')

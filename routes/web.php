@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\MuridController;
+use App\Http\Controllers\UserController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -29,9 +31,21 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     
     // CRUD Routes
     Route::resource('guru', App\Http\Controllers\GuruController::class);
+    Route::resource('users', UserController::class);
+
+    // Nested routes for Murid
+    Route::get('kelas/{kelas}/murid', [MuridController::class, 'index'])->name('kelas.murid.index');
+    Route::post('kelas/{kelas}/murid', [MuridController::class, 'store'])->name('kelas.murid.store');
+    Route::put('kelas/{kelas}/murid/{murid}', [MuridController::class, 'update'])->name('kelas.murid.update');
+    Route::delete('kelas/{kelas}/murid/{murid}', [MuridController::class, 'destroy'])->name('kelas.murid.destroy');
+
+    Route::resource('angkatan', App\Http\Controllers\AngkatanController::class);
     Route::resource('kelas', App\Http\Controllers\KelasController::class);
     Route::resource('jurusan', App\Http\Controllers\JurusanController::class);
     Route::resource('jadwalajar', App\Http\Controllers\JadwalAjarController::class);
+    
+    // Absen Masuk & Murid Read-only
+    Route::get('absenmasuk/{absenmasuk}/murid', [App\Http\Controllers\AbsenMasukController::class, 'murid'])->name('absenmasuk.murid');
     Route::resource('absenmasuk', App\Http\Controllers\AbsenMasukController::class);
     Route::resource('ketuakelas', App\Http\Controllers\KetuaKelasController::class);
     Route::resource('mapel', App\Http\Controllers\MapelController::class);

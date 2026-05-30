@@ -17,4 +17,5 @@ class AbsenMasuk extends Model
     public function kelas() { return $this->belongsTo(Kelas::class, 'kelas_id'); }
     public function ruangan() { return $this->belongsTo(Ruangan::class, 'ruangan_id'); }
     public function absenKeluar() { return $this->hasOne(AbsenKeluar::class, 'absen_masuk_id'); }
+    public function absenMurids() { return $this->hasMany(AbsenMurid::class, 'absen_masuk_id'); }
 }

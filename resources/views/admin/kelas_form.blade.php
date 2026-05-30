@@ -13,8 +13,22 @@
             <input type="text" name="name" value="{{ old('name', $data->name ?? '') }}" class="w-full rounded-lg border-slate-300 border px-4 py-2 focus:ring-brand-500 focus:border-brand-500" required>
         </div>
         <div class="mb-4">
+            <label class="block text-sm font-medium text-slate-700 mb-1">Angkatan</label>
+            <select name="angkatan_id" class="w-full rounded-lg border-slate-300 border px-4 py-2 focus:ring-brand-500 focus:border-brand-500">
+                <option value="">-- Pilih Angkatan --</option>
+                @foreach($angkatans as $ang)
+                <option value="{{ $ang->id }}" @if(old('angkatan_id', $data->angkatan_id ?? '') == $ang->id) selected @endif>{{ $ang->name }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="mb-4">
             <label class="block text-sm font-medium text-slate-700 mb-1">Grade</label>
-            <input type="text" name="grade" value="{{ old('grade', $data->grade ?? '') }}" class="w-full rounded-lg border-slate-300 border px-4 py-2 focus:ring-brand-500 focus:border-brand-500" required>
+            <select name="grade" class="w-full rounded-lg border-slate-300 border px-4 py-2 focus:ring-brand-500 focus:border-brand-500" required>
+                <option value="">-- Pilih Grade --</option>
+                <option value="10" @if(old('grade', $data->grade ?? '') == '10') selected @endif>10</option>
+                <option value="11" @if(old('grade', $data->grade ?? '') == '11') selected @endif>11</option>
+                <option value="12" @if(old('grade', $data->grade ?? '') == '12') selected @endif>12</option>
+            </select>
         </div>
         <div class="mb-4">
             <label class="block text-sm font-medium text-slate-700 mb-1">Jurusan</label>

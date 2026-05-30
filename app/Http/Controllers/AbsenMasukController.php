@@ -45,9 +45,17 @@ class AbsenMasukController extends Controller
         return redirect()->route('absenmasuk.index')->with('success', 'Data berhasil diubah');
     }
 
-    public function destroy($id)
+    public function destroy(AbsenMasuk $absenmasuk)
     {
-        AbsenMasuk::destroy($id);
+        $absenmasuk->delete();
         return redirect()->route('absenmasuk.index')->with('success', 'Data berhasil dihapus');
+    }
+
+    public function murid(AbsenMasuk $absenmasuk)
+    {
+        $murids = \App\Models\Murid::where('kelas_id', $absenmasuk->kelas_id)->orderBy('no_absen')->orderBy('name')->get();
+        $absenMurids = \App\Models\AbsenMurid::where('absen_masuk_id', $absenmasuk->id)->get()->keyBy('murid_id');
+        
+        return view('admin.absenmasuk.murid', compact('absenmasuk', 'murids', 'absenMurids'));
     }
 }

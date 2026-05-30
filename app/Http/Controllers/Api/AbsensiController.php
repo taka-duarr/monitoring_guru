@@ -114,4 +114,64 @@ class AbsensiController extends Controller
             'message' => 'Berhasil absen MASUK untuk ' . ($jadwal->mapel->name ?? 'Mata Pelajaran')
         ]);
     }
+
+    public function getAbsenMurid(Request $request, $absen_masuk_id)
+    {
+        $absenMasuk = AbsenMasuk::find($absen_masuk_id);
+        if (!$absenMasuk) {
+            return response()->json(['success' => false, 'message' => 'Data absen guru tidak ditemukan'], 404);
+        }
+
+        $murids = \App\Models\Murid::where('kelas_id', $absenMasuk->kelas_id)->orderBy('no_absen')->orderBy('name')->get();
+        $absenMurids = \App\Models\AbsenMurid::where('absen_masuk_id', $absen_masuk_id)->get()->keyBy('murid_id');
+
+        $data = $murids->map(function ($murid) use ($absenMurids) {
+            $status = 'hadir'; // default
+            if ($absenMurids->has($murid->id)) {
+                $status = $absenMurids[$murid->id]->status;
+            }
+            return [
+                'id' => $murid->id,
+                'no_absen' => $murid->no_absen,
+                'nis' => $murid->nis,
+                'name' => $murid->name,
+                'status' => $status
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'data' => $data
+        ]);
+    }
+
+    public function saveAbsenMurid(Request $request, $absen_masuk_id)
+    {
+        $absenMasuk = AbsenMasuk::find($absen_masuk_id);
+        if (!$absenMasuk) {
+            return response()->json(['success' => false, 'message' => 'Data absen guru tidak ditemukan'], 404);
+        }
+
+        $muridsData = $request->input('murids', []);
+
+        foreach ($muridsData as $mData) {
+            if (!isset($mData['id']) || !isset($mData['status'])) continue;
+
+            \App\Models\AbsenMurid::updateOrCreate(
+                [
+                    'absen_masuk_id' => $absen_masuk_id,
+                    'murid_id' => $mData['id']
+                ],
+                [
+                    'id' => \Illuminate\Support\Str::uuid(),
+                    'status' => $mData['status']
+                ]
+            );
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Absensi murid berhasil disimpan!'
+        ]);
+    }
 }
