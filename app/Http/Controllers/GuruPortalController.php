@@ -48,4 +48,21 @@ class GuruPortalController extends Controller
     {
         return view('guru.izin');
     }
+
+    public function riwayatMapel($mapel_id)
+    {
+        $guru = \Illuminate\Support\Facades\Auth::user();
+        $mapel = \App\Models\Mapel::findOrFail($mapel_id);
+
+        $riwayat = \App\Models\AbsenMasuk::with(['kelas', 'ruangan'])
+            ->where('guru_id', $guru->id)
+            ->whereHas('jadwalAjar', function ($query) use ($mapel_id) {
+                $query->where('mapel_id', $mapel_id);
+            })
+            ->orderBy('tanggal', 'desc')
+            ->orderBy('jam_masuk', 'desc')
+            ->get();
+
+        return view('guru.riwayat_mapel', compact('mapel', 'riwayat'));
+    }
 }

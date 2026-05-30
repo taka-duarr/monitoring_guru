@@ -45,7 +45,11 @@
                     <span class="inline-block px-2.5 py-1 {{ $statusColor }} text-[10px] font-bold uppercase tracking-wider rounded-md mb-2">
                         {{ $statusText }}
                     </span>
-                    <h3 class="font-bold text-lg text-slate-800 leading-tight">{{ $jadwal->mapel->name ?? 'Mata Pelajaran' }}</h3>
+                    <h3 class="font-bold text-lg text-slate-800 leading-tight">
+                        <a href="{{ route('guru.riwayat_mapel', $jadwal->mapel_id) }}" class="hover:text-brand-600 hover:underline transition">
+                            {{ $jadwal->mapel->name ?? 'Mata Pelajaran' }}
+                        </a>
+                    </h3>
                     <p class="text-sm text-slate-500 mt-0.5">Kelas {{ $jadwal->kelas->name ?? '-' }} • {{ $jadwal->ruangan->name ?? 'Ruang Belum Diset' }}</p>
                 </div>
                 <div class="text-right bg-slate-50 px-3 py-2 rounded-xl border border-slate-100">

@@ -56,4 +56,29 @@ class JadwalController extends Controller
             'data'    => $jadwal
         ]);
     }
+
+    public function riwayatMapel($mapel_id, Request $request)
+    {
+        $user = $request->user();
+        $mapel = \App\Models\Mapel::findOrFail($mapel_id);
+
+        $riwayat = \App\Models\AbsenMasuk::with(['kelas', 'ruangan'])
+            ->where('guru_id', $user->id)
+            ->whereHas('jadwalAjar', function ($query) use ($mapel_id) {
+                $query->where('mapel_id', $mapel_id);
+            })
+            ->orderBy('tanggal', 'desc')
+            ->orderBy('jam_masuk', 'desc')
+            ->get()
+            ->map(function ($absen) {
+                $absen->absen_keluar = \App\Models\AbsenKeluar::where('absen_masuk_id', $absen->id)->first();
+                return $absen;
+            });
+
+        return response()->json([
+            'success' => true,
+            'mapel'   => $mapel,
+            'data'    => $riwayat
+        ]);
+    }
 }

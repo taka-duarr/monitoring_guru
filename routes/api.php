@@ -12,4 +12,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/jadwal', [App\Http\Controllers\Api\JadwalController::class, 'index']);
     Route::post('/scan', [App\Http\Controllers\Api\AbsensiController::class, 'scan']);
     Route::get('/status-kelas', [App\Http\Controllers\Api\StatusKelasController::class, 'index']);
+    Route::get('/riwayat-mapel/{mapel_id}', [App\Http\Controllers\Api\JadwalController::class, 'riwayatMapel']);
 });
