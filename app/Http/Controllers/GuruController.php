@@ -1,27 +1,27 @@
 <?php
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
-use App\Models\Guru;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class GuruController extends Controller
 {
     public function index()
     {
-        $data = Guru::latest()->paginate(15);
+        $data = User::whereIn('jabatan', ['guru', 'admin'])->latest()->paginate(15);
         return view('admin.guru', compact('data'));
     }
 
     public function create()
     {
-        
         return view('admin.guru_form');
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'nik' => 'required|numeric|unique:gurus,nik',
+            'name'    => 'required|string|max:255',
+            'nik'     => 'required|numeric|unique:users,nik',
             'jabatan' => 'required'
         ], [
             'nik.unique' => 'NIK sudah terdaftar, silakan gunakan NIK lain.'
@@ -29,39 +29,37 @@ class GuruController extends Controller
 
         $data = $request->except('_token');
         if (empty($data['password'])) {
-            $data['password'] = bcrypt($data['nik']);
+            $data['password'] = Hash::make($data['nik']);
         } else {
-            $data['password'] = bcrypt($data['password']);
+            $data['password'] = Hash::make($data['password']);
         }
-        Guru::create($data);
+        User::create($data);
         return redirect()->route('guru.index')->with('success', 'Data berhasil ditambahkan');
     }
 
     public function edit($id)
     {
-        $data = Guru::findOrFail($id);
-        
+        $data = User::whereIn('jabatan', ['guru', 'admin'])->findOrFail($id);
         return view('admin.guru_form', compact('data'));
     }
 
     public function update(Request $request, $id)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'nik' => 'required|numeric|unique:gurus,nik,' . $id,
+            'name'    => 'required|string|max:255',
+            'nik'     => 'required|numeric|unique:users,nik,' . $id,
             'jabatan' => 'required'
         ], [
             'nik.unique' => 'NIK sudah terdaftar, silakan gunakan NIK lain.'
         ]);
 
-        $record = Guru::findOrFail($id);
+        $record = User::whereIn('jabatan', ['guru', 'admin'])->findOrFail($id);
         $data = $request->except(['_token', '_method']);
         
-        // Reset password jika NIK diubah
         if (isset($data['nik']) && $data['nik'] !== $record->nik) {
-            $data['password'] = bcrypt($data['nik']);
+            $data['password'] = Hash::make($data['nik']);
         } elseif (isset($data['password']) && $data['password']) {
-            $data['password'] = bcrypt($data['password']);
+            $data['password'] = Hash::make($data['password']);
         } else {
             unset($data['password']);
         }
@@ -72,7 +70,7 @@ class GuruController extends Controller
 
     public function destroy($id)
     {
-        Guru::destroy($id);
+        User::whereIn('jabatan', ['guru', 'admin'])->findOrFail($id)->delete();
         return redirect()->route('guru.index')->with('success', 'Data berhasil dihapus');
     }
 }

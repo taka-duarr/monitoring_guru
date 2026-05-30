@@ -11,8 +11,8 @@ class SiswaMiddleware
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (!Auth::guard('siswa')->check()) {
-            return redirect()->route('siswa.login');
+        if (!Auth::check() || Auth::user()->jabatan !== 'ketuakelas') {
+            return redirect()->route('login');
         }
 
         return $next($request);

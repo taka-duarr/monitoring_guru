@@ -4,18 +4,20 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
 });
 
-// Admin & Guru Login
+// ==========================================
+// AUTH - Semua Role Login dari Sini
+// ==========================================
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Siswa Login
-Route::get('/siswa/login', [App\Http\Controllers\SiswaAuthController::class, 'showLogin'])->name('siswa.login');
-Route::post('/siswa/login', [App\Http\Controllers\SiswaAuthController::class, 'login']);
-Route::post('/siswa/logout', [App\Http\Controllers\SiswaAuthController::class, 'logout'])->name('siswa.logout');
+// Redirect /siswa/login ke /login (tidak ada lagi halaman login terpisah)
+Route::get('/siswa/login', function () {
+    return redirect()->route('login');
+})->name('siswa.login');
 
 // ==========================================
 // ADMIN ROUTES (Hanya untuk Admin)
@@ -50,7 +52,7 @@ Route::middleware(['auth', 'role:guru'])->prefix('guru')->group(function () {
 });
 
 // ==========================================
-// SISWA ROUTES (Hanya untuk Siswa/Ketua Kelas)
+// SISWA / KETUA KELAS ROUTES
 // ==========================================
 Route::get('/siswa', function () {
     return redirect()->route('siswa.dashboard');

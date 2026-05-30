@@ -13,7 +13,7 @@ class JadwalAjarController extends Controller
 
     public function create()
     {
-        $gurus = \App\Models\Guru::where('jabatan', 'guru')->get();
+        $gurus = \App\Models\User::where('jabatan', 'guru')->get();
         $mapels = \App\Models\Mapel::all();
         $kelas = \App\Models\Kelas::all();
         $ruangans = \App\Models\Ruangan::all();
@@ -31,7 +31,7 @@ class JadwalAjarController extends Controller
     public function edit($id)
     {
         $data = JadwalAjar::findOrFail($id);
-        $gurus = \App\Models\Guru::where('jabatan', 'guru')->get();
+        $gurus = \App\Models\User::where('jabatan', 'guru')->get();
         $mapels = \App\Models\Mapel::all();
         $kelas = \App\Models\Kelas::all();
         $ruangans = \App\Models\Ruangan::all();

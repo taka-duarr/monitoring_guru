@@ -11,7 +11,7 @@
         </div>
         <div>
             <p class="text-sm text-slate-500 font-medium">Total Guru</p>
-            <h3 class="text-2xl font-bold text-slate-800">{{ \App\Models\Guru::count() }}</h3>
+            <h3 class="text-2xl font-bold text-slate-800">{{ \App\Models\User::where('jabatan', 'guru')->count() }}</h3>
         </div>
     </div>
     

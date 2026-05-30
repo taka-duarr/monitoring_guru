@@ -25,9 +25,9 @@
     <header class="bg-brand-600 px-5 py-4 shadow-md flex justify-between items-center z-10 sticky top-0 text-white">
         <div>
             <h1 class="font-heading font-bold text-xl tracking-tight">Portal Siswa</h1>
-            <p class="text-xs text-brand-100 opacity-90">{{ Auth::guard('siswa')->user()->name }} (Ketua Kelas)</p>
+            <p class="text-xs text-brand-100 opacity-90">{{ Auth::user()->name }} (Ketua Kelas)</p>
         </div>
-        <form action="{{ route('siswa.logout') }}" method="POST">
+        <form action="{{ route('logout') }}" method="POST">
             @csrf
             <button type="submit" class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white active:bg-white/30 transition-colors backdrop-blur-sm">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>

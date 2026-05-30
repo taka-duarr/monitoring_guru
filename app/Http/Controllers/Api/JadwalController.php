@@ -12,8 +12,6 @@ class JadwalController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
-        // Konversi hari ini ke format Bahasa Indonesia
-        // Carbon default menggunakan locale 'id' jika sudah diset di config, atau manual map.
         $hariInggris = Carbon::now()->format('l');
         $mapHari = [
             'Monday'    => 'Senin',
@@ -28,18 +26,34 @@ class JadwalController extends Controller
 
         $query = JadwalAjar::with(['guru', 'mapel', 'kelas', 'ruangan'])->where('hari', $hariIni);
 
-        if ($user instanceof \App\Models\Guru) {
+        // Filter berdasarkan jabatan (role)
+        $jabatan = $user->jabatan ?? 'guru';
+        if ($jabatan === 'guru' || $jabatan === 'admin') {
             $query->where('guru_id', $user->id);
-        } elseif ($user instanceof \App\Models\KetuaKelas) {
+        } elseif ($jabatan === 'ketuakelas') {
             $query->where('kelas_id', $user->kelas_id);
         }
 
         $jadwal = $query->orderBy('jam_mulai')->get();
 
+        $today = \Carbon\Carbon::today()->toDateString();
+        foreach ($jadwal as $j) {
+            $absen = \App\Models\AbsenMasuk::where('jadwal_ajar_id', $j->id)
+                        ->where('tanggal', $today)
+                        ->first();
+            
+            $j->absen_masuk = $absen;
+            $j->absen_keluar = null;
+            
+            if ($absen) {
+                $j->absen_keluar = \App\Models\AbsenKeluar::where('absen_masuk_id', $absen->id)->first();
+            }
+        }
+
         return response()->json([
             'success' => true,
-            'hari' => $hariIni,
-            'data' => $jadwal
+            'hari'    => $hariIni,
+            'data'    => $jadwal
         ]);
     }
 }

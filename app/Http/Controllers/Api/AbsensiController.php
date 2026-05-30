@@ -30,8 +30,8 @@ class AbsensiController extends Controller
 
         $user = $request->user();
         
-        // Cek apakah user yang login adalah Guru
-        if (!$user instanceof \App\Models\Guru) {
+        // Cek apakah user yang login adalah Guru (bukan ketua kelas)
+        if (!$user || !in_array($user->jabatan, ['guru', 'admin'])) {
             return response()->json([
                 'success' => false,
                 'message' => 'Hanya Guru yang dapat melakukan scan absensi.'

@@ -13,6 +13,6 @@ class Kelas extends Model
     protected $guarded = [];
 
     public function jurusan() { return $this->belongsTo(Jurusan::class, 'jurusan_id'); }
-    public function ketua() { return $this->belongsTo(KetuaKelas::class, 'ketua_id'); }
+    public function ketua() { return $this->belongsTo(User::class, 'ketua_id'); }
     public function statusKelas() { return $this->hasOne(StatusKelas::class, 'kelas_id'); }
 }

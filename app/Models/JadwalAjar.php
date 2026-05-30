@@ -12,7 +12,7 @@ class JadwalAjar extends Model
     
     protected $guarded = [];
 
-    public function guru() { return $this->belongsTo(Guru::class, 'guru_id'); }
+    public function guru() { return $this->belongsTo(User::class, 'guru_id'); }
     public function mapel() { return $this->belongsTo(Mapel::class, 'mapel_id'); }
     public function kelas() { return $this->belongsTo(Kelas::class, 'kelas_id'); }
     public function ruangan() { return $this->belongsTo(Ruangan::class, 'ruangan_id'); }

@@ -26,12 +26,14 @@ class AuthController extends Controller
                 return redirect()->intended('/admin/dashboard');
             } elseif ($role === 'guru') {
                 return redirect()->intended('/guru/dashboard');
+            } elseif ($role === 'ketuakelas') {
+                return redirect()->intended('/siswa/dashboard');
             }
             return redirect('/');
         }
 
         return back()->withErrors([
-            'nik' => 'Kredensial yang diberikan tidak cocok dengan catatan kami.',
+            'nik' => 'NIK atau password salah.',
         ])->onlyInput('nik');
     }
 
@@ -42,6 +44,6 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect('/login');
     }
 }

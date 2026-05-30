@@ -9,8 +9,8 @@ class SiswaPortalController extends Controller
 {
     public function dashboard()
     {
-        $ketua = Auth::guard('siswa')->user();
-        $kelas = $ketua->kelas;
+        $ketua = Auth::user();
+        $kelas = $ketua->kelas; // relasi dari model Guru
         
         $hariIni = \Carbon\Carbon::now()->locale('id')->isoFormat('dddd');
         

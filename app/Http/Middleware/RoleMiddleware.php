@@ -28,9 +28,10 @@ class RoleMiddleware
                 return redirect()->route('admin.dashboard');
             } elseif ($userRole === 'guru') {
                 return redirect()->route('guru.dashboard');
+            } elseif ($userRole === 'ketuakelas') {
+                return redirect()->route('siswa.dashboard');
             }
             
-            // Fallback (misal ketua kelas)
             return redirect('/');
         }
 

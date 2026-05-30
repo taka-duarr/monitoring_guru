@@ -42,10 +42,6 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
-        'siswa' => [
-            'driver' => 'session',
-            'provider' => 'ketua_kelas',
-        ],
     ],
 
     /*
@@ -68,11 +64,7 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL', User::class),
-        ],
-        'ketua_kelas' => [
-            'driver' => 'eloquent',
-            'model' => App\Models\KetuaKelas::class,
+            'model' => env('AUTH_MODEL', App\Models\User::class),
         ],
     ],
 
