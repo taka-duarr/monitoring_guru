@@ -15,4 +15,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/riwayat-mapel/{mapel_id}', [App\Http\Controllers\Api\JadwalController::class, 'riwayatMapel']);
     Route::get('/absen-murid/{absen_masuk_id}', [App\Http\Controllers\Api\AbsensiController::class, 'getAbsenMurid']);
     Route::post('/absen-murid/{absen_masuk_id}', [App\Http\Controllers\Api\AbsensiController::class, 'saveAbsenMurid']);
+    
+    // Rute API untuk Izin
+    Route::get('/izin', [App\Http\Controllers\Api\IzinController::class, 'index']);
+    Route::post('/izin', [App\Http\Controllers\Api\IzinController::class, 'store']);
 });

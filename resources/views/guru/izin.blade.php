@@ -9,7 +9,7 @@
     </div>
 
     <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
-        <form action="#" method="POST" class="space-y-5">
+        <form action="{{ route('guru.store_izin') }}" method="POST" enctype="multipart/form-data" class="space-y-5">
             @csrf
             
             <div>
@@ -42,17 +42,30 @@
 
             <div>
                 <label class="block text-sm font-semibold text-slate-700 mb-1.5">Bukti (Surat Dokter/Lampiran)</label>
-                <div class="border-2 border-dashed border-slate-300 rounded-xl p-6 flex flex-col items-center justify-center text-slate-500 hover:bg-slate-50 hover:border-brand-400 transition cursor-pointer">
+                <label class="border-2 border-dashed border-slate-300 rounded-xl p-6 flex flex-col items-center justify-center text-slate-500 hover:bg-slate-50 hover:border-brand-400 transition cursor-pointer">
                     <svg class="w-8 h-8 mb-2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                    <span class="text-sm font-medium">Upload File (Max: 2MB)</span>
-                    <input type="file" name="file" class="hidden">
-                </div>
+                    <span id="upload-text" class="text-sm font-medium">Upload File (Max: 2MB)</span>
+                    <input type="file" name="file" id="file" class="hidden" onchange="showFileName(this)">
+                </label>
             </div>
 
-            <button type="button" onclick="Swal.fire('Berhasil', 'Pengajuan izin terkirim! Menunggu persetujuan Admin.', 'success')" class="w-full bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white font-semibold py-3.5 rounded-xl shadow-lg shadow-brand-500/30 transition transform active:scale-[0.98]">
+            <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white font-semibold py-3.5 rounded-xl shadow-lg shadow-brand-500/30 transition transform active:scale-[0.98]">
                 Kirim Pengajuan
             </button>
         </form>
     </div>
 </div>
+
+<script>
+function showFileName(input) {
+    const textSpan = document.getElementById('upload-text');
+    if (input.files && input.files[0]) {
+        textSpan.textContent = "Terpilih: " + input.files[0].name;
+        textSpan.classList.add('text-brand-600');
+    } else {
+        textSpan.textContent = "Upload File (Max: 2MB)";
+        textSpan.classList.remove('text-brand-600');
+    }
+}
+</script>
 @endsection
