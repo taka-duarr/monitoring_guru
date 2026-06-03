@@ -27,10 +27,9 @@
                         }
                     }
                 }
-            }
-        }
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="{{ asset('css/forms.css') }}">
+    <script src="{{ asset('js/forms.js') }}"></script>
 </head>
 <body class="bg-slate-50 font-sans text-slate-800 antialiased h-screen flex flex-col pb-16">
 
@@ -50,39 +49,7 @@
 
     <!-- Main Content -->
     <main class="flex-1 overflow-y-auto relative">
-        @if(session('success'))
-            <script>
-                document.addEventListener('DOMContentLoaded', function () {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Berhasil!',
-                        text: '{!! session("success") !!}',
-                        toast: true,
-                        position: 'top-end',
-                        showConfirmButton: false,
-                        timer: 3000,
-                        timerProgressBar: true
-                    });
-                });
-            </script>
-        @endif
-        
-        @if(session('error'))
-            <script>
-                document.addEventListener('DOMContentLoaded', function () {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops...',
-                        text: '{!! session("error") !!}',
-                        toast: true,
-                        position: 'top-end',
-                        showConfirmButton: false,
-                        timer: 3000,
-                        timerProgressBar: true
-                    });
-                });
-            </script>
-        @endif
+        <x-toast />
 
         @yield('content')
     </main>

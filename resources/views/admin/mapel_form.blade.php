@@ -1,30 +1,81 @@
 @extends('layouts.admin')
-@section('title', (isset($data) ? 'Edit' : 'Tambah') . ' Mata Pelajaran')
-@section('page_title', (isset($data) ? 'Edit' : 'Tambah') . ' Mata Pelajaran')
+
+@section('title', (isset($data) ? 'Edit' : 'Tambah') . ' Mata Pelajaran - SIMGURU')
+
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/forms.css') }}">
+@endpush
 
 @section('content')
-<div class="max-w-2xl bg-white shadow-sm rounded-2xl overflow-hidden border border-slate-100 p-6">
-    <form action="{{ isset($data) ? route('mapel.update', $data->id) : route('mapel.store') }}" method="POST">
+<!-- Header Page Title -->
+<div class="d-flex align-center justify-between mb-4">
+    <div>
+        <h2 class="text-2xl font-bold tracking-tight text-primary-900">{{ isset($data) ? 'Edit' : 'Tambah' }} Mata Pelajaran</h2>
+        <p class="text-sm text-neutral-500">Silakan isi formulir mata pelajaran di bawah ini.</p>
+    </div>
+    <!-- Back Button -->
+    <a href="{{ route('mapel.index') }}" class="btn btn-secondary d-flex align-center gap-2" style="text-decoration: none;">
+        <i class="ti ti-arrow-left"></i> Kembali
+    </a>
+</div>
+
+<div class="card bg-white" style="padding: 28px; max-w-2xl; margin: 0 auto;">
+    <!-- Main Form -->
+    <form action="{{ isset($data) ? route('mapel.update', $data->id) : route('mapel.store') }}" method="POST"
+          x-data="{ loading: false }"
+          @submit="loading = true">
         @csrf
         @if(isset($data)) @method('PUT') @endif
-        
-        <div class="mb-4">
-            <label class="block text-sm font-medium text-slate-700 mb-1">Nama Mapel</label>
-            <input type="text" name="name" value="{{ old('name', $data->name ?? '') }}" class="w-full rounded-lg border-slate-300 border px-4 py-2 focus:ring-brand-500 focus:border-brand-500" required>
-        </div>
-        <div class="mb-4">
-            <label class="block text-sm font-medium text-slate-700 mb-1">Jurusan</label>
-            <select name="jurusan_id" class="w-full rounded-lg border-slate-300 border px-4 py-2 focus:ring-brand-500 focus:border-brand-500">
-                <option value="">-- Pilih Jurusan --</option>
-                @foreach($jurusans as $rel)
-                <option value="{{ $rel->id }}" @if(old('jurusan_id', $data->jurusan_id ?? '') == $rel->id) selected @endif>{{ $rel->name }}</option>
-                @endforeach
-            </select>
+
+        <!-- Nama Mapel -->
+        <div class="form-group">
+            <label for="name" class="form-label">
+                Nama Mata Pelajaran <span class="required-indicator">*</span>
+            </label>
+            <input type="text" id="name" name="name" 
+                   class="form-control @error('name') is-invalid @else @if(old('name')) is-valid @endif @enderror" 
+                   value="{{ old('name', $data->name ?? '') }}" placeholder="Contoh: Matematika Wajib, Fisika Peminatan..." required>
+            @error('name')
+                <span class="form-error">
+                    <i class="ti ti-alert-circle"></i>
+                    {{ $message }}
+                </span>
+            @enderror
         </div>
 
-        <div class="mt-6 flex gap-3">
-            <button type="submit" class="px-6 py-2.5 bg-brand-600 text-white font-semibold rounded-xl hover:bg-brand-700 transition shadow-sm">Simpan</button>
-            <a href="{{ route('mapel.index') }}" class="px-6 py-2.5 bg-slate-100 text-slate-700 font-semibold rounded-xl hover:bg-slate-200 transition">Batal</a>
+        <!-- Jurusan -->
+        <div class="form-group">
+            <label for="jurusan_id" class="form-label">
+                Jurusan Terkait <span class="form-helper">(Kosongkan jika Mata Pelajaran Umum)</span>
+            </label>
+            <select id="jurusan_id" name="jurusan_id" class="form-select @error('jurusan_id') is-invalid @enderror">
+                <option value="">-- Pelajaran Umum (Semua Jurusan) --</option>
+                @foreach($jurusans as $rel)
+                    <option value="{{ $rel->id }}" {{ old('jurusan_id', $data->jurusan_id ?? '') == $rel->id ? 'selected' : '' }}>
+                        {{ $rel->name }} ({{ $rel->kode_jurusan }})
+                    </option>
+                @endforeach
+            </select>
+            @error('jurusan_id')
+                <span class="form-error">
+                    <i class="ti ti-alert-circle"></i>
+                    {{ $message }}
+                </span>
+            @enderror
+        </div>
+
+        <!-- FORM ACTION BUTTONS -->
+        <div class="d-flex justify-end gap-3 mt-8 border-t border-neutral-200 pt-5">
+            <a href="{{ route('mapel.index') }}" class="btn btn-secondary d-flex align-center gap-2" :disabled="loading" style="text-decoration: none;">
+                Batal
+            </a>
+            
+            <button type="submit" class="btn btn-primary d-flex align-center gap-2" :disabled="loading">
+                <template x-if="loading">
+                    <span class="table-spinner" style="width: 14px; height: 14px; border-width: 2px; border-color: white; border-top-color: transparent;"></span>
+                </template>
+                <span x-text="loading ? 'Menyimpan...' : 'Simpan Data'"></span>
+            </button>
         </div>
     </form>
 </div>

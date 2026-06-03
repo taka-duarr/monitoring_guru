@@ -1,0 +1,251 @@
+/**
+ * Sistem Informasi Monitoring Guru (SIMGURU)
+ * dashboard.css - Custom Dashboard Layout & Component Styles
+ */
+
+/* Stat Cards Grid */
+.dashboard-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 24px;
+    margin-bottom: 28px;
+}
+
+/* Stat Card Style */
+.stat-card {
+    background-color: #ffffff;
+    border: 1px solid var(--color-neutral-200);
+    border-radius: var(--radius-lg);
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow var(--transition-base), transform var(--transition-base);
+}
+
+.stat-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+/* Icon Wrap with tint background */
+.stat-card-icon-wrapper {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.stat-card-info {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.stat-card-label {
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-neutral-500);
+    margin-bottom: 4px;
+}
+
+.stat-card-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--color-primary-900);
+    line-height: 1.1;
+    margin-bottom: 4px;
+}
+
+.stat-card-trend {
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Color Variations for Stat Cards */
+.stat-card-primary .stat-card-icon-wrapper {
+    background-color: var(--color-primary-50);
+    color: var(--color-primary-600);
+}
+.stat-card-primary .stat-card-trend {
+    color: var(--color-primary-500);
+}
+
+.stat-card-success .stat-card-icon-wrapper {
+    background-color: var(--color-success-50);
+    color: var(--color-success-600);
+}
+.stat-card-success .stat-card-trend {
+    color: var(--color-success-600);
+}
+
+.stat-card-danger .stat-card-icon-wrapper {
+    background-color: var(--color-danger-50);
+    color: var(--color-danger-600);
+}
+.stat-card-danger .stat-card-trend {
+    color: var(--color-danger-600);
+}
+
+.stat-card-warning .stat-card-icon-wrapper {
+    background-color: var(--color-warning-50);
+    color: var(--color-warning-600);
+}
+.stat-card-warning .stat-card-trend {
+    color: var(--color-warning-600);
+}
+
+/* 2-Column Responsive Dashboard Grid (60% + 40%) */
+.dashboard-grid-2col {
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    gap: 28px;
+    margin-bottom: 28px;
+}
+
+/* Chart Canvas Wrapper to enforce height limit */
+.chart-container {
+    position: relative;
+    height: 280px;
+    width: 100%;
+}
+
+/* Table Card Footer Link */
+.card-footer-link {
+    display: block;
+    text-align: center;
+    padding-top: 14px;
+    margin-top: 10px;
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--color-primary-500);
+    text-decoration: none;
+    border-top: 1px solid var(--color-neutral-100);
+    transition: color var(--transition-fast);
+}
+
+.card-footer-link:hover {
+    color: var(--color-primary-700);
+}
+
+/* Empty States for table and schedule lists */
+.empty-state-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 36px 20px;
+    text-align: center;
+}
+
+.empty-state-icon {
+    width: 56px;
+    height: 56px;
+    background-color: var(--color-success-50);
+    color: var(--color-success-600);
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    margin-bottom: 12px;
+}
+
+.empty-state-title {
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    color: var(--color-primary-900);
+    margin-bottom: 4px;
+}
+
+.empty-state-sub {
+    font-size: var(--font-size-sm);
+    color: var(--color-neutral-500);
+}
+
+/* Schedule List Style */
+.schedule-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.schedule-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    background-color: var(--color-neutral-50);
+    border: 1px solid var(--color-neutral-200);
+    font-size: var(--font-size-sm);
+    transition: background-color var(--transition-fast);
+}
+
+/* Empty Schedule Row Highlight */
+.schedule-item.schedule-empty {
+    background-color: var(--color-danger-50);
+    border-color: var(--color-danger-200);
+}
+
+.schedule-item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.schedule-item-time {
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    color: var(--color-neutral-500);
+}
+
+.schedule-item.schedule-empty .schedule-item-time {
+    color: var(--color-danger-700);
+}
+
+.schedule-item-title {
+    font-weight: 600;
+    color: var(--color-primary-900);
+}
+
+.schedule-item-meta {
+    font-size: var(--font-size-xs);
+    color: var(--color-neutral-500);
+}
+
+.schedule-item.schedule-empty .schedule-item-meta {
+    color: var(--color-danger-600);
+}
+
+.schedule-item-badge {
+    flex-shrink: 0;
+}
+
+/* Responsive Overrides */
+@media (max-width: 1280px) {
+    .dashboard-grid-2col {
+        gap: 20px;
+    }
+}
+
+@media (max-width: 1024px) {
+    .dashboard-grid-2col {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+}

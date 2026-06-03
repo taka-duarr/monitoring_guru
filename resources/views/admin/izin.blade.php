@@ -1,77 +1,121 @@
 @extends('layouts.admin')
-@section('title', 'Pengajuan Izin - Monitoring Guru')
-@section('page_title', 'Data Pengajuan Izin')
+
+@section('title', 'Perizinan Guru - SIMGURU')
+
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/table.css') }}">
+@endpush
 
 @section('content')
-<div class="bg-white shadow-sm rounded-2xl overflow-hidden border border-slate-100">
-    <div class="p-6 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+<div class="position-relative">
+    <!-- Header Page Title -->
+    <div class="d-flex align-center justify-between mb-4">
         <div>
-            <h3 class="text-lg font-bold text-slate-800">Daftar Pengajuan Izin</h3>
-            <p class="text-sm text-slate-500 mt-0.5">Total: <strong>{{ $data->total() }}</strong> data</p>
+            <h2 class="text-2xl font-bold tracking-tight text-primary-900">Perizinan Guru</h2>
+            <p class="text-sm text-neutral-500">Kelola dan pantau seluruh pengajuan izin tidak mengajar dari guru</p>
         </div>
-        <a href="{{ route('izin.create') }}" class="inline-flex items-center px-4 py-2 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 transition-colors shadow-sm">
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-            Tambah Data
+        <a href="{{ route('izin.create') }}" class="btn btn-primary d-flex align-center gap-2">
+            <i class="ti ti-plus"></i> Tambah Data
         </a>
     </div>
-    <div class="overflow-x-auto">
-        <table class="w-full">
-            <thead class="bg-slate-50 border-b border-slate-100">
-                <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">No</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Tanggal</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Guru</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Judul</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Bukti</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
-                    <th class="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Aksi</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100">
-                @forelse($data as $row)
-                <tr class="hover:bg-slate-50/70 transition-colors">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{{ $loop->iteration + ($data->firstItem() - 1) }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $row->tanggal_izin }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700 font-semibold">{{ $row->guru->name ?? '-' }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $row->judul }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">
-                        @if($row->file)
-                            <a href="{{ asset('storage/' . $row->file) }}" target="_blank" class="inline-flex items-center px-2.5 py-1.5 bg-slate-100 text-slate-800 rounded-lg text-xs font-semibold hover:bg-slate-200 transition-colors">
-                                <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                                Lihat File
-                            </a>
-                        @else
-                            -
-                        @endif
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">
-                        @if($row->approval)
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Disetujui</span>
-                        @else
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">Menunggu</span>
-                        @endif
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
-                        <a href="{{ route('izin.edit', $row->id) }}" class="text-blue-600 hover:text-blue-800 font-semibold">Edit</a>
-                        <form method="POST" action="{{ route('izin.destroy', $row->id) }}" class="inline" onsubmit="return confirm('Hapus data ini?')">
-                            @csrf @method('DELETE')
-                            <button type="submit" class="text-red-500 hover:text-red-700 font-semibold">Hapus</button>
-                        </form>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="100%" class="px-6 py-16 text-center text-slate-400">
-                        <svg class="w-14 h-14 mx-auto text-slate-200 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                        <p class="font-semibold text-slate-500">Belum ada data Pengajuan Izin</p>
-                    </td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
+    <!-- MAIN DATA TABLE SECTION -->
+    <div class="table-wrapper card p-0 overflow-hidden" x-data="{ tableLoading: false }">
+        <div class="table-loading-overlay" x-show="tableLoading" style="display: none;">
+            <div class="table-spinner"></div>
+        </div>
+
+        @if($data->isEmpty())
+            <div class="table-empty-state">
+                <div class="table-empty-icon">
+                    <i class="ti ti-mail-opened"></i>
+                </div>
+                <span class="table-empty-title">Tidak ada data perizinan</span>
+                <span class="table-empty-sub">Belum ada pengajuan izin mengajar yang tercatat.</span>
+                <div class="table-empty-actions">
+                    <a href="{{ route('izin.create') }}" class="btn btn-primary">Buat Pengajuan Izin</a>
+                </div>
+            </div>
+        @else
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th class="col-no">No</th>
+                        <th>Tanggal</th>
+                        <th>Jadwal Ajar</th>
+                        <th>Judul Izin</th>
+                        <th>Bukti Lampiran</th>
+                        <th class="col-center">Status</th>
+                        <th class="col-actions col-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($data as $row)
+                        <tr>
+                            <td class="col-no">
+                                {{ ($data->currentPage() - 1) * $data->perPage() + $loop->iteration }}
+                            </td>
+                            <td>
+                                {{ \Carbon\Carbon::parse($row->tanggal_izin)->translatedFormat('d M Y') }}
+                            </td>
+                            <td>
+                                <div class="font-medium text-neutral-800">{{ $row->jadwalAjar->mapel->name ?? '-' }}</div>
+                                <div class="text-xs text-neutral-500">Guru: {{ $row->guru->name ?? $row->jadwalAjar->guru->name ?? '-' }} (Kelas: {{ $row->jadwalAjar->kelas->name ?? '-' }})</div>
+                            </td>
+                            <td>
+                                <span class="font-semibold text-neutral-800">{{ $row->judul }}</span>
+                            </td>
+                            <td>
+                                @if($row->file)
+                                    <a href="{{ asset('storage/' . $row->file) }}" target="_blank" class="btn btn-secondary btn-sm d-inline-flex align-center gap-1.5 py-1 px-2.5" style="text-decoration: none; font-size: 12px;">
+                                        <i class="ti ti-file-text text-danger" style="font-size: 15px;"></i> Lihat File
+                                    </a>
+                                @else
+                                    <span class="text-neutral-400 text-xs">-</span>
+                                @endif
+                            </td>
+                            <td class="col-center">
+                                @if($row->approval)
+                                    <span class="badge badge-success">Disetujui</span>
+                                @else
+                                    <span class="badge badge-warning">Menunggu</span>
+                                @endif
+                            </td>
+                            <td class="col-actions col-center">
+                                <div class="action-buttons-group">
+                                    <!-- Edit Record -->
+                                    <x-tooltip text="Edit / Setujui">
+                                        <a href="{{ route('izin.edit', $row->id) }}" class="btn btn-ghost action-edit">
+                                            <i class="ti ti-pencil"></i>
+                                        </a>
+                                    </x-tooltip>
+                                    
+                                    <!-- Delete Button -->
+                                    <x-tooltip text="Hapus Data">
+                                        <button type="button" class="btn btn-ghost action-delete" 
+                                                @click="$dispatch('confirm-delete', {
+                                                    url: '{{ route('izin.destroy', $row->id) }}',
+                                                    name: 'Izin {{ addslashes($row->judul) }}'
+                                                })">
+                                            <i class="ti ti-trash"></i>
+                                        </button>
+                                    </x-tooltip>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @endif
     </div>
-    <div class="p-4 border-t border-slate-100">
-        {{ $data->links() }}
-    </div>
+
+    <!-- PAGINATION -->
+    @if(!$data->isEmpty())
+        <div class="mt-4">
+            {{ $data->links('vendor.pagination.custom') }}
+        </div>
+    @endif
+
+    <!-- Reusable Hapus Modal -->
+    <x-modal-hapus />
 </div>
 @endsection
