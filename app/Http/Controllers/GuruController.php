@@ -245,4 +245,102 @@ class GuruController extends Controller
         
         return redirect()->route('guru.index')->with('success', 'Data guru berhasil dihapus.');
     }
+
+    /**
+     * Process bulk import of teachers from CSV/Excel.
+     */
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv,txt|max:5120',
+        ]);
+
+        $import = new \App\Imports\GuruImport();
+
+        try {
+            \Maatwebsite\Excel\Facades\Excel::import($import, $request->file('file'));
+        } catch (\Exception $e) {
+            return redirect()->route('guru.index')->with('error', 'Terjadi kesalahan membaca berkas import: ' . $e->getMessage());
+        }
+
+        $errors = $import->getErrors();
+
+        if (count($errors) > 0) {
+            return redirect()->route('guru.index')->with('import_errors', $errors);
+        }
+
+        return redirect()->route('guru.index')->with('success', 'Data guru berhasil di-import massal.');
+    }
+
+    /**
+     * Download the CSV import template with sample data.
+     */
+    public function downloadTemplate()
+    {
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="template-import-guru.csv"',
+        ];
+
+        $callback = function () {
+            $file = fopen('php://output', 'w');
+            // Add BOM for Excel compatibility (UTF-8)
+            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
+
+            // Headers
+            fputcsv($file, [
+                'Nama Lengkap',
+                'NIP',
+                'Jenis Kelamin',
+                'Tempat Lahir',
+                'Tanggal Lahir',
+                'Nomor Telepon',
+                'Status Kepegawaian',
+                'Golongan Pangkat',
+                'TMT',
+                'Status',
+                'Mata Pelajaran',
+                'Kelas Pengampu',
+                'Jumlah Jam Mengajar'
+            ]);
+
+            // Sample Row 1
+            fputcsv($file, [
+                'Budi Hartono, S.Pd.',
+                '198505202010011001',
+                'Laki-laki',
+                'Surabaya',
+                '1985-05-20',
+                '081234567890',
+                'PNS',
+                'III/b',
+                '2010-01-01',
+                'Aktif',
+                'Matematika',
+                'X IPA 1, X IPA 2',
+                '24'
+            ]);
+
+            // Sample Row 2
+            fputcsv($file, [
+                'Siti Aminah, S.Pd.',
+                '199009122018022002',
+                'Perempuan',
+                'Sidoarjo',
+                '1990-09-12',
+                '089876543210',
+                'GTT',
+                '',
+                '2018-02-15',
+                'Aktif',
+                'Bahasa Indonesia',
+                'XI IPS 1',
+                '18'
+            ]);
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
 }

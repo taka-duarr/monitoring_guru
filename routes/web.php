@@ -30,6 +30,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     
     // CRUD Routes
     Route::get('guru/export', [App\Http\Controllers\GuruController::class, 'export'])->name('guru.export');
+    Route::get('guru/import/template', [App\Http\Controllers\GuruController::class, 'downloadTemplate'])->name('guru.import.template');
+    Route::post('guru/import', [App\Http\Controllers\GuruController::class, 'import'])->name('guru.import');
     Route::resource('guru', App\Http\Controllers\GuruController::class);
     Route::resource('users', UserController::class);
 
