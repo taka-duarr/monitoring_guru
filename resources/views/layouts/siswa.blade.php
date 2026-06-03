@@ -13,11 +13,9 @@
                 extend: {
                     fontFamily: { sans: ['Inter', 'sans-serif'], heading: ['Outfit', 'sans-serif'] },
                     colors: { brand: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' } }
-                }
-            }
-        }
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="{{ asset('css/forms.css') }}">
+    <script src="{{ asset('js/forms.js') }}"></script>
 </head>
 <body class="bg-slate-50 font-sans text-slate-800 antialiased h-screen flex flex-col">
 
@@ -37,6 +35,8 @@
 
     <!-- Main Content -->
     <main class="flex-1 overflow-y-auto relative p-5">
+        <x-toast />
+
         @yield('content')
     </main>
 

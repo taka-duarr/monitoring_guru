@@ -1,163 +1,199 @@
 @extends('layouts.admin')
-@section('title', 'Manajemen Murid - ' . $kelas->name)
-@section('page_title', 'Data Murid Kelas ' . $kelas->name)
+
+@section('title', 'Manajemen Murid - ' . $kelas->name . ' - SIMGURU')
+
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/table.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/forms.css') }}">
+@endpush
 
 @section('content')
-<div class="mb-6">
-    <a href="{{ route('kelas.index') }}" class="text-slate-500 hover:text-slate-700 flex items-center gap-2">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-        Kembali ke Daftar Kelas
-    </a>
-</div>
+<div x-data="{ 
+    showTambah: false, 
+    showEdit: false, 
+    editId: '', 
+    editNoAbsen: '', 
+    editNis: '', 
+    editName: '' 
+}" class="position-relative">
 
-<div class="bg-white shadow-sm rounded-2xl overflow-hidden border border-slate-100">
-    <div class="p-6 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+    <!-- Header Page Title -->
+    <div class="d-flex align-center justify-between mb-4">
         <div>
-            <h3 class="text-lg font-bold text-slate-800">Daftar Murid</h3>
-            <p class="text-sm text-slate-500 mt-0.5">Kelas: <strong>{{ $kelas->name }}</strong> (Total: {{ $murids->count() }} siswa)</p>
+            <h2 class="text-2xl font-bold tracking-tight text-primary-900">Siswa Kelas {{ $kelas->name }}</h2>
+            <p class="text-sm text-neutral-500">Total terdaftar: <strong>{{ $murids->count() }}</strong> siswa</p>
         </div>
-        <button type="button" onclick="document.getElementById('modalTambah').classList.remove('hidden')" class="inline-flex items-center px-4 py-2 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 transition-colors shadow-sm">
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-            Tambah Murid
-        </button>
+        <div class="d-flex align-center gap-2">
+            <a href="{{ route('kelas.index') }}" class="btn btn-secondary d-flex align-center gap-2" style="text-decoration: none;">
+                <i class="ti ti-arrow-left"></i> Kembali
+            </a>
+            <button type="button" class="btn btn-primary d-flex align-center gap-2" @click="showTambah = true">
+                <i class="ti ti-plus"></i> Tambah Murid
+            </button>
+        </div>
     </div>
-    
-    @if(session('success'))
-    <div class="bg-green-50 text-green-700 p-4 border-b border-green-100">
-        {{ session('success') }}
-    </div>
-    @endif
-    
-    @if($errors->any())
-    <div class="bg-red-50 text-red-700 p-4 border-b border-red-100">
-        <ul class="list-disc list-inside">
-            @foreach($errors->all() as $err)
-            <li>{{ $err }}</li>
-            @endforeach
-        </ul>
-    </div>
-    @endif
 
-    <div class="overflow-x-auto">
-        <table class="w-full">
-            <thead class="bg-slate-50 border-b border-slate-100">
-                <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">No Absen</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">NIS</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Nama Lengkap</th>
-                    <th class="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Aksi</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100">
-                @forelse($murids as $row)
-                <tr class="hover:bg-slate-50/70 transition-colors">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-800">{{ $row->no_absen ?? '-' }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-800">{{ $row->nis }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $row->name }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
-                        <button type="button" onclick="editMurid('{{ $row->id }}', '{{ $row->no_absen }}', '{{ $row->nis }}', '{{ addslashes($row->name) }}')" class="text-blue-600 hover:text-blue-800 font-semibold">Edit</button>
-                        <form method="POST" action="{{ route('kelas.murid.destroy', [$kelas->id, $row->id]) }}" class="inline" onsubmit="return confirm('Yakin ingin menghapus data siswa ini?')">
-                            @csrf @method('DELETE')
-                            <button type="submit" class="text-red-500 hover:text-red-700 font-semibold">Hapus</button>
-                        </form>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="4" class="px-6 py-16 text-center text-slate-400">
-                        <svg class="w-14 h-14 mx-auto text-slate-200 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                        <p class="font-semibold text-slate-500">Belum ada murid di kelas ini.</p>
-                    </td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-</div>
+    <!-- MAIN DATA TABLE SECTION -->
+    <div class="table-wrapper card p-0 overflow-hidden" x-data="{ tableLoading: false }">
+        <div class="table-loading-overlay" x-show="tableLoading" style="display: none;">
+            <div class="table-spinner"></div>
+        </div>
 
-<!-- Modal Tambah -->
-<div id="modalTambah" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <div class="fixed inset-0 bg-slate-900 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="document.getElementById('modalTambah').classList.add('hidden')"></div>
-        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-        <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
-            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 border-b border-slate-100">
-                <h3 class="text-lg leading-6 font-bold text-slate-900" id="modal-title">Tambah Murid Baru</h3>
+        @if($murids->isEmpty())
+            <div class="table-empty-state">
+                <div class="table-empty-icon">
+                    <i class="ti ti-users text-primary"></i>
+                </div>
+                <span class="table-empty-title">Belum ada data murid</span>
+                <span class="table-empty-sub">Silakan tambahkan siswa baru ke dalam kelas ini.</span>
+                <div class="table-empty-actions">
+                    <button type="button" class="btn btn-primary" @click="showTambah = true">Tambah Murid Baru</button>
+                </div>
             </div>
-            <form action="{{ route('kelas.murid.store', $kelas->id) }}" method="POST">
+        @else
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th class="col-no">No Absen</th>
+                        <th>NIS</th>
+                        <th>Nama Lengkap</th>
+                        <th class="col-actions col-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($murids as $row)
+                        <tr>
+                            <td class="col-no font-semibold">
+                                {{ $row->no_absen ?? '-' }}
+                            </td>
+                            <td>
+                                <span class="font-mono text-xs">{{ $row->nis }}</span>
+                            </td>
+                            <td>
+                                <span class="font-bold text-neutral-800">{{ $row->name }}</span>
+                            </td>
+                            <td class="col-actions col-center">
+                                <div class="action-buttons-group">
+                                    <!-- Edit Record -->
+                                    <x-tooltip text="Edit Data">
+                                        <button type="button" class="btn btn-ghost action-edit"
+                                                @click="showEdit = true; 
+                                                        editId = '{{ $row->id }}'; 
+                                                        editNoAbsen = '{{ $row->no_absen }}'; 
+                                                        editNis = '{{ $row->nis }}'; 
+                                                        editName = '{{ addslashes($row->name) }}'">
+                                            <i class="ti ti-pencil"></i>
+                                        </button>
+                                    </x-tooltip>
+                                    
+                                    <!-- Delete Button -->
+                                    <x-tooltip text="Hapus Data">
+                                        <button type="button" class="btn btn-ghost action-delete" 
+                                                @click="$dispatch('confirm-delete', {
+                                                    url: '{{ route('kelas.murid.destroy', [$kelas->id, $row->id]) }}',
+                                                    name: 'Siswa {{ addslashes($row->name) }}'
+                                                })">
+                                            <i class="ti ti-trash"></i>
+                                        </button>
+                                    </x-tooltip>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @endif
+    </div>
+
+    <!-- Reusable Hapus Modal -->
+    <x-modal-hapus />
+
+    <!-- MODAL TAMBAH INLINE -->
+    <div class="modal-backdrop-blur" x-show="showTambah" x-transition style="display: none; position: fixed; inset: 0; z-index: 100; background-color: rgba(15, 23, 42, 0.6); align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+        <div class="card shadow-lg" style="width: 100%; max-width: 500px; padding: 0; overflow: hidden; border-radius: var(--radius-lg);" @click.away="showTambah = false">
+            <div class="card-header d-flex align-center justify-between" style="background-color: var(--color-primary-900); color: white; padding: 16px 24px;">
+                <h3 class="card-title text-white" style="margin: 0; font-size: 16px; font-weight: 700;">Tambah Murid Baru</h3>
+                <button type="button" class="btn btn-ghost text-white p-1" style="min-width: unset; height: unset; color: white !important;" @click="showTambah = false">
+                    <i class="ti ti-x" style="font-size: 20px;"></i>
+                </button>
+            </div>
+            <form action="{{ route('kelas.murid.store', $kelas->id) }}" method="POST" x-data="{ loading: false }" @submit="loading = true">
                 @csrf
-                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-slate-700 mb-1">No Absen</label>
-                        <input type="number" name="no_absen" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none transition-all">
+                <div style="padding: 24px;">
+                    <!-- No Absen -->
+                    <div class="form-group">
+                        <label for="no_absen" class="form-label">No. Absen</label>
+                        <input type="number" id="no_absen" name="no_absen" class="form-control" placeholder="Contoh: 1, 2, 15...">
                     </div>
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-slate-700 mb-1">NIS (Nomor Induk Siswa)</label>
-                        <input type="text" name="nis" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none transition-all">
+
+                    <!-- NIS -->
+                    <div class="form-group">
+                        <label for="nis" class="form-label">NIS (Nomor Induk Siswa) <span class="required-indicator">*</span></label>
+                        <input type="text" id="nis" name="nis" class="form-control" placeholder="Masukkan NIS siswa..." required>
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Nama Lengkap</label>
-                        <input type="text" name="name" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none transition-all">
+
+                    <!-- Nama Lengkap -->
+                    <div class="form-group mb-0">
+                        <label for="name" class="form-label">Nama Lengkap <span class="required-indicator">*</span></label>
+                        <input type="text" id="name" name="name" class="form-control" placeholder="Masukkan nama lengkap siswa..." required>
                     </div>
                 </div>
-                <div class="bg-slate-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse rounded-b-2xl">
-                    <button type="submit" class="w-full inline-flex justify-center rounded-xl border border-transparent shadow-sm px-4 py-2 bg-brand-600 text-base font-medium text-white hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 sm:ml-3 sm:w-auto sm:text-sm transition-colors">
-                        Simpan Data
-                    </button>
-                    <button type="button" onclick="document.getElementById('modalTambah').classList.add('hidden')" class="mt-3 w-full inline-flex justify-center rounded-xl border border-slate-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm transition-colors">
-                        Batal
+                <div class="d-flex justify-end gap-3" style="background-color: var(--color-neutral-50); padding: 16px 24px; border-top: 1px solid var(--color-neutral-200);">
+                    <button type="button" class="btn btn-secondary" @click="showTambah = false" :disabled="loading">Batal</button>
+                    <button type="submit" class="btn btn-primary d-flex align-center gap-2" :disabled="loading">
+                        <template x-if="loading">
+                            <span class="table-spinner" style="width: 14px; height: 14px; border-width: 2px; border-color: white; border-top-color: transparent;"></span>
+                        </template>
+                        <span x-text="loading ? 'Menyimpan...' : 'Simpan Data'"></span>
                     </button>
                 </div>
             </form>
         </div>
     </div>
-</div>
 
-<!-- Modal Edit -->
-<div id="modalEdit" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <div class="fixed inset-0 bg-slate-900 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="document.getElementById('modalEdit').classList.add('hidden')"></div>
-        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-        <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
-            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 border-b border-slate-100">
-                <h3 class="text-lg leading-6 font-bold text-slate-900" id="modal-title">Edit Data Murid</h3>
+    <!-- MODAL EDIT INLINE -->
+    <div class="modal-backdrop-blur" x-show="showEdit" x-transition style="display: none; position: fixed; inset: 0; z-index: 100; background-color: rgba(15, 23, 42, 0.6); align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+        <div class="card shadow-lg" style="width: 100%; max-width: 500px; padding: 0; overflow: hidden; border-radius: var(--radius-lg);" @click.away="showEdit = false">
+            <div class="card-header d-flex align-center justify-between" style="background-color: var(--color-primary-900); color: white; padding: 16px 24px;">
+                <h3 class="card-title text-white" style="margin: 0; font-size: 16px; font-weight: 700;">Edit Data Murid</h3>
+                <button type="button" class="btn btn-ghost text-white p-1" style="min-width: unset; height: unset; color: white !important;" @click="showEdit = false">
+                    <i class="ti ti-x" style="font-size: 20px;"></i>
+                </button>
             </div>
-            <form id="formEdit" method="POST">
-                @csrf @method('PUT')
-                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-slate-700 mb-1">No Absen</label>
-                        <input type="number" name="no_absen" id="edit_no_absen" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none transition-all">
+            <form :action="'/admin/kelas/{{ $kelas->id }}/murid/' + editId" method="POST" x-data="{ loading: false }" @submit="loading = true">
+                @csrf
+                @method('PUT')
+                <div style="padding: 24px;">
+                    <!-- No Absen -->
+                    <div class="form-group">
+                        <label for="edit_no_absen" class="form-label">No. Absen</label>
+                        <input type="number" id="edit_no_absen" name="no_absen" class="form-control" x-model="editNoAbsen">
                     </div>
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-slate-700 mb-1">NIS (Nomor Induk Siswa)</label>
-                        <input type="text" name="nis" id="edit_nis" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none transition-all">
+
+                    <!-- NIS -->
+                    <div class="form-group">
+                        <label for="edit_nis" class="form-label">NIS (Nomor Induk Siswa) <span class="required-indicator">*</span></label>
+                        <input type="text" id="edit_nis" name="nis" class="form-control" x-model="editNis" required>
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Nama Lengkap</label>
-                        <input type="text" name="name" id="edit_name" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none transition-all">
+
+                    <!-- Nama Lengkap -->
+                    <div class="form-group mb-0">
+                        <label for="edit_name" class="form-label">Nama Lengkap <span class="required-indicator">*</span></label>
+                        <input type="text" id="edit_name" name="name" class="form-control" x-model="editName" required>
                     </div>
                 </div>
-                <div class="bg-slate-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse rounded-b-2xl">
-                    <button type="submit" class="w-full inline-flex justify-center rounded-xl border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm transition-colors">
-                        Update Data
-                    </button>
-                    <button type="button" onclick="document.getElementById('modalEdit').classList.add('hidden')" class="mt-3 w-full inline-flex justify-center rounded-xl border border-slate-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm transition-colors">
-                        Batal
+                <div class="d-flex justify-end gap-3" style="background-color: var(--color-neutral-50); padding: 16px 24px; border-top: 1px solid var(--color-neutral-200);">
+                    <button type="button" class="btn btn-secondary" @click="showEdit = false" :disabled="loading">Batal</button>
+                    <button type="submit" class="btn btn-primary d-flex align-center gap-2" :disabled="loading">
+                        <template x-if="loading">
+                            <span class="table-spinner" style="width: 14px; height: 14px; border-width: 2px; border-color: white; border-top-color: transparent;"></span>
+                        </template>
+                        <span x-text="loading ? 'Menyimpan...' : 'Simpan Data'"></span>
                     </button>
                 </div>
             </form>
         </div>
     </div>
-</div>
 
-<script>
-    function editMurid(id, no_absen, nis, name) {
-        document.getElementById('edit_no_absen').value = no_absen;
-        document.getElementById('edit_nis').value = nis;
-        document.getElementById('edit_name').value = name;
-        document.getElementById('formEdit').action = "/admin/kelas/{{ $kelas->id }}/murid/" + id;
-        document.getElementById('modalEdit').classList.remove('hidden');
-    }
-</script>
+</div>
 @endsection

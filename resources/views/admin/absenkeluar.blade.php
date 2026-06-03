@@ -1,64 +1,115 @@
 @extends('layouts.admin')
-@section('title', 'Rekap Absen Keluar - Monitoring Guru')
-@section('page_title', 'Data Rekap Absen Keluar')
+
+@section('title', 'Rekap Kehadiran Keluar - SIMGURU')
+
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/table.css') }}">
+@endpush
 
 @section('content')
-<div class="bg-white shadow-sm rounded-2xl overflow-hidden border border-slate-100">
-    <div class="p-6 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+<div class="position-relative">
+    <!-- Header Page Title -->
+    <div class="d-flex align-center justify-between mb-4">
         <div>
-            <h3 class="text-lg font-bold text-slate-800">Daftar Rekap Absen Keluar</h3>
-            <p class="text-sm text-slate-500 mt-0.5">Total: <strong>{{ $data->total() }}</strong> data</p>
+            <h2 class="text-2xl font-bold tracking-tight text-primary-900">Kehadiran Keluar</h2>
+            <p class="text-sm text-neutral-500">Daftar rekap absensi pulang / keluar guru pengampu kelas</p>
         </div>
-        <a href="{{ route('absenkeluar.create') }}" class="inline-flex items-center px-4 py-2 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 transition-colors shadow-sm">
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-            Tambah Data
+        <a href="{{ route('absenkeluar.create') }}" class="btn btn-primary d-flex align-center gap-2">
+            <i class="ti ti-plus"></i> Tambah Data
         </a>
     </div>
-    <div class="overflow-x-auto">
-        <table class="w-full">
-            <thead class="bg-slate-50 border-b border-slate-100">
-                <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Tgl Masuk</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Jam Keluar</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Guru</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Kelas</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Mapel</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
-                    <th class="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Aksi</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100">
-                @forelse($data as $row)
-                <tr class="hover:bg-slate-50/70 transition-colors">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $row->absenMasuk->tanggal ?? '-' }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700 font-bold text-rose-600">{{ $row->jam_keluar }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $row->absenMasuk->guru->name ?? '-' }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $row->absenMasuk->kelas->name ?? '-' }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $row->absenMasuk->jadwalAjar->mapel->name ?? '-' }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">
-                        <span class="inline-block px-2.5 py-1 bg-brand-50 text-brand-700 text-[10px] font-bold uppercase tracking-wider rounded-md">{{ $row->status }}</span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
-                        <a href="{{ route('absenkeluar.edit', $row->id) }}" class="text-blue-600 hover:text-blue-800 font-semibold">Edit</a>
-                        <form method="POST" action="{{ route('absenkeluar.destroy', $row->id) }}" class="inline" onsubmit="return confirm('Hapus data ini?')">
-                            @csrf @method('DELETE')
-                            <button type="submit" class="text-red-500 hover:text-red-700 font-semibold">Hapus</button>
-                        </form>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="100%" class="px-6 py-16 text-center text-slate-400">
-                        <svg class="w-14 h-14 mx-auto text-slate-200 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                        <p class="font-semibold text-slate-500">Belum ada data Rekap Absen Keluar</p>
-                    </td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
+
+    <!-- MAIN DATA TABLE SECTION -->
+    <div class="table-wrapper card p-0 overflow-hidden" x-data="{ tableLoading: false }">
+        <div class="table-loading-overlay" x-show="tableLoading" style="display: none;">
+            <div class="table-spinner"></div>
+        </div>
+
+        @if($data->isEmpty())
+            <div class="table-empty-state">
+                <div class="table-empty-icon">
+                    <i class="ti ti-calendar-event"></i>
+                </div>
+                <span class="table-empty-title">Tidak ada data kehadiran keluar</span>
+                <span class="table-empty-sub">Belum ada log kehadiran keluar yang tercatat.</span>
+                <div class="table-empty-actions">
+                    <a href="{{ route('absenkeluar.create') }}" class="btn btn-primary">Tambah Log Keluar</a>
+                </div>
+            </div>
+        @else
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th class="col-no">No</th>
+                        <th>Tgl Masuk</th>
+                        <th>Jam Keluar</th>
+                        <th>Guru</th>
+                        <th>Kelas</th>
+                        <th>Mapel</th>
+                        <th class="col-center">Status</th>
+                        <th class="col-actions col-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($data as $row)
+                        <tr>
+                            <td class="col-no">
+                                {{ ($data->currentPage() - 1) * $data->perPage() + $loop->iteration }}
+                            </td>
+                            <td>
+                                {{ $row->absenMasuk->tanggal ?? '-' }}
+                            </td>
+                            <td class="font-bold text-danger-500">
+                                {{ $row->jam_keluar }}
+                            </td>
+                            <td>
+                                <span class="font-semibold text-neutral-800">{{ $row->absenMasuk->guru->name ?? '-' }}</span>
+                            </td>
+                            <td>
+                                {{ $row->absenMasuk->kelas->name ?? '-' }}
+                            </td>
+                            <td>
+                                {{ $row->absenMasuk->jadwalAjar->mapel->name ?? '-' }}
+                            </td>
+                            <td class="col-center">
+                                <span class="badge badge-success">{{ $row->status }}</span>
+                            </td>
+                            <td class="col-actions col-center">
+                                <div class="action-buttons-group">
+                                    <!-- Edit Record -->
+                                    <x-tooltip text="Edit Data">
+                                        <a href="{{ route('absenkeluar.edit', $row->id) }}" class="btn btn-ghost action-edit">
+                                            <i class="ti ti-pencil"></i>
+                                        </a>
+                                    </x-tooltip>
+                                    
+                                    <!-- Delete Button -->
+                                    <x-tooltip text="Hapus Data">
+                                        <button type="button" class="btn btn-ghost action-delete" 
+                                                @click="$dispatch('confirm-delete', {
+                                                    url: '{{ route('absenkeluar.destroy', $row->id) }}',
+                                                    name: 'Keluar {{ addslashes($row->absenMasuk->guru->name ?? 'Guru') }}'
+                                                })">
+                                            <i class="ti ti-trash"></i>
+                                        </button>
+                                    </x-tooltip>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @endif
     </div>
-    <div class="p-4 border-t border-slate-100">
-        {{ $data->links() }}
-    </div>
+
+    <!-- PAGINATION -->
+    @if(!$data->isEmpty())
+        <div class="mt-4">
+            {{ $data->links('vendor.pagination.custom') }}
+        </div>
+    @endif
+
+    <!-- Reusable Hapus Modal -->
+    <x-modal-hapus />
 </div>
 @endsection

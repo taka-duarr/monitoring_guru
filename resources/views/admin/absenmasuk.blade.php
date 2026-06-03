@@ -1,76 +1,119 @@
 @extends('layouts.admin')
-@section('title', 'Rekap Absensi - Monitoring Guru')
-@section('page_title', 'Data Rekap Absensi')
+
+@section('title', 'Rekap Kehadiran Masuk - SIMGURU')
+
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/table.css') }}">
+@endpush
 
 @section('content')
-<div class="bg-white shadow-sm rounded-2xl overflow-hidden border border-slate-100">
-    <div class="p-6 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+<div class="position-relative">
+    <!-- Header Page Title -->
+    <div class="d-flex align-center justify-between mb-4">
         <div>
-            <h3 class="text-lg font-bold text-slate-800">Daftar Rekap Absensi</h3>
-            <p class="text-sm text-slate-500 mt-0.5">Total: <strong>{{ $data->total() }}</strong> data</p>
+            <h2 class="text-2xl font-bold tracking-tight text-primary-900">Kehadiran Masuk</h2>
+            <p class="text-sm text-neutral-500">Pantau dan kelola seluruh log kehadiran masuk guru pengampu kelas</p>
         </div>
-        <a href="{{ route('absenmasuk.create') }}" class="hidden items-center px-4 py-2 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 transition-colors shadow-sm">
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-            Tambah Data
-        </a>
     </div>
-    <div class="overflow-x-auto">
-        <table class="w-full">
-            <thead class="bg-slate-50 border-b border-slate-100">
-                <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">No</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Tanggal</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Guru</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Kelas / Mapel</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Jam Masuk</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Jam Keluar</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
-                    <th class="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Aksi</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100">
-                @forelse($data as $row)
-                <tr class="hover:bg-slate-50/70 transition-colors">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{{ $loop->iteration + ($data->firstItem() - 1) }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ \Carbon\Carbon::parse($row->tanggal)->translatedFormat('d M Y') }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-800 font-bold">{{ $row->guru->name ?? '-' }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">
-                        <div class="font-medium text-slate-800">{{ $row->kelas->name ?? '-' }}</div>
-                        <div class="text-xs text-slate-500">{{ $row->jadwalAjar->mapel->name ?? '-' }}</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700 font-bold text-emerald-600">{{ $row->jam_masuk }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700 font-bold {{ $row->absenKeluar ? 'text-rose-600' : 'text-slate-300' }}">
-                        {{ $row->absenKeluar->jam_keluar ?? '--:--:--' }}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">
-                        @if($row->absenKeluar)
-                        <span class="inline-block px-2.5 py-1 bg-emerald-50 text-emerald-700 text-[10px] font-bold uppercase tracking-wider rounded-md">Selesai</span>
-                        @else
-                        <span class="inline-block px-2.5 py-1 bg-amber-50 text-amber-700 text-[10px] font-bold uppercase tracking-wider rounded-md">Belum Keluar</span>
-                        @endif
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
-                        <a href="{{ route('absenmasuk.murid', $row->id) }}" class="text-teal-600 hover:text-teal-800 font-semibold">Lihat Murid</a>
-                        <a href="{{ route('absenmasuk.edit', $row->id) }}" class="text-blue-600 hover:text-blue-800 font-semibold">Edit</a>
-                        <form method="POST" action="{{ route('absenmasuk.destroy', $row->id) }}" class="inline" onsubmit="return confirm('Hapus data ini?')">
-                            @csrf @method('DELETE')
-                            <button type="submit" class="text-red-500 hover:text-red-700 font-semibold">Hapus</button>
-                        </form>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="100%" class="px-6 py-16 text-center text-slate-400">
-                        <svg class="w-14 h-14 mx-auto text-slate-200 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                        <p class="font-semibold text-slate-500">Belum ada data Absen Masuk</p>
-                    </td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
+
+    <!-- MAIN DATA TABLE SECTION -->
+    <div class="table-wrapper card p-0 overflow-hidden" x-data="{ tableLoading: false }">
+        <div class="table-loading-overlay" x-show="tableLoading" style="display: none;">
+            <div class="table-spinner"></div>
+        </div>
+
+        @if($data->isEmpty())
+            <div class="table-empty-state">
+                <div class="table-empty-icon">
+                    <i class="ti ti-calendar-event"></i>
+                </div>
+                <span class="table-empty-title">Tidak ada data kehadiran masuk</span>
+                <span class="table-empty-sub">Belum ada log kehadiran masuk guru yang tercatat.</span>
+            </div>
+        @else
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th class="col-no">No</th>
+                        <th>Tanggal</th>
+                        <th>Guru</th>
+                        <th>Kelas / Mapel</th>
+                        <th>Jam Masuk</th>
+                        <th>Jam Keluar</th>
+                        <th class="col-center">Status</th>
+                        <th class="col-actions col-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($data as $row)
+                        <tr>
+                            <td class="col-no">
+                                {{ ($data->currentPage() - 1) * $data->perPage() + $loop->iteration }}
+                            </td>
+                            <td>
+                                {{ \Carbon\Carbon::parse($row->tanggal)->translatedFormat('d M Y') }}
+                            </td>
+                            <td>
+                                <span class="font-semibold text-neutral-800">{{ $row->guru->name ?? '-' }}</span>
+                            </td>
+                            <td>
+                                <div class="font-medium text-neutral-800">{{ $row->kelas->name ?? '-' }}</div>
+                                <div class="text-xs text-neutral-500">{{ $row->jadwalAjar->mapel->name ?? '-' }}</div>
+                            </td>
+                            <td class="font-bold text-success-600">{{ $row->jam_masuk }}</td>
+                            <td class="font-bold {{ $row->absenKeluar ? 'text-danger-500' : 'text-neutral-300' }}">
+                                {{ $row->absenKeluar->jam_keluar ?? '--:--:--' }}
+                            </td>
+                            <td class="col-center">
+                                @if($row->absenKeluar)
+                                    <span class="badge badge-success">Selesai</span>
+                                @else
+                                    <span class="badge badge-warning">Belum Keluar</span>
+                                @endif
+                            </td>
+                            <td class="col-actions col-center">
+                                <div class="action-buttons-group">
+                                    <!-- Lihat Murid -->
+                                    <x-tooltip text="Lihat Murid">
+                                        <a href="{{ route('absenmasuk.murid', $row->id) }}" class="btn btn-ghost action-view">
+                                            <i class="ti ti-users"></i>
+                                        </a>
+                                    </x-tooltip>
+                                    
+                                    <!-- Edit Record -->
+                                    <x-tooltip text="Edit Data">
+                                        <a href="{{ route('absenmasuk.edit', $row->id) }}" class="btn btn-ghost action-edit">
+                                            <i class="ti ti-pencil"></i>
+                                        </a>
+                                    </x-tooltip>
+                                    
+                                    <!-- Delete Button -->
+                                    <x-tooltip text="Hapus Data">
+                                        <button type="button" class="btn btn-ghost action-delete" 
+                                                @click="$dispatch('confirm-delete', {
+                                                    url: '{{ route('absenmasuk.destroy', $row->id) }}',
+                                                    name: 'Kehadiran {{ addslashes($row->guru->name ?? 'Guru') }}'
+                                                })">
+                                            <i class="ti ti-trash"></i>
+                                        </button>
+                                    </x-tooltip>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @endif
     </div>
-    <div class="p-4 border-t border-slate-100">
-        {{ $data->links() }}
-    </div>
+
+    <!-- PAGINATION -->
+    @if(!$data->isEmpty())
+        <div class="mt-4">
+            {{ $data->links('vendor.pagination.custom') }}
+        </div>
+    @endif
+
+    <!-- Reusable Hapus Modal -->
+    <x-modal-hapus />
 </div>
 @endsection

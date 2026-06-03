@@ -1,49 +1,215 @@
 @extends('layouts.admin')
-@section('title', 'Dashboard - Monitoring Guru')
-@section('page_title', 'Beranda Dashboard')
+
+@section('title', 'Dashboard - SIMGURU')
+
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
+@endpush
 
 @section('content')
-<!-- Stats -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center">
-        <div class="w-14 h-14 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mr-4">
-            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-        </div>
-        <div>
-            <p class="text-sm text-slate-500 font-medium">Total Guru</p>
-            <h3 class="text-2xl font-bold text-slate-800">{{ \App\Models\User::where('jabatan', 'guru')->count() }}</h3>
-        </div>
+<div class="dashboard-wrapper">
+    <!-- Header Page Title (Scannable Summary) -->
+    <div class="mb-4">
+        <h2 class="text-2xl font-bold tracking-tight text-primary-900">Ringkasan Pemantauan Hari Ini</h2>
+        <p class="text-sm text-neutral-500">Informasi kehadiran guru dan status kelas tanggal {{ date('d F Y') }}</p>
     </div>
-    
-    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center">
-        <div class="w-14 h-14 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center mr-4">
-            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+
+    <!-- ROW 1: STAT CARDS -->
+    <div class="dashboard-stats-grid">
+        <!-- Card 1: Total Guru -->
+        <div class="stat-card stat-card-primary">
+            <div class="stat-card-icon-wrapper">
+                <i class="ti ti-users"></i>
+            </div>
+            <div class="stat-card-info">
+                <span class="stat-card-label">Total Guru</span>
+                <span class="stat-card-value">{{ $stats['total_guru'] }}</span>
+                <span class="stat-card-trend">
+                    <i class="ti ti-arrow-up-right"></i> {{ $stats['active_guru_change'] }} aktif
+                </span>
+            </div>
         </div>
-        <div>
-            <p class="text-sm text-slate-500 font-medium">Total Kelas</p>
-            <h3 class="text-2xl font-bold text-slate-800">{{ \App\Models\Kelas::count() }}</h3>
+
+        <!-- Card 2: Guru Hadir -->
+        <div class="stat-card stat-card-success">
+            <div class="stat-card-icon-wrapper">
+                <i class="ti ti-user-check"></i>
+            </div>
+            <div class="stat-card-info">
+                <span class="stat-card-label">Hadir</span>
+                <span class="stat-card-value">{{ $stats['hadir'] }}</span>
+                <span class="stat-card-trend">
+                    <i class="ti ti-plus"></i>{{ $stats['change_hadir'] }} vs kemarin
+                </span>
+            </div>
+        </div>
+
+        <!-- Card 3: Tidak Hadir -->
+        <div class="stat-card stat-card-danger">
+            <div class="stat-card-icon-wrapper">
+                <i class="ti ti-user-x"></i>
+            </div>
+            <div class="stat-card-info">
+                <span class="stat-card-label">Tidak Hadir</span>
+                <span class="stat-card-value">{{ $stats['tidak_hadir'] }}</span>
+                <span class="stat-card-trend">
+                    {{ $stats['change_tidak_hadir'] }} vs kemarin
+                </span>
+            </div>
+        </div>
+
+        <!-- Card 4: Persentase Kehadiran -->
+        <div class="stat-card stat-card-warning">
+            <div class="stat-card-icon-wrapper">
+                <i class="ti ti-chart-pie"></i>
+            </div>
+            <div class="stat-card-info">
+                <span class="stat-card-label">% Kehadiran</span>
+                <span class="stat-card-value">{{ number_format($stats['persen_hadir'], 1, ',', '.') }}%</span>
+                <span class="stat-card-trend">
+                    <i class="ti ti-trending-up"></i> ▲ 2,1% vs kemarin
+                </span>
+            </div>
         </div>
     </div>
 
-    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center">
-        <div class="w-14 h-14 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mr-4">
-            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+    <!-- ROW 2: CHARTS -->
+    <div class="dashboard-grid-2col">
+        <!-- Bar Chart Card (60%) -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Tren Kehadiran 7 Hari Terakhir</h3>
+                <span class="text-xs text-muted">Statistik harian</span>
+            </div>
+            <div class="chart-container">
+                <canvas id="attendanceBarChart"></canvas>
+            </div>
         </div>
-        <div>
-            <p class="text-sm text-slate-500 font-medium">Total Jadwal Ajar</p>
-            <h3 class="text-2xl font-bold text-slate-800">{{ \App\Models\JadwalAjar::count() }}</h3>
+
+        <!-- Donut Chart Card (40%) -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Distribusi Status Hari Ini</h3>
+                <span class="text-xs text-muted">Persentase status</span>
+            </div>
+            <div class="chart-container">
+                <canvas id="distributionDonutChart"></canvas>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- Welcome Banner -->
-<div class="bg-gradient-to-r from-brand-600 to-brand-800 rounded-3xl p-8 text-white shadow-lg relative overflow-hidden mb-8">
-    <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full mix-blend-overlay filter blur-xl transform translate-x-1/2 -translate-y-1/2"></div>
-    <div class="relative z-10">
-        <h2 class="text-3xl font-heading font-bold mb-2">Selamat datang kembali, {{ Auth::user()->name }}! 👋</h2>
-        <p class="text-brand-100 text-lg max-w-2xl">
-            By TAKA Dev 
-        </p>
+    <!-- ROW 3: TABEL KETIDAKHADIRAN & JADWAL KELAS KOSONG -->
+    <div class="dashboard-grid-2col">
+        <!-- Table Card (60%) -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Daftar Guru Tidak Hadir Hari Ini</h3>
+                <span class="badge badge-neutral">{{ $tidak_hadir_hari_ini->count() }} orang</span>
+            </div>
+
+            @if($tidak_hadir_hari_ini->isEmpty())
+                <div class="empty-state-wrapper">
+                    <div class="empty-state-icon">
+                        <i class="ti ti-circle-check"></i>
+                    </div>
+                    <span class="empty-state-title">Semua guru hadir hari ini!</span>
+                    <span class="empty-state-sub">Tidak ada ketidakhadiran yang dilaporkan.</span>
+                </div>
+            @else
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Nama Guru</th>
+                                <th>Mata Pelajaran</th>
+                                <th>Kelas</th>
+                                <th>Status</th>
+                                <th>Keterangan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($tidak_hadir_hari_ini as $guru)
+                                <tr>
+                                    <td class="d-flex align-center gap-2">
+                                        @php
+                                            $initials = collect(explode(' ', $guru->name))->map(fn($n) => substr($n, 0, 1))->take(2)->join('');
+                                            $colorIndex = (ord(substr($guru->name, 0, 1)) % 9) + 1;
+                                        @endphp
+                                        <div class="avatar avatar-sm avatar-bg-{{ $colorIndex }}">
+                                            {{ $initials }}
+                                        </div>
+                                        <span class="font-semibold">{{ $guru->name }}</span>
+                                    </td>
+                                    <td>{{ $guru->mapel }}</td>
+                                    <td>{{ $guru->kelas }}</td>
+                                    <td>
+                                        @if($guru->status == 'Sakit')
+                                            <span class="badge badge-warning">Sakit</span>
+                                        @elseif($guru->status == 'Izin')
+                                            <span class="badge badge-info">Izin</span>
+                                        @else
+                                            <span class="badge badge-danger">Alpha</span>
+                                        @endif
+                                    </td>
+                                    <td class="text-muted">{{ $guru->keterangan }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                <a href="{{ route('izin.index') }}" class="card-footer-link">Lihat semua pengajuan izin →</a>
+            @endif
+        </div>
+
+        <!-- Schedule list Card (40%) -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Jadwal Kelas Kosong Hari Ini</h3>
+                <span class="badge badge-danger">{{ $jadwal_kosong->count() }} kelas</span>
+            </div>
+
+            @if($jadwal_kosong->isEmpty())
+                <div class="empty-state-wrapper">
+                    <div class="empty-state-icon">
+                        <i class="ti ti-circle-check"></i>
+                    </div>
+                    <span class="empty-state-title">Semua kelas terisi!</span>
+                    <span class="empty-state-sub">Seluruh jadwal ajar hari ini memiliki guru pengganti.</span>
+                </div>
+            @else
+                <ul class="schedule-list">
+                    @foreach($jadwal_kosong as $jadwal)
+                        <li class="schedule-item schedule-empty">
+                            <div class="schedule-item-info">
+                                <span class="schedule-item-time">Jam: {{ $jadwal->jam }}</span>
+                                <span class="schedule-item-title">{{ $jadwal->kelas }} – {{ $jadwal->mapel }}</span>
+                                <span class="schedule-item-meta">Guru tidak hadir tanpa pengganti</span>
+                            </div>
+                            <span class="badge badge-danger schedule-item-badge">KOSONG</span>
+                        </li>
+                    @endforeach
+                </ul>
+            @endif
+        </div>
     </div>
 </div>
 @endsection
+
+@push('scripts')
+    <!-- Chart.js (via CDN) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ asset('js/dashboard.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Retrieve and parse Laravel dashboard chart datasets
+            const barData = @json($chartData);
+            const donutData = @json($donutData);
+            
+            // Format percentage with Indonesian style
+            const persenHadirText = "{{ number_format($stats['persen_hadir'], 1, ',', '.') }}%";
+            
+            // Initialize charts via globally registered js script
+            initializeDashboardCharts(barData, donutData, persenHadirText);
+        });
+    </script>
+@endpush

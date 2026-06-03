@@ -1,47 +1,69 @@
 <?php
+
 namespace App\Http\Controllers;
+
 use Illuminate\Http\Request;
 use App\Models\Izin;
+use App\Models\User;
 
 class IzinController extends Controller
 {
     public function index()
     {
-        $data = Izin::latest()->paginate(15);
+        $data = Izin::with(['guru', 'jadwalAjar.mapel', 'jadwalAjar.guru', 'jadwalAjar.kelas'])
+            ->latest()
+            ->paginate(15);
         return view('admin.izin', compact('data'));
     }
 
     public function create()
     {
-        
-        return view('admin.izin_form');
+        $gurus = User::query()->where('jabatan', 'guru')->orderBy('name', 'asc')->get();
+        return view('admin.izin_form', compact('gurus'));
     }
 
     public function store(Request $request)
     {
+        $request->validate([
+            'guru_id' => 'required|exists:users,id',
+            'tanggal_izin' => 'required|date',
+            'jam_izin' => 'required|string',
+            'judul' => 'required|string|max:255',
+            'pesan' => 'required|string',
+            'approval' => 'required|boolean',
+        ]);
+
         $data = $request->except('_token');
-        if (isset($data['password'])) $data['password'] = bcrypt($data['password']);
+        $data['read'] = false;
+
         Izin::create($data);
+
         return redirect()->route('izin.index')->with('success', 'Data berhasil ditambahkan');
     }
 
     public function edit($id)
     {
         $data = Izin::findOrFail($id);
-        
-        return view('admin.izin_form', compact('data'));
+        $gurus = User::query()->where('jabatan', 'guru')->orderBy('name', 'asc')->get();
+        return view('admin.izin_form', compact('data', 'gurus'));
     }
 
     public function update(Request $request, $id)
     {
         $record = Izin::findOrFail($id);
+
+        $request->validate([
+            'guru_id' => 'required|exists:users,id',
+            'tanggal_izin' => 'required|date',
+            'jam_izin' => 'required|string',
+            'judul' => 'required|string|max:255',
+            'pesan' => 'required|string',
+            'approval' => 'required|boolean',
+        ]);
+
         $data = $request->except(['_token', '_method']);
-        if (isset($data['password']) && $data['password']) {
-            $data['password'] = bcrypt($data['password']);
-        } else {
-            unset($data['password']);
-        }
         $record->update($data);
+
         return redirect()->route('izin.index')->with('success', 'Data berhasil diubah');
     }
 

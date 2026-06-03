@@ -1,0 +1,362 @@
+/**
+ * Sistem Informasi Monitoring Guru (SIMGURU)
+ * table.css - Advanced Table Grid and Filter Styles
+ */
+
+/* Filter & Control Layout */
+.table-filter-wrapper {
+    background-color: #ffffff;
+    border: 1px solid var(--color-neutral-200);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow-sm);
+}
+
+.filter-controls-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Search Input Custom Styling with Loupe Icon */
+.search-input-wrapper {
+    position: relative;
+    width: 280px;
+    flex-shrink: 0;
+}
+
+.search-input-wrapper input {
+    width: 100%;
+    height: 40px;
+    padding: 8px 12px 8px 36px !important; /* Extra padding left for the icon */
+    font-size: var(--font-size-sm);
+    border: 1px solid var(--color-neutral-300);
+    border-radius: var(--radius-md);
+    outline: none;
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.search-input-wrapper input:focus {
+    border-color: var(--color-primary-500);
+    box-shadow: 0 0 0 3px var(--color-primary-100);
+}
+
+.search-icon-inside {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-neutral-400);
+    font-size: 16px;
+    pointer-events: none;
+}
+
+/* Dropdown Filters */
+.filter-select {
+    height: 40px;
+    padding: 8px 12px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-neutral-300);
+    background-color: #ffffff;
+    font-size: var(--font-size-sm);
+    color: var(--color-neutral-800);
+    cursor: pointer;
+    min-width: 130px;
+    transition: border-color var(--transition-fast);
+}
+
+.filter-select:focus {
+    border-color: var(--color-primary-500);
+    outline: none;
+}
+
+/* Reset and Active Filter Badges */
+.active-filters-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: var(--font-size-sm);
+    color: var(--color-neutral-600);
+}
+
+/* Export & Action Buttons Right alignment */
+.filter-actions-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Metadata Bar */
+.table-meta-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding: 0 4px;
+}
+
+.table-meta-left {
+    font-size: var(--font-size-sm);
+    color: var(--color-neutral-500);
+}
+
+.table-meta-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: var(--font-size-sm);
+    color: var(--color-neutral-500);
+}
+
+/* Main Data Table Style Overrides */
+.table-wrapper {
+    position: relative; /* Essential for loading overlay */
+}
+
+.data-table th.sortable {
+    cursor: pointer;
+    position: relative;
+    padding-right: 28px !important;
+}
+
+.data-table th.sortable .sort-direction-icon {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    opacity: 0.3;
+    transition: opacity var(--transition-fast);
+}
+
+.data-table th.sortable:hover .sort-direction-icon,
+.data-table th.sortable.active-sort .sort-direction-icon {
+    opacity: 1;
+}
+
+/* Zebra and hover row adjustments */
+.data-table tbody tr {
+    height: 56px;
+}
+
+.data-table tbody tr:nth-child(even) {
+    background-color: rgba(0, 0, 0, 0.015);
+}
+
+.data-table tbody tr:hover {
+    background-color: var(--color-neutral-50) !important;
+}
+
+/* Column Specific Widths & Layouts */
+.col-center {
+    text-align: center !important;
+}
+
+.col-no {
+    width: 48px;
+    text-align: center;
+}
+
+.col-avatar-name {
+    min-width: 200px;
+}
+
+.col-nip {
+    width: 140px;
+    font-family: monospace;
+    font-size: 12px;
+    color: var(--color-neutral-700);
+}
+
+.col-mapel {
+    width: 160px;
+}
+
+.col-kelas {
+    width: 180px;
+}
+
+.col-status {
+    width: 100px;
+    text-align: center;
+}
+
+.col-actions {
+    width: 100px;
+    text-align: center;
+}
+
+/* Avatar info styling */
+.teacher-profile-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.teacher-profile-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.teacher-name {
+    font-weight: 500;
+    font-size: var(--font-size-sm);
+    color: var(--color-neutral-900);
+}
+
+.teacher-sub {
+    font-size: var(--font-size-xs);
+    color: var(--color-neutral-500);
+}
+
+/* Subject layout with abbreviation badge */
+.mapel-cell {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.mapel-abbr-badge {
+    background-color: var(--color-primary-50);
+    color: var(--color-primary-700);
+    border: 1px solid var(--color-primary-200);
+    padding: 1px 4px;
+    font-size: 9px;
+    font-weight: 700;
+    border-radius: var(--radius-sm);
+    flex-shrink: 0;
+}
+
+/* Class pill indicators */
+.class-pill-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.class-pill-item {
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    background-color: var(--color-neutral-100);
+    color: var(--color-neutral-700);
+    border: 1px solid var(--color-neutral-200);
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+}
+
+.class-pill-more {
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    background-color: var(--color-neutral-200);
+    color: var(--color-neutral-800);
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    cursor: help;
+}
+
+/* Action button groupings */
+.action-buttons-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.action-buttons-group .btn-ghost {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+}
+
+.action-buttons-group .btn-ghost i {
+    font-size: 16px;
+}
+
+.action-buttons-group .btn-ghost:hover {
+    background-color: var(--color-neutral-100);
+}
+
+.action-buttons-group .btn-ghost.action-view:hover {
+    color: var(--color-primary-500) !important;
+}
+
+.action-buttons-group .btn-ghost.action-edit:hover {
+    color: var(--color-warning-600) !important;
+}
+
+.action-buttons-group .btn-ghost.action-delete:hover {
+    color: var(--color-danger-600) !important;
+}
+
+/* Loading Overlay state */
+.table-loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.6);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.table-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--color-neutral-300);
+    border-top-color: var(--color-primary-500);
+    border-radius: 50%;
+    animation: spinner-rotation 0.8s linear infinite;
+}
+
+@keyframes spinner-rotation {
+    to { transform: rotate(360deg); }
+}
+
+/* Empty State Table Overrides */
+.table-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 64px 20px;
+    text-align: center;
+    background-color: #ffffff;
+    border: 1px solid var(--color-neutral-200);
+    border-top: none;
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+
+.table-empty-icon {
+    font-size: 64px;
+    color: var(--color-neutral-300);
+    line-height: 1;
+    margin-bottom: 16px;
+}
+
+.table-empty-title {
+    font-size: var(--font-size-md);
+    font-weight: 600;
+    color: var(--color-primary-900);
+    margin-bottom: 4px;
+}
+
+.table-empty-sub {
+    font-size: var(--font-size-sm);
+    color: var(--color-neutral-500);
+    margin-bottom: 20px;
+}
+
+.table-empty-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}

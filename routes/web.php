@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MuridController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\LaporanController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -25,11 +26,10 @@ Route::get('/siswa/login', function () {
 // ADMIN ROUTES (Hanya untuk Admin)
 // ==========================================
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('admin.dashboard');
-    })->name('admin.dashboard');
+    Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->name('admin.dashboard');
     
     // CRUD Routes
+    Route::get('guru/export', [App\Http\Controllers\GuruController::class, 'export'])->name('guru.export');
     Route::resource('guru', App\Http\Controllers\GuruController::class);
     Route::resource('users', UserController::class);
 
@@ -53,6 +53,17 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::resource('izin', App\Http\Controllers\IzinController::class);
     Route::resource('absenkeluar', App\Http\Controllers\AbsenKeluarController::class);
     Route::resource('statuskelas', App\Http\Controllers\StatusKelasController::class);
+
+    // Laporan
+    Route::get('laporan', [LaporanController::class, 'index'])->name('laporan.index');
+    Route::post('laporan', [LaporanController::class, 'generate'])->name('laporan.generate');
+    Route::get('laporan/riwayat', [LaporanController::class, 'riwayat'])->name('laporan.riwayat');
+    Route::get('laporan/{riwayat}/download', [LaporanController::class, 'download'])->name('laporan.download');
+    Route::delete('laporan/{riwayat}', [LaporanController::class, 'destroy'])->name('laporan.destroy');
+
+    // Pengaturan
+    Route::get('pengaturan', [App\Http\Controllers\PengaturanController::class, 'index'])->name('pengaturan.index');
+    Route::put('pengaturan', [App\Http\Controllers\PengaturanController::class, 'update'])->name('pengaturan.update');
 });
 
 // ==========================================

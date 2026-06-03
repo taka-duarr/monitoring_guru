@@ -1,34 +1,97 @@
 @extends('layouts.admin')
-@section('title', (isset($data) ? 'Edit' : 'Tambah') . ' Rekap Absen Keluar')
-@section('page_title', (isset($data) ? 'Edit' : 'Tambah') . ' Rekap Absen Keluar')
+
+@section('title', (isset($data) ? 'Edit' : 'Tambah') . ' Kehadiran Keluar - SIMGURU')
+
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/forms.css') }}">
+@endpush
 
 @section('content')
-<div class="max-w-2xl bg-white shadow-sm rounded-2xl overflow-hidden border border-slate-100 p-6">
-    <form action="{{ isset($data) ? route('absenkeluar.update', $data->id) : route('absenkeluar.store') }}" method="POST">
+<!-- Header Page Title -->
+<div class="d-flex align-center justify-between mb-4">
+    <div>
+        <h2 class="text-2xl font-bold tracking-tight text-primary-900">{{ isset($data) ? 'Edit' : 'Tambah' }} Kehadiran Keluar</h2>
+        <p class="text-sm text-neutral-500">Sesuaikan data log keluar mengajar guru di bawah ini.</p>
+    </div>
+    <!-- Back Button -->
+    <a href="{{ route('absenkeluar.index') }}" class="btn btn-secondary d-flex align-center gap-2" style="text-decoration: none;">
+        <i class="ti ti-arrow-left"></i> Kembali
+    </a>
+</div>
+
+<div class="card bg-white" style="padding: 28px; max-w-2xl; margin: 0 auto;">
+    <!-- Main Form -->
+    <form action="{{ isset($data) ? route('absenkeluar.update', $data->id) : route('absenkeluar.store') }}" method="POST"
+          x-data="{ loading: false }"
+          @submit="loading = true">
         @csrf
         @if(isset($data)) @method('PUT') @endif
-        
-        <div class="mb-4">
-            <label class="block text-sm font-medium text-slate-700 mb-1">ID Absen Masuk</label>
-            <select name="absen_masuk_id" class="w-full rounded-lg border-slate-300 border px-4 py-2 focus:ring-brand-500 focus:border-brand-500">
-                <option value="">-- Pilih ID Absen Masuk --</option>
+
+        <!-- Sesi Absen Masuk -->
+        <div class="form-group">
+            <label for="absen_masuk_id" class="form-label">
+                Pilih Sesi Kehadiran Masuk <span class="required-indicator">*</span>
+            </label>
+            <select id="absen_masuk_id" name="absen_masuk_id" class="form-select @error('absen_masuk_id') is-invalid @enderror" required>
+                <option value="">-- Pilih Sesi Kehadiran --</option>
                 @foreach($absenMasuks as $rel)
-                <option value="{{ $rel->id }}" @if(old('absen_masuk_id', $data->absen_masuk_id ?? '') == $rel->id) selected @endif>{{ $rel->tanggal }}</option>
+                    <option value="{{ $rel->id }}" {{ old('absen_masuk_id', $data->absen_masuk_id ?? '') == $rel->id ? 'selected' : '' }}>
+                        Tanggal: {{ $rel->tanggal }} – Guru: {{ $rel->guru->name ?? '-' }} (Kelas: {{ $rel->kelas->name ?? '-' }})
+                    </option>
                 @endforeach
             </select>
-        </div>
-        <div class="mb-4">
-            <label class="block text-sm font-medium text-slate-700 mb-1">Waktu Keluar</label>
-            <input type="time" name="jam_keluar" value="{{ old('jam_keluar', $data->jam_keluar ?? '') }}" class="w-full rounded-lg border-slate-300 border px-4 py-2 focus:ring-brand-500 focus:border-brand-500" required>
-        </div>
-        <div class="mb-4">
-            <label class="block text-sm font-medium text-slate-700 mb-1">Status</label>
-            <input type="text" name="status" value="{{ old('status', $data->status ?? '') }}" class="w-full rounded-lg border-slate-300 border px-4 py-2 focus:ring-brand-500 focus:border-brand-500" required>
+            @error('absen_masuk_id')
+                <span class="form-error">
+                    <i class="ti ti-alert-circle"></i>
+                    {{ $message }}
+                </span>
+            @enderror
         </div>
 
-        <div class="mt-6 flex gap-3">
-            <button type="submit" class="px-6 py-2.5 bg-brand-600 text-white font-semibold rounded-xl hover:bg-brand-700 transition shadow-sm">Simpan</button>
-            <a href="{{ route('absenkeluar.index') }}" class="px-6 py-2.5 bg-slate-100 text-slate-700 font-semibold rounded-xl hover:bg-slate-200 transition">Batal</a>
+        <!-- Jam Keluar -->
+        <div class="form-group">
+            <label for="jam_keluar" class="form-label">
+                Waktu Keluar <span class="required-indicator">*</span>
+            </label>
+            <input type="time" id="jam_keluar" name="jam_keluar" 
+                   class="form-control @error('jam_keluar') is-invalid @else @if(old('jam_keluar')) is-valid @endif @enderror" 
+                   value="{{ old('jam_keluar', $data->jam_keluar ?? '') }}" required>
+            @error('jam_keluar')
+                <span class="form-error">
+                    <i class="ti ti-alert-circle"></i>
+                    {{ $message }}
+                </span>
+            @enderror
+        </div>
+
+        <!-- Status -->
+        <div class="form-group">
+            <label for="status" class="form-label">
+                Status Keluar <span class="required-indicator">*</span>
+            </label>
+            <input type="text" id="status" name="status" 
+                   class="form-control @error('status') is-invalid @else @if(old('status')) is-valid @endif @enderror" 
+                   value="{{ old('status', $data->status ?? 'Selesai') }}" placeholder="Contoh: Selesai, Meninggalkan Kelas..." required>
+            @error('status')
+                <span class="form-error">
+                    <i class="ti ti-alert-circle"></i>
+                    {{ $message }}
+                </span>
+            @enderror
+        </div>
+
+        <!-- FORM ACTION BUTTONS -->
+        <div class="d-flex justify-end gap-3 mt-8 border-t border-neutral-200 pt-5">
+            <a href="{{ route('absenkeluar.index') }}" class="btn btn-secondary d-flex align-center gap-2" :disabled="loading" style="text-decoration: none;">
+                Batal
+            </a>
+            
+            <button type="submit" class="btn btn-primary d-flex align-center gap-2" :disabled="loading">
+                <template x-if="loading">
+                    <span class="table-spinner" style="width: 14px; height: 14px; border-width: 2px; border-color: white; border-top-color: transparent;"></span>
+                </template>
+                <span x-text="loading ? 'Menyimpan...' : 'Simpan Data'"></span>
+            </button>
         </div>
     </form>
 </div>
