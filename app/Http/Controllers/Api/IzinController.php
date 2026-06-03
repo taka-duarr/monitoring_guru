@@ -16,7 +16,13 @@ class IzinController extends Controller
      */
     public function index(Request $request)
     {
-        $izin = Izin::latest()->get();
+        $izin = Izin::where('guru_id', $request->user()->id)->latest()->get();
+
+        // Tambahkan URL lengkap untuk file
+        $izin->transform(function ($item) {
+            $item->file_url = $item->file ? asset('storage/' . $item->file) : null;
+            return $item;
+        });
 
         return response()->json([
             'success' => true,
@@ -51,6 +57,7 @@ class IzinController extends Controller
         }
 
         $izin = Izin::create([
+            'guru_id'      => $request->user()->id,
             'tanggal_izin' => $request->tanggal,
             'jam_izin'     => '07:00', // default jam masuk
             'judul'        => $request->jenis == 'sakit' ? 'Sakit' : 'Izin',
@@ -59,6 +66,8 @@ class IzinController extends Controller
             'approval'     => false,
             'read'         => false,
         ]);
+
+        $izin->file_url = $filePath ? asset('storage/' . $filePath) : null;
 
         return response()->json([
             'success' => true,

@@ -66,6 +66,7 @@ class GuruPortalController extends Controller
         }
 
         Izin::create([
+            'guru_id'      => \Illuminate\Support\Facades\Auth::id(),
             'tanggal_izin' => $request->tanggal,
             'jam_izin' => '07:00', // default jam masuk
             'judul' => $request->jenis == 'sakit' ? 'Sakit' : 'Izin',

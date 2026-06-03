@@ -20,7 +20,7 @@
                 <tr>
                     <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">No</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Tanggal</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Jadwal Ajar</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Guru</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Judul</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Bukti</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
@@ -32,7 +32,7 @@
                 <tr class="hover:bg-slate-50/70 transition-colors">
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{{ $loop->iteration + ($data->firstItem() - 1) }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $row->tanggal_izin }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $row->jadwalAjar->mapel->name ?? '-' }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700 font-semibold">{{ $row->guru->name ?? '-' }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ $row->judul }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">
                         @if($row->file)

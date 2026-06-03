@@ -13,4 +13,5 @@ class Izin extends Model
     protected $guarded = [];
 
     public function jadwalAjar() { return $this->belongsTo(JadwalAjar::class, 'jadwal_ajar_id'); }
+    public function guru() { return $this->belongsTo(User::class, 'guru_id'); }
 }
