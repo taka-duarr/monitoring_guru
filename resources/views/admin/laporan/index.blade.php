@@ -199,7 +199,7 @@
     </div>
     @endif
 
-    <form method="POST" action="{{ route('laporan.generate') }}" @submit="loading = true">
+    <form method="POST" action="{{ route('laporan.generate') }}" @submit="setTimeout(() => { loading = true; }, 100); setTimeout(() => { loading = false; }, 5000);">
         @csrf
 
         {{-- ============================================================ --}}
