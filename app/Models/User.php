@@ -16,11 +16,11 @@ class User extends Authenticatable
     protected $guarded = [];
 
     /**
-     * Kolom yang digunakan untuk autentikasi (login dengan NIK)
+     * Kolom yang digunakan untuk autentikasi (primary key model)
      */
     public function getAuthIdentifierName(): string
     {
-        return 'nik';
+        return 'id';
     }
 
     public function jadwalAjars() { return $this->hasMany(JadwalAjar::class, 'guru_id'); }
