@@ -12,17 +12,31 @@
             theme: {
                 extend: {
                     fontFamily: { sans: ['Inter', 'sans-serif'], heading: ['Outfit', 'sans-serif'] },
-                    colors: { brand: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' } }
+                    colors: {
+                        brand: {
+                            50: '#F0F7FF',
+                            100: '#EFF6FF',
+                            500: '#2563EB',
+                            600: '#1B2F4E',
+                            700: '#1E3A5F'
+                        }
+                    }
+                }
+            }
+        }
+
     </script>
-    <link rel="stylesheet" href="{{ asset('css/forms.css') }}">
+    <link class="js-forms" rel="stylesheet" href="{{ asset('css/forms.css') }}">
     <script src="{{ asset('js/forms.js') }}"></script>
+    <!-- Alpine.js (via CDN) -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 <body class="bg-slate-50 font-sans text-slate-800 antialiased h-screen flex flex-col">
 
     <!-- Header -->
     <header class="bg-brand-600 px-5 py-4 shadow-md flex justify-between items-center z-10 sticky top-0 text-white">
         <div>
-            <h1 class="font-heading font-bold text-xl tracking-tight">Portal Siswa</h1>
+            <h1 class="font-heading font-bold text-white-800 text-xl tracking-tight">Portal Siswa</h1>
             <p class="text-xs text-brand-100 opacity-90">{{ Auth::user()->name }} (Ketua Kelas)</p>
         </div>
         <form action="{{ route('logout') }}" method="POST">

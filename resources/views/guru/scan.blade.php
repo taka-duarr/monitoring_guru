@@ -46,9 +46,15 @@
             (decodedText, decodedResult) => {
                 // Berhasil scan, Hentikan kamera
                 html5QrCode.stop().then(() => {
-                    document.getElementById('scan-result').classList.remove('hidden');
-                    document.getElementById('scan-result').innerText = "Memproses QR...";
-                    
+                    // Show skeleton loading while request is in-flight
+                    const resultEl = document.getElementById('scan-result');
+                    resultEl.classList.remove('hidden');
+                    resultEl.innerHTML = `
+                        <div class="animate-pulse space-y-2 py-1">
+                            <div class="bg-slate-200 rounded h-4 w-3/4 mx-auto"></div>
+                            <div class="bg-slate-200 rounded h-3 w-1/2 mx-auto"></div>
+                        </div>`;
+
                     // AJAX POST ke server
                     fetch("{{ route('guru.processQr') }}", {
                         method: "POST",
@@ -60,7 +66,14 @@
                     })
                     .then(response => response.json())
                     .then(data => {
+                        // Restore result element styling
+                        resultEl.innerHTML = '';
+                        resultEl.classList.add('bg-green-50', 'text-green-700', 'border-green-200');
+
                         if(data.success) {
+                            // Haptic feedback on supported devices
+                            if ('vibrate' in navigator) { navigator.vibrate(200); }
+
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Absen Berhasil!',
@@ -75,6 +88,7 @@
                         }
                     })
                     .catch(err => {
+                        resultEl.innerHTML = '';
                         console.error(err);
                         Swal.fire('Error', 'Terjadi kesalahan sistem!', 'error').then(() => location.reload());
                     });

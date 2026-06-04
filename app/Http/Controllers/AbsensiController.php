@@ -44,7 +44,26 @@ class AbsensiController extends Controller
         $absenMasuk = AbsenMasuk::where('jadwal_ajar_id', $jadwalId)
                                 ->where('tanggal', now()->toDateString())
                                 ->first();
-        
+
+        // ── Validasi Waktu (Server-Side) ──────────────────────────────────────
+        // Hanya berlaku untuk Absen MASUK (belum ada $absenMasuk).
+        // Absen KELUAR tidak dibatasi waktu.
+        if (!$absenMasuk) {
+            $jamMulai = Carbon::createFromFormat('H:i', substr($jadwal->jam_mulai, 0, 5));
+            $now      = Carbon::now();
+
+            if ($now->lt($jamMulai)) {
+                $sisaMenit = (int) $now->diffInMinutes($jamMulai, false) * -1;
+                $label     = $jamMulai->format('H:i');
+                return response()->json([
+                    'success' => false,
+                    'message' => "Belum bisa absen masuk. Kelas dimulai pukul {$label} " .
+                                 "(masih " . abs($sisaMenit) . " menit lagi).",
+                ], 403);
+            }
+        }
+        // ─────────────────────────────────────────────────────────────────────
+
         if ($absenMasuk) {
             // Jika sudah absen masuk, cek apakah sudah absen keluar
             $absenKeluar = \App\Models\AbsenKeluar::where('absen_masuk_id', $absenMasuk->id)->first();
