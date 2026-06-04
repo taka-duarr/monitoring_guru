@@ -48,6 +48,27 @@
             @enderror
         </div>
 
+        <!-- Jadwal Ajar -->
+        <div class="form-group">
+            <label for="jadwal_ajar_id" class="form-label">
+                Pilih Jadwal Ajar (opsional)
+            </label>
+            <select id="jadwal_ajar_id" name="jadwal_ajar_id" class="form-select @error('jadwal_ajar_id') is-invalid @enderror" style="color: #111827; background: #ffffff;">
+                <option value="">-- Izin Umum (Tidak Terikat Jadwal Spesifik) --</option>
+                @foreach($jadwals as $j)
+                    <option value="{{ $j->id }}" data-guru-id="{{ $j->guru_id }}" {{ old('jadwal_ajar_id', $data->jadwal_ajar_id ?? '') == $j->id ? 'selected' : '' }}>
+                        {{ $j->hari }} · {{ $j->jam_mulai }}-{{ $j->jam_selesai }} · {{ $j->mapel->name ?? '-' }} ({{ $j->kelas->name ?? '-' }})
+                    </option>
+                @endforeach
+            </select>
+            @error('jadwal_ajar_id')
+                <span class="form-error">
+                    <i class="ti ti-alert-circle"></i>
+                    {{ $message }}
+                </span>
+            @enderror
+        </div>
+
         <!-- Tanggal -->
         <div class="form-group">
             <label for="tanggal_izin" class="form-label">
@@ -156,4 +177,35 @@
         </div>
     </form>
 </div>
+
+@push('scripts')
+<script>
+    function filterJadwals() {
+        const guruId = document.getElementById('guru_id').value;
+        const jadwalSelect = document.getElementById('jadwal_ajar_id');
+        if (!jadwalSelect) return;
+        const options = jadwalSelect.options;
+        for (let i = 0; i < options.length; i++) {
+            const option = options[i];
+            const optGuruId = option.getAttribute('data-guru-id');
+            if (!optGuruId) continue;
+            if (optGuruId === guruId) {
+                option.style.display = '';
+                option.disabled = false;
+            } else {
+                option.style.display = 'none';
+                option.disabled = true;
+                if (option.selected) {
+                    option.selected = false;
+                    jadwalSelect.value = '';
+                }
+            }
+        }
+    }
+    document.getElementById('guru_id').addEventListener('change', filterJadwals);
+    document.addEventListener('DOMContentLoaded', filterJadwals);
+    // Jalankan sekali saat load (untuk edit/old inputs)
+    setTimeout(filterJadwals, 100);
+</script>
+@endpush
 @endsection

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Izin;
 use App\Models\User;
+use App\Models\JadwalAjar;
 
 class IzinController extends Controller
 {
@@ -19,13 +20,15 @@ class IzinController extends Controller
     public function create()
     {
         $gurus = User::query()->where('jabatan', 'guru')->orderBy('name', 'asc')->get();
-        return view('admin.izin_form', compact('gurus'));
+        $jadwals = JadwalAjar::with(['mapel', 'kelas'])->orderBy('hari')->get();
+        return view('admin.izin_form', compact('gurus', 'jadwals'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'guru_id' => 'required|exists:users,id',
+            'jadwal_ajar_id' => 'nullable|exists:jadwal_ajars,id',
             'tanggal_izin' => 'required|date',
             'jam_izin' => 'required|string',
             'judul' => 'required|string|max:255',
@@ -45,7 +48,8 @@ class IzinController extends Controller
     {
         $data = Izin::findOrFail($id);
         $gurus = User::query()->where('jabatan', 'guru')->orderBy('name', 'asc')->get();
-        return view('admin.izin_form', compact('data', 'gurus'));
+        $jadwals = JadwalAjar::with(['mapel', 'kelas'])->orderBy('hari')->get();
+        return view('admin.izin_form', compact('data', 'gurus', 'jadwals'));
     }
 
     public function update(Request $request, $id)
@@ -54,6 +58,7 @@ class IzinController extends Controller
 
         $request->validate([
             'guru_id' => 'required|exists:users,id',
+            'jadwal_ajar_id' => 'nullable|exists:jadwal_ajars,id',
             'tanggal_izin' => 'required|date',
             'jam_izin' => 'required|string',
             'judul' => 'required|string|max:255',
@@ -73,3 +78,4 @@ class IzinController extends Controller
         return redirect()->route('izin.index')->with('success', 'Data berhasil dihapus');
     }
 }
+

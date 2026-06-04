@@ -186,23 +186,55 @@ class LaporanController extends Controller
 
     private function queryPerizinan(Request $req, Carbon $mulai, Carbon $akhir, string $periodeLabel): array
     {
-        $query = Izin::with(['jadwalAjar.guru', 'jadwalAjar.kelas'])
-            ->whereBetween('created_at', [$mulai, $akhir]);
+        $query = Izin::with(['guru', 'jadwalAjar.kelas'])
+            ->whereBetween('tanggal_izin', [$mulai->toDateString(), $akhir->toDateString()]);
 
         if ($req->jenis_izin) {
-            $query->where('jenis_izin', $req->jenis_izin);
+            $jenis = $req->jenis_izin;
+            if ($jenis === 'sakit') {
+                $query->where('judul', 'like', '%sakit%');
+            } elseif ($jenis === 'dinas') {
+                $query->where('judul', 'like', '%dinas%');
+            } elseif ($jenis === 'izin') {
+                $query->where(function ($q) {
+                    $q->where('judul', 'like', '%izin%')
+                      ->orWhere('judul', 'like', '%keluarga%')
+                      ->orWhere('judul', 'like', '%keperluan%');
+                });
+            } else {
+                $query->where('judul', 'not like', '%sakit%')
+                      ->where('judul', 'not like', '%dinas%')
+                      ->where('judul', 'not like', '%izin%')
+                      ->where('judul', 'not like', '%keluarga%')
+                      ->where('judul', 'not like', '%keperluan%');
+            }
         }
 
         $raw = $query->get();
 
-        $data = $raw->map(fn ($izin) => (object)[
-            'nama_guru'  => $izin->jadwalAjar?->guru?->name ?? '-',
-            'nik'        => $izin->jadwalAjar?->guru?->nik  ?? '-',
-            'tanggal'    => $izin->created_at?->toDateString(),
-            'jenis_izin' => $izin->jenis_izin ?? '-',
-            'keterangan' => $izin->keterangan ?? '-',
-            'status'     => $izin->status ?? 'Diajukan',
-        ]);
+        $data = $raw->map(function ($izin) {
+            $judulLower = strtolower($izin->judul);
+            if (str_contains($judulLower, 'sakit')) {
+                $jenisIzin = 'sakit';
+            } elseif (str_contains($judulLower, 'dinas')) {
+                $jenisIzin = 'dinas';
+            } elseif (str_contains($judulLower, 'izin') || str_contains($judulLower, 'keluarga') || str_contains($judulLower, 'keperluan')) {
+                $jenisIzin = 'izin';
+            } else {
+                $jenisIzin = 'lainnya';
+            }
+
+            $statusStr = $izin->approval ? 'Disetujui' : 'Menunggu';
+
+            return (object)[
+                'nama_guru'  => $izin->guru?->name ?? $izin->jadwalAjar?->guru?->name ?? '-',
+                'nik'        => $izin->guru?->nik ?? $izin->jadwalAjar?->guru?->nik ?? '-',
+                'tanggal'    => $izin->tanggal_izin,
+                'jenis_izin' => $jenisIzin,
+                'keterangan' => $izin->judul . ($izin->pesan ? ' - ' . $izin->pesan : ''),
+                'status'     => $statusStr,
+            ];
+        });
 
         $jenisIzinLabel = $req->jenis_izin ? ucfirst($req->jenis_izin) : 'Semua Jenis';
         $namaLaporan    = "Perizinan Guru ({$periodeLabel})";
@@ -261,7 +293,7 @@ class LaporanController extends Controller
             'mapel'   => $j->mapel?->name ?? '-',
             'kelas'   => $j->kelas?->name ?? '-',
             'hari'    => $j->hari    ?? '-',
-            'jam'     => $j->jam     ?? '-',
+            'jam'     => ($j->jam_mulai && $j->jam_selesai) ? "{$j->jam_mulai} - {$j->jam_selesai}" : '-',
             'ruangan' => $j->ruangan?->name ?? '-',
         ]);
 
