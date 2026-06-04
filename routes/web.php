@@ -42,15 +42,30 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::delete('kelas/{kelas}/murid/{murid}', [MuridController::class, 'destroy'])->name('kelas.murid.destroy');
 
     Route::resource('angkatan', App\Http\Controllers\AngkatanController::class);
+    Route::get('kelas/export', [App\Http\Controllers\KelasController::class, 'export'])->name('kelas.export');
+    Route::get('kelas/import/template', [App\Http\Controllers\KelasController::class, 'downloadTemplate'])->name('kelas.import.template');
+    Route::post('kelas/import', [App\Http\Controllers\KelasController::class, 'import'])->name('kelas.import');
     Route::resource('kelas', App\Http\Controllers\KelasController::class);
+    Route::get('jurusan/export', [App\Http\Controllers\JurusanController::class, 'export'])->name('jurusan.export');
+    Route::get('jurusan/import/template', [App\Http\Controllers\JurusanController::class, 'downloadTemplate'])->name('jurusan.import.template');
+    Route::post('jurusan/import', [App\Http\Controllers\JurusanController::class, 'import'])->name('jurusan.import');
     Route::resource('jurusan', App\Http\Controllers\JurusanController::class);
     Route::resource('jadwalajar', App\Http\Controllers\JadwalAjarController::class);
     
     // Absen Masuk & Murid Read-only
     Route::get('absenmasuk/{absenmasuk}/murid', [App\Http\Controllers\AbsenMasukController::class, 'murid'])->name('absenmasuk.murid');
     Route::resource('absenmasuk', App\Http\Controllers\AbsenMasukController::class);
+    Route::get('ketuakelas/export', [App\Http\Controllers\KetuaKelasController::class, 'export'])->name('ketuakelas.export');
+    Route::get('ketuakelas/import/template', [App\Http\Controllers\KetuaKelasController::class, 'downloadTemplate'])->name('ketuakelas.import.template');
+    Route::post('ketuakelas/import', [App\Http\Controllers\KetuaKelasController::class, 'import'])->name('ketuakelas.import');
     Route::resource('ketuakelas', App\Http\Controllers\KetuaKelasController::class);
+    Route::get('mapel/export', [App\Http\Controllers\MapelController::class, 'export'])->name('mapel.export');
+    Route::get('mapel/import/template', [App\Http\Controllers\MapelController::class, 'downloadTemplate'])->name('mapel.import.template');
+    Route::post('mapel/import', [App\Http\Controllers\MapelController::class, 'import'])->name('mapel.import');
     Route::resource('mapel', App\Http\Controllers\MapelController::class);
+    Route::get('ruangan/export', [App\Http\Controllers\RuanganController::class, 'export'])->name('ruangan.export');
+    Route::get('ruangan/import/template', [App\Http\Controllers\RuanganController::class, 'downloadTemplate'])->name('ruangan.import.template');
+    Route::post('ruangan/import', [App\Http\Controllers\RuanganController::class, 'import'])->name('ruangan.import');
     Route::resource('ruangan', App\Http\Controllers\RuanganController::class);
     Route::resource('izin', App\Http\Controllers\IzinController::class);
     Route::resource('absenkeluar', App\Http\Controllers\AbsenKeluarController::class);

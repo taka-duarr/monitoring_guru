@@ -50,4 +50,92 @@ class MapelController extends Controller
         Mapel::destroy($id);
         return redirect()->route('mapel.index')->with('success', 'Data berhasil dihapus');
     }
+    public function export(Request $request)
+    {
+        $format = $request->query('format', 'pdf');
+        $mapels = Mapel::with('jurusan')->orderBy('name', 'asc')->get();
+
+        if ($format === 'excel') {
+            if (class_exists(\Maatwebsite\Excel\Facades\Excel::class)) {
+                return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\MapelExport(), 'data-mapel-' . date('Y-m-d') . '.xlsx');
+            }
+            
+            // Fallback: direct CSV download
+            $headers = [
+                'Content-Type' => 'text/csv',
+                'Content-Disposition' => 'attachment; filename="data-mapel-' . date('Y-m-d') . '.csv"',
+            ];
+            $callback = function() use ($mapels) {
+                $file = fopen('php://output', 'w');
+                fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
+                fputcsv($file, ['No', 'Nama Mata Pelajaran', 'Kategori Jurusan']);
+                foreach ($mapels as $index => $mapel) {
+                    fputcsv($file, [
+                        $index + 1,
+                        $mapel->name,
+                        $mapel->jurusan ? $mapel->jurusan->name : 'Umum / Semua Jurusan'
+                    ]);
+                }
+                fclose($file);
+            };
+            return response()->stream($callback, 200, $headers);
+        }
+
+        // PDF Format
+        if (class_exists(\Barryvdh\DomPDF\Facade\Pdf::class)) {
+            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.mapel_pdf', compact('mapels'));
+            return $pdf->download('data-mapel-' . date('Y-m-d') . '.pdf');
+        }
+
+        return view('admin.mapel_pdf', compact('mapels'));
+    }
+
+    public function downloadTemplate()
+    {
+        if (class_exists(\Maatwebsite\Excel\Facades\Excel::class)) {
+            return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\MapelExport(true), 'template-import-mapel.xlsx');
+        }
+
+        // Fallback if Excel not installed
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="template-import-mapel.csv"',
+        ];
+
+        $callback = function () {
+            $file = fopen('php://output', 'w');
+            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
+
+            fputcsv($file, ['Nama Mata Pelajaran', 'Kategori Jurusan']);
+            fputcsv($file, ['Matematika Lanjut', 'Rekayasa Perangkat Lunak']);
+            fputcsv($file, ['Sejarah Indonesia', 'Teknik Komputer dan Jaringan']);
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv,txt|max:5120',
+        ]);
+
+        $import = new \App\Imports\MapelImport();
+
+        try {
+            \Maatwebsite\Excel\Facades\Excel::import($import, $request->file('file'));
+        } catch (\Exception $e) {
+            return redirect()->route('mapel.index')->with('error', 'Terjadi kesalahan membaca berkas import: ' . $e->getMessage());
+        }
+
+        $errors = $import->getErrors();
+
+        if (count($errors) > 0) {
+            return redirect()->route('mapel.index')->with('import_errors', $errors);
+        }
+
+        return redirect()->route('mapel.index')->with('success', 'Data mata pelajaran berhasil di-import massal.');
+    }
 }

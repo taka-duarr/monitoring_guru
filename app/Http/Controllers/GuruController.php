@@ -277,6 +277,11 @@ class GuruController extends Controller
      */
     public function downloadTemplate()
     {
+        if (class_exists(\Maatwebsite\Excel\Facades\Excel::class)) {
+            return \Maatwebsite\Excel\Facades\Excel::download(new GuruExport([], true), 'template-import-guru.xlsx');
+        }
+
+        // Fallback jika Excel tidak tersedia
         $headers = [
             'Content-Type' => 'text/csv',
             'Content-Disposition' => 'attachment; filename="template-import-guru.csv"',
@@ -284,58 +289,24 @@ class GuruController extends Controller
 
         $callback = function () {
             $file = fopen('php://output', 'w');
-            // Add BOM for Excel compatibility (UTF-8)
             fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
 
-            // Headers
             fputcsv($file, [
-                'Nama Lengkap',
-                'NIP',
-                'Jenis Kelamin',
-                'Tempat Lahir',
-                'Tanggal Lahir',
-                'Nomor Telepon',
-                'Status Kepegawaian',
-                'Golongan Pangkat',
-                'TMT',
-                'Status',
-                'Mata Pelajaran',
-                'Kelas Pengampu',
-                'Jumlah Jam Mengajar'
+                'Nama Lengkap', 'NIP', 'Jenis Kelamin', 'Tempat Lahir', 'Tanggal Lahir',
+                'Nomor Telepon', 'Status Kepegawaian', 'Golongan Pangkat', 'TMT', 'Status',
+                'Mata Pelajaran', 'Kelas Pengampu', 'Jumlah Jam Mengajar'
             ]);
 
-            // Sample Row 1
             fputcsv($file, [
-                'Budi Hartono, S.Pd.',
-                '198505202010011001',
-                'Laki-laki',
-                'Surabaya',
-                '1985-05-20',
-                '081234567890',
-                'PNS',
-                'III/b',
-                '2010-01-01',
-                'Aktif',
-                'Matematika',
-                'X IPA 1, X IPA 2',
-                '24'
+                'Budi Hartono, S.Pd.', '198505202010011001', 'Laki-laki', 'Surabaya', '1985-05-20',
+                '081234567890', 'PNS', 'III/b', '2010-01-01', 'Aktif',
+                'Matematika', 'X IPA 1, X IPA 2', '24'
             ]);
 
-            // Sample Row 2
             fputcsv($file, [
-                'Siti Aminah, S.Pd.',
-                '199009122018022002',
-                'Perempuan',
-                'Sidoarjo',
-                '1990-09-12',
-                '089876543210',
-                'GTT',
-                '',
-                '2018-02-15',
-                'Aktif',
-                'Bahasa Indonesia',
-                'XI IPS 1',
-                '18'
+                'Siti Aminah, S.Pd.', '199009122018022002', 'Perempuan', 'Sidoarjo', '1990-09-12',
+                '089876543210', 'GTT', '', '2018-02-15', 'Aktif',
+                'Bahasa Indonesia', 'XI IPS 1', '18'
             ]);
 
             fclose($file);
