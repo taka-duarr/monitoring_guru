@@ -2,13 +2,29 @@
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\AbsenMasuk;
+use App\Models\Kelas;
 
 class AbsenMasukController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $data = AbsenMasuk::with(['guru', 'kelas', 'jadwalAjar.mapel', 'absenKeluar'])->latest()->paginate(15);
-        return view('admin.absenmasuk', compact('data'));
+        $data = AbsenMasuk::with(['guru', 'kelas', 'jadwalAjar.mapel', 'absenKeluar'])
+            ->when($request->filled('guru'), function ($q) use ($request) {
+                $q->whereHas('guru', fn($g) => $g->where('name', 'LIKE', '%' . $request->guru . '%'));
+            })
+            ->when($request->filled('kelas_id'), function ($q) use ($request) {
+                $q->where('kelas_id', $request->kelas_id);
+            })
+            ->when($request->filled('tanggal'), function ($q) use ($request) {
+                $q->where('tanggal', $request->tanggal);
+            })
+            ->latest()
+            ->paginate(15)
+            ->appends($request->query());
+
+        $allKelas = Kelas::orderBy('name')->get();
+
+        return view('admin.absenmasuk', compact('data', 'allKelas'));
     }
 
     public function create()

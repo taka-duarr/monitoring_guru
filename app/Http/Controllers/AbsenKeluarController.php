@@ -2,17 +2,33 @@
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\AbsenKeluar;
+use App\Models\Kelas;
 
 class AbsenKeluarController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $data = AbsenKeluar::with([
-            'absenMasuk.guru', 
-            'absenMasuk.kelas', 
+            'absenMasuk.guru',
+            'absenMasuk.kelas',
             'absenMasuk.jadwalAjar.mapel'
-        ])->latest()->paginate(15);
-        return view('admin.absenkeluar', compact('data'));
+        ])
+            ->when($request->filled('guru'), function ($q) use ($request) {
+                $q->whereHas('absenMasuk.guru', fn($g) => $g->where('name', 'LIKE', '%' . $request->guru . '%'));
+            })
+            ->when($request->filled('kelas_id'), function ($q) use ($request) {
+                $q->whereHas('absenMasuk', fn($m) => $m->where('kelas_id', $request->kelas_id));
+            })
+            ->when($request->filled('tanggal'), function ($q) use ($request) {
+                $q->whereHas('absenMasuk', fn($m) => $m->where('tanggal', $request->tanggal));
+            })
+            ->latest()
+            ->paginate(15)
+            ->appends($request->query());
+
+        $allKelas = Kelas::orderBy('name')->get();
+
+        return view('admin.absenkeluar', compact('data', 'allKelas'));
     }
 
     public function create()

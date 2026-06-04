@@ -137,6 +137,10 @@
 
     <!-- Custom CSS for layout fixes that are cleaner outside utility layers -->
     <style>
+        /* Collapsed wrapper adjustment */
+        .sidebar-collapsed-wrapper {
+            margin-left: 60px !important;
+        }
         /* Backdrop responsive visibility */
         @media (min-width: 1025px) {
             .sidebar-backdrop {

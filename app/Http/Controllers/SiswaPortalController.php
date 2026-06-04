@@ -15,12 +15,26 @@ class SiswaPortalController extends Controller
         $hariIni = \Carbon\Carbon::now()->locale('id')->isoFormat('dddd');
         
         $jadwals = [];
+        $today = \Carbon\Carbon::today()->toDateString();
         if ($kelas) {
             $jadwals = \App\Models\JadwalAjar::with(['guru', 'mapel', 'ruangan'])
                         ->where('kelas_id', $kelas->id)
                         ->where('hari', $hariIni)
                         ->orderBy('jam_mulai', 'asc')
                         ->get();
+
+            foreach ($jadwals as $jadwal) {
+                $absen = \App\Models\AbsenMasuk::where('jadwal_ajar_id', $jadwal->id)
+                            ->where('tanggal', $today)
+                            ->first();
+                
+                $jadwal->absen_masuk = $absen;
+                $jadwal->absen_keluar = null;
+                
+                if ($absen) {
+                    $jadwal->absen_keluar = \App\Models\AbsenKeluar::where('absen_masuk_id', $absen->id)->first();
+                }
+            }
         }
         
         return view('siswa.dashboard', compact('ketua', 'kelas', 'jadwals', 'hariIni'));

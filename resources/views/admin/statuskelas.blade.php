@@ -37,10 +37,31 @@
             <h2 class="text-2xl font-bold tracking-tight text-primary-900">Status Aktivitas Kelas</h2>
             <p class="text-sm text-neutral-500">Pantau aktivitas belajar-mengajar di setiap ruangan secara real-time</p>
         </div>
-        <a href="{{ route('statuskelas.create') }}" class="btn btn-primary d-flex align-center gap-2">
-            <i class="ti ti-plus"></i> Tambah Data
-        </a>
+        <div class="d-flex align-center gap-3">
+            {{-- Countdown refresh badge --}}
+            <div class="d-flex align-center gap-1.5 text-xs text-neutral-500 bg-neutral-50 border border-neutral-200 px-3 py-1.5 rounded-xl">
+                <i class="ti ti-refresh" style="font-size:13px;"></i>
+                <span>Refresh dalam <span id="refresh-countdown" class="font-semibold text-neutral-700">30</span>d</span>
+            </div>
+            <a href="{{ route('statuskelas.create') }}" class="btn btn-primary d-flex align-center gap-2">
+                <i class="ti ti-plus"></i> Tambah Data
+            </a>
+        </div>
     </div>
+
+    {{-- Summary bar --}}
+    @php
+        $aktif = $data->filter(fn($k) => $k->live_status && $k->live_status->is_active)->count();
+        $total = $data->total();
+    @endphp
+    @if(!$data->isEmpty())
+        <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 mb-4 text-sm text-emerald-700 d-flex align-center gap-2">
+            <span class="pulse-dot" style="flex-shrink:0;"></span>
+            <span>
+                <span class="font-bold">{{ $aktif }} kelas aktif</span> dari <span class="font-bold">{{ $total }} total kelas</span> saat ini sedang berlangsung
+            </span>
+        </div>
+    @endif
 
     <!-- MAIN DATA TABLE SECTION -->
     <div class="table-wrapper card p-0 overflow-hidden" x-data="{ tableLoading: false }">
@@ -75,7 +96,7 @@
                             $status = $row->live_status;
                             $isActive = $status ? $status->is_active : false;
                         @endphp
-                        <tr>
+                        <tr class="{{ $isActive ? 'bg-emerald-50/50' : '' }}" style="{{ $isActive ? 'border-left: 4px solid #16a34a;' : '' }}">
                             <td class="col-no">
                                 {{ ($data->currentPage() - 1) * $data->perPage() + $loop->iteration }}
                             </td>
@@ -93,7 +114,7 @@
                             </td>
                             <td class="col-center">
                                 @if($isActive)
-                                    <span class="badge badge-success d-inline-flex align-center gap-1.5">
+                                    <span class="badge badge-success d-inline-flex align-center gap-1.5" style="font-size: 0.8rem; padding: 4px 10px;">
                                         <span class="pulse-dot"></span>
                                         Sedang Belajar
                                     </span>
@@ -146,4 +167,26 @@
     <!-- Reusable Hapus Modal -->
     <x-modal-hapus />
 </div>
+
+@push('scripts')
+<script>
+    (function () {
+        var seconds = 30;
+        var el = document.getElementById('refresh-countdown');
+
+        if (!el) return;
+
+        var interval = setInterval(function () {
+            seconds--;
+            el.textContent = seconds;
+
+            if (seconds <= 0) {
+                clearInterval(interval);
+                location.reload();
+            }
+        }, 1000);
+    })();
+</script>
+@endpush
+
 @endsection
