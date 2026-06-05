@@ -35,7 +35,7 @@
                                     'badge-neutral': data.status !== 'Aktif' && data.status !== 'Cuti'
                                 }"
                                 x-text="data.status"></span>
-                          <span style="font-size: 13px; color: var(--color-neutral-500); font-weight: 500;" x-text="data.status_kepegawaian"></span>
+
                       </div>
                   </div>
               </div>
@@ -52,19 +52,10 @@
                   
                   <!-- Left Column -->
                   <div class="d-flex flex-column gap-4">
-                      <div>
-                          <span style="display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--color-neutral-400); letter-spacing: 0.05em; margin-bottom: 2px;">NIP / NIK (Masing-masing)</span>
-                          <span style="font-family: monospace; font-size: 14px; font-weight: 600; color: var(--color-neutral-800);" x-text="data.nik"></span>
-                      </div>
                       
                       <div>
                           <span style="display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--color-neutral-400); letter-spacing: 0.05em; margin-bottom: 2px;">Jenis Kelamin</span>
                           <span style="font-size: 14px; font-weight: 500; color: var(--color-neutral-800);" x-text="data.jenis_kelamin"></span>
-                      </div>
-                      
-                      <div>
-                          <span style="display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--color-neutral-400); letter-spacing: 0.05em; margin-bottom: 2px;">Tempat & Tanggal Lahir</span>
-                          <span style="font-size: 14px; font-weight: 500; color: var(--color-neutral-800);" x-text="data.tempat_lahir + ', ' + data.tanggal_lahir"></span>
                       </div>
                       
                       <div>
@@ -75,28 +66,9 @@
                   
                   <!-- Right Column -->
                   <div class="d-flex flex-column gap-4">
-                      <div>
-                          <span style="display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--color-neutral-400); letter-spacing: 0.05em; margin-bottom: 2px;">Golongan / Pangkat</span>
-                          <span style="font-size: 14px; font-weight: 500; color: var(--color-neutral-800);" x-text="data.golongan"></span>
-                      </div>
+
                       
-                      <div>
-                          <span style="display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--color-neutral-400); letter-spacing: 0.05em; margin-bottom: 2px;">TMT (Tanggal Mulai Tugas)</span>
-                          <span style="font-size: 14px; font-weight: 500; color: var(--color-neutral-800);" x-text="data.tmt"></span>
-                      </div>
-                      
-                      <div>
-                          <span style="display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--color-neutral-400); letter-spacing: 0.05em; margin-bottom: 2px;">Mata Pelajaran & Jam Kerja</span>
-                          <div class="d-flex align-center gap-2">
-                              <span style="font-size: 14px; font-weight: 600; color: var(--color-neutral-800);" x-text="data.mapel"></span>
-                              <span class="badge badge-info" x-text="data.jumlah_jam + ' Jam'"></span>
-                          </div>
-                      </div>
-                      
-                      <div>
-                          <span style="display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--color-neutral-400); letter-spacing: 0.05em; margin-bottom: 2px;">Kelas Pengampu</span>
-                          <span style="font-size: 14px; font-weight: 500; color: var(--color-neutral-800);" x-text="data.kelas"></span>
-                      </div>
+
                   </div>
                   
               </div>

@@ -156,36 +156,28 @@
 }
 
 .col-no {
-    width: 48px;
+    width: 5%;
     text-align: center;
 }
 
 .col-avatar-name {
-    min-width: 200px;
+    width: 40%;
 }
 
 .col-nip {
-    width: 140px;
+    width: 25%;
     font-family: monospace;
-    font-size: 12px;
+    font-size: 14px;
     color: var(--color-neutral-700);
 }
 
-.col-mapel {
-    width: 160px;
-}
-
-.col-kelas {
-    width: 180px;
-}
-
 .col-status {
-    width: 100px;
+    width: 15%;
     text-align: center;
 }
 
 .col-actions {
-    width: 100px;
+    width: 15%;
     text-align: center;
 }
 

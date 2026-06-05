@@ -44,31 +44,6 @@ class SettingSeeder extends Seeder
                 'value' => '197001011995011001',
                 'group' => 'school',
             ],
-            [
-                'key' => 'academic_year',
-                'value' => '2025/2026',
-                'group' => 'academic',
-            ],
-            [
-                'key' => 'academic_semester',
-                'value' => 'Ganjil',
-                'group' => 'academic',
-            ],
-            [
-                'key' => 'default_time_in',
-                'value' => '07:00',
-                'group' => 'attendance',
-            ],
-            [
-                'key' => 'default_time_out',
-                'value' => '14:00',
-                'group' => 'attendance',
-            ],
-            [
-                'key' => 'tolerance_minutes',
-                'value' => '15',
-                'group' => 'attendance',
-            ],
         ];
 
         foreach ($settings as $setting) {

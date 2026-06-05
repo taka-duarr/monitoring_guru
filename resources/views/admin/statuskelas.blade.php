@@ -43,9 +43,7 @@
                 <i class="ti ti-refresh" style="font-size:13px;"></i>
                 <span>Refresh dalam <span id="refresh-countdown" class="font-semibold text-neutral-700">30</span>d</span>
             </div>
-            <a href="{{ route('statuskelas.create') }}" class="btn btn-primary d-flex align-center gap-2">
-                <i class="ti ti-plus"></i> Tambah Data
-            </a>
+
         </div>
     </div>
 

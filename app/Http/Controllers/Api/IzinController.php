@@ -57,14 +57,14 @@ class IzinController extends Controller
         }
 
         $izin = Izin::create([
-            'guru_id'      => $request->user()->id,
-            'tanggal_izin' => $request->tanggal,
-            'jam_izin'     => '07:00', // default jam masuk
-            'judul'        => $request->jenis == 'sakit' ? 'Sakit' : 'Izin',
-            'pesan'        => $request->keterangan,
-            'file'         => $filePath,
-            'approval'     => false,
-            'read'         => false,
+            'guru_id'        => $request->user()->id,
+            'jadwal_ajar_id' => $request->jadwal_ajar_id,
+            'tanggal_izin'   => $request->tanggal,
+            'judul'          => $request->jenis == 'sakit' ? 'Sakit' : 'Izin',
+            'pesan'          => $request->keterangan,
+            'file'           => $filePath,
+            'approval'       => false,
+            'read'           => false,
         ]);
 
         $izin->file_url = $filePath ? asset('storage/' . $filePath) : null;

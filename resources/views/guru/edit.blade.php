@@ -22,7 +22,7 @@
 <div class="card bg-white" style="padding: 28px;">
     <!-- Main Form -->
     <form action="{{ route('guru.update', $data->id) }}" method="POST" enctype="multipart/form-data"
-          x-data="{ loading: false, statusKepegawaian: '{{ old('status_kepegawaian', $data->status_kepegawaian ?? '') }}' }"
+          x-data="{ loading: false }"
           @submit="loading = true">
         @csrf
         @method('PUT')
@@ -139,10 +139,9 @@
                     <input type="text" id="nik" name="nik" 
                            class="form-control @error('nik') is-invalid @else is-valid @enderror" 
                            value="{{ old('nik', $data->nik) }}" 
-                           placeholder="Masukkan 18 digit NIP..."
-                           maxlength="18"
-                           pattern="[0-9]{18}">
-                    <span class="form-helper">NIP akan digunakan sebagai username & password default login guru.</span>
+                           placeholder="Masukkan NIK/NIP atau ID pegawai..."
+                           maxlength="50">
+                    <span class="form-helper">NIP/ID akan digunakan sebagai username & password default login guru.</span>
                     @error('nik')
                         <span class="form-error">
                             <i class="ti ti-alert-circle"></i>
@@ -174,35 +173,7 @@
                     @enderror
                 </div>
 
-                <!-- Tempat & Tanggal Lahir -->
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="form-group">
-                        <label for="tempat_lahir" class="form-label">Tempat Lahir</label>
-                        <input type="text" id="tempat_lahir" name="tempat_lahir" 
-                               class="form-control @error('tempat_lahir') is-invalid @else @if(old('tempat_lahir', $data->tempat_lahir)) is-valid @endif @enderror" 
-                               value="{{ old('tempat_lahir', $data->tempat_lahir) }}" 
-                               placeholder="Kota/Kabupaten...">
-                        @error('tempat_lahir')
-                            <span class="form-error">
-                                <i class="ti ti-alert-circle"></i>
-                                {{ $message }}
-                            </span>
-                        @enderror
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="tanggal_lahir" class="form-label">Tanggal Lahir</label>
-                        <input type="date" id="tanggal_lahir" name="tanggal_lahir" 
-                               class="form-control @error('tanggal_lahir') is-invalid @else @if(old('tanggal_lahir', $data->tanggal_lahir)) is-valid @endif @enderror" 
-                               value="{{ old('tanggal_lahir', $data->tanggal_lahir ? \Carbon\Carbon::parse($data->tanggal_lahir)->format('Y-m-d') : '') }}">
-                        @error('tanggal_lahir')
-                            <span class="form-error">
-                                <i class="ti ti-alert-circle"></i>
-                                {{ $message }}
-                            </span>
-                        @enderror
-                    </div>
-                </div>
+
 
                 <!-- No Telepon -->
                 <div class="form-group">
@@ -227,160 +198,34 @@
                 </div>
             </div>
 
-            <!-- RIGHT COLUMN — Data Kepegawaian & Data Mengajar -->
+            <!-- RIGHT COLUMN — Status Aktif -->
             <div>
-                <!-- Data Kepegawaian Section -->
                 <h3 style="font-size: 15px; font-weight: 700; color: var(--color-primary-800); border-bottom: 1px solid var(--color-neutral-200); padding-bottom: 8px; margin-bottom: 16px;">
-                    Data Kepegawaian
+                    Status Keaktifan
                 </h3>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <!-- Status Kepegawaian -->
-                    <div class="form-group">
-                        <label for="status_kepegawaian" class="form-label">
-                            Status Pegawai <span class="required-indicator">*</span>
-                        </label>
-                        <select id="status_kepegawaian" name="status_kepegawaian" 
-                                class="form-select @error('status_kepegawaian') is-invalid @enderror"
-                                x-model="statusKepegawaian">
-                            <option value="">Pilih Status...</option>
-                            <option value="PNS">PNS</option>
-                            <option value="GTT">GTT (Guru Tidak Tetap)</option>
-                            <option value="GTY">GTY (Guru Tetap Yayasan)</option>
-                            <option value="Honorer">Honorer</option>
-                        </select>
-                        @error('status_kepegawaian')
-                            <span class="form-error">
-                                <i class="ti ti-alert-circle"></i>
-                                {{ $message }}
-                            </span>
-                        @enderror
-                    </div>
-
-                    <!-- Golongan (Conditional) -->
-                    <div class="form-group" x-show="statusKepegawaian === 'PNS'" style="display: none;">
-                        <label for="golongan" class="form-label">
-                            Golongan / Pangkat <span class="required-indicator">*</span>
-                        </label>
-                        <input type="text" id="golongan" name="golongan" 
-                               class="form-control @error('golongan') is-invalid @else @if(old('golongan', $data->golongan)) is-valid @endif @enderror" 
-                               value="{{ old('golongan', $data->golongan) }}" 
-                               placeholder="Contoh: IV/aPembina">
-                        @error('golongan')
-                            <span class="form-error">
-                                <i class="ti ti-alert-circle"></i>
-                                {{ $message }}
-                            </span>
-                        @enderror
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <!-- TMT -->
-                    <div class="form-group">
-                        <label for="tmt" class="form-label">TMT (Mulai Tugas)</label>
-                        <input type="date" id="tmt" name="tmt" 
-                               class="form-control @error('tmt') is-invalid @else @if(old('tmt', $data->tmt)) is-valid @endif @enderror" 
-                               value="{{ old('tmt', $data->tmt ? \Carbon\Carbon::parse($data->tmt)->format('Y-m-d') : '') }}">
-                        @error('tmt')
-                            <span class="form-error">
-                                <i class="ti ti-alert-circle"></i>
-                                {{ $message }}
-                            </span>
-                        @enderror
-                    </div>
-
-                    <!-- Status Aktif (3-way selector card style) -->
-                    <div class="form-group">
-                        <label class="form-label">
-                            Status Aktif <span class="required-indicator">*</span>
-                        </label>
-                        <div class="d-flex gap-2">
-                            <!-- Aktif -->
-                            <div class="gender-radio-card" style="flex: 1;">
-                                <input type="radio" id="status_a" name="status" value="Aktif" {{ old('status', $data->status) == 'Aktif' ? 'checked' : '' }}>
-                                <label for="status_a" class="gender-radio-label" style="padding: 10px; font-size: 13px;">Aktif</label>
-                            </div>
-                            <!-- Cuti -->
-                            <div class="gender-radio-card" style="flex: 1;">
-                                <input type="radio" id="status_c" name="status" value="Cuti" {{ old('status', $data->status) == 'Cuti' ? 'checked' : '' }}>
-                                <label for="status_c" class="gender-radio-label" style="padding: 10px; font-size: 13px;">Cuti</label>
-                            </div>
-                            <!-- Pensiun -->
-                            <div class="gender-radio-card" style="flex: 1;">
-                                <input type="radio" id="status_p" name="status" value="Pensiun" {{ old('status', $data->status) == 'Pensiun' ? 'checked' : '' }}>
-                                <label for="status_p" class="gender-radio-label" style="padding: 10px; font-size: 13px;">Pensiun</label>
-                            </div>
-                        </div>
-                        @error('status')
-                            <span class="form-error">
-                                <i class="ti ti-alert-circle"></i>
-                                {{ $message }}
-                            </span>
-                        @enderror
-                    </div>
-                </div>
-
-                <!-- Data Mengajar Section -->
-                <h3 style="font-size: 15px; font-weight: 700; color: var(--color-primary-800); border-bottom: 1px solid var(--color-neutral-200); padding-bottom: 8px; margin-bottom: 16px; margin-top: 10px;">
-                    Data Mengajar
-                </h3>
-
-                <!-- Mata Pelajaran -->
-                <div class="form-group">
-                    <label for="mapel_id" class="form-label">
-                        Mata Pelajaran Utama <span class="required-indicator">*</span>
-                    </label>
-                    <select id="mapel_id" name="mapel_id" class="form-select @error('mapel_id') is-invalid @enderror">
-                        <option value="">Pilih Mata Pelajaran...</option>
-                        @foreach($mapels as $mapel)
-                            <option value="{{ $mapel->id }}" {{ old('mapel_id', $assignedMapelId) == $mapel->id ? 'selected' : '' }}>
-                                {{ $mapel->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('mapel_id')
-                        <span class="form-error">
-                            <i class="ti ti-alert-circle"></i>
-                            {{ $message }}
-                        </span>
-                    @enderror
-                </div>
-
-                <!-- Kelas Pengampu (Multi checkbox grid) -->
+                
                 <div class="form-group">
                     <label class="form-label">
-                        Kelas Pengampu <span class="required-indicator">*</span>
+                        Status Aktif <span class="required-indicator">*</span>
                     </label>
-                    <div class="checkbox-grid">
-                        @foreach($kelas as $kelasItem)
-                            <label class="checkbox-item">
-                                <input type="checkbox" name="kelas_ids[]" value="{{ $kelasItem->id }}"
-                                    {{ in_array($kelasItem->id, old('kelas_ids', $assignedKelasIds ?? [])) ? 'checked' : '' }}>
-                                <span>{{ $kelasItem->name }}</span>
-                            </label>
-                        @endforeach
+                    <div class="d-flex gap-2">
+                        <!-- Aktif -->
+                        <div class="gender-radio-card" style="flex: 1;">
+                            <input type="radio" id="status_a" name="status" value="Aktif" {{ old('status', $data->status) == 'Aktif' ? 'checked' : '' }}>
+                            <label for="status_a" class="gender-radio-label" style="padding: 10px; font-size: 13px;">Aktif</label>
+                        </div>
+                        <!-- Cuti -->
+                        <div class="gender-radio-card" style="flex: 1;">
+                            <input type="radio" id="status_c" name="status" value="Cuti" {{ old('status', $data->status) == 'Cuti' ? 'checked' : '' }}>
+                            <label for="status_c" class="gender-radio-label" style="padding: 10px; font-size: 13px;">Cuti</label>
+                        </div>
+                        <!-- Pensiun -->
+                        <div class="gender-radio-card" style="flex: 1;">
+                            <input type="radio" id="status_p" name="status" value="Pensiun" {{ old('status', $data->status) == 'Pensiun' ? 'checked' : '' }}>
+                            <label for="status_p" class="gender-radio-label" style="padding: 10px; font-size: 13px;">Pensiun</label>
+                        </div>
                     </div>
-                    @error('kelas_ids')
-                        <span class="form-error">
-                            <i class="ti ti-alert-circle"></i>
-                            {{ $message }}
-                        </span>
-                    @enderror
-                </div>
-
-                <!-- Jumlah Jam Mengajar -->
-                <div class="form-group">
-                    <label for="jumlah_jam" class="form-label">
-                        Jumlah Jam Mengajar (JP) <span class="required-indicator">*</span>
-                    </label>
-                    <input type="number" id="jumlah_jam" name="jumlah_jam" 
-                           class="form-control @error('jumlah_jam') is-invalid @else is-valid @enderror" 
-                           value="{{ old('jumlah_jam', $data->jumlah_jam ?? 0) }}" 
-                           min="0" max="48"
-                           placeholder="0">
-                    <span class="form-helper">Durasi mengajar dalam JP (Jam Pelajaran) per minggu, maksimal 48 JP.</span>
-                    @error('jumlah_jam')
+                    @error('status')
                         <span class="form-error">
                             <i class="ti ti-alert-circle"></i>
                             {{ $message }}

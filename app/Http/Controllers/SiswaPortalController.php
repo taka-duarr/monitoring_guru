@@ -39,4 +39,22 @@ class SiswaPortalController extends Controller
         
         return view('siswa.dashboard', compact('ketua', 'kelas', 'jadwals', 'hariIni'));
     }
+
+    public function checkStatus($id)
+    {
+        $today = \Carbon\Carbon::today()->toDateString();
+        $absenMasuk = \App\Models\AbsenMasuk::where('jadwal_ajar_id', $id)
+                        ->where('tanggal', $today)
+                        ->first();
+                        
+        $absenKeluar = null;
+        if ($absenMasuk) {
+            $absenKeluar = \App\Models\AbsenKeluar::where('absen_masuk_id', $absenMasuk->id)->first();
+        }
+        
+        return response()->json([
+            'absen_masuk' => $absenMasuk ? true : false,
+            'absen_keluar' => $absenKeluar ? true : false,
+        ]);
+    }
 }

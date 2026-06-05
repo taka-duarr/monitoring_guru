@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Rekap Kehadiran Masuk - SIMGURU')
+@section('title', 'Rekap Kehadiran - SIMGURU')
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/table.css') }}">
@@ -11,8 +11,8 @@
     <!-- Header Page Title -->
     <div class="d-flex align-center justify-between mb-4">
         <div>
-            <h2 class="text-2xl font-bold tracking-tight text-primary-900">Kehadiran Masuk</h2>
-            <p class="text-sm text-neutral-500">Pantau dan kelola seluruh log kehadiran masuk guru pengampu kelas</p>
+            <h2 class="text-2xl font-bold tracking-tight text-primary-900">Rekap Kehadiran</h2>
+            <p class="text-sm text-neutral-500">Pantau dan kelola seluruh log kehadiran (masuk & keluar) guru pengampu kelas</p>
         </div>
     </div>
 
@@ -80,8 +80,8 @@
                 <div class="table-empty-icon">
                     <i class="ti ti-calendar-event"></i>
                 </div>
-                <span class="table-empty-title">Tidak ada data kehadiran masuk</span>
-                <span class="table-empty-sub">Belum ada log kehadiran masuk guru yang tercatat.</span>
+                <span class="table-empty-title">Tidak ada data kehadiran</span>
+                <span class="table-empty-sub">Belum ada log kehadiran guru yang tercatat.</span>
             </div>
         @else
             <table class="data-table">

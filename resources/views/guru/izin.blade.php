@@ -9,11 +9,38 @@
     </div>
 
     <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
+        @if($errors->any())
+            <div class="mb-5 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm">
+                <div class="font-bold mb-1 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Gagal mengirim pengajuan:
+                </div>
+                <ul class="list-disc list-inside">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         <form action="{{ route('guru.store_izin') }}" method="POST" enctype="multipart/form-data" class="space-y-5">
             @csrf
             
             <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Tanggal</label>
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Jadwal Ajar</label>
+                <select name="jadwal_ajar_id" class="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition" required>
+                    <option value="">-- Pilih Jadwal Ajar --</option>
+                    @foreach($jadwals as $j)
+                        <option value="{{ $j->id }}">{{ $j->hari }} · {{ $j->jam_mulai }}-{{ $j->jam_selesai }} · {{ $j->mapel->name ?? '-' }} ({{ $j->kelas->name ?? '-' }})</option>
+                    @endforeach
+                </select>
+                @if($jadwals->isEmpty())
+                    <p class="text-xs text-orange-600 mt-1">Anda tidak memiliki jadwal ajar yang terdaftar.</p>
+                @endif
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Tanggal Izin</label>
                 <input type="date" name="tanggal" class="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition" required>
             </div>
 
@@ -44,7 +71,7 @@
                 <label class="block text-sm font-semibold text-slate-700 mb-1.5">Bukti (Surat Dokter/Lampiran)</label>
                 <label class="border-2 border-dashed border-slate-300 rounded-xl p-6 flex flex-col items-center justify-center text-slate-500 hover:bg-slate-50 hover:border-brand-400 transition cursor-pointer">
                     <svg class="w-8 h-8 mb-2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                    <span id="upload-text" class="text-sm font-medium">Upload File (Max: 2MB)</span>
+                    <span id="upload-text" class="text-sm font-medium">Upload File (Max: 5MB)</span>
                     <input type="file" name="file" id="file" class="hidden" onchange="showFileName(this)">
                 </label>
             </div>
@@ -63,7 +90,7 @@ function showFileName(input) {
         textSpan.textContent = "Terpilih: " + input.files[0].name;
         textSpan.classList.add('text-brand-600');
     } else {
-        textSpan.textContent = "Upload File (Max: 2MB)";
+        textSpan.textContent = "Upload File (Max: 5MB)";
         textSpan.classList.remove('text-brand-600');
     }
 }

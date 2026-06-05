@@ -20,7 +20,7 @@ class Guru extends User
     {
         // Global scope to only return users who are teachers or admins
         static::addGlobalScope('role_guru', function (Builder $builder) {
-            $builder->whereIn('jabatan', ['guru', 'admin']);
+            $builder->where('jabatan', 'guru');
         });
     }
 
@@ -40,14 +40,6 @@ class Guru extends User
             });
         })->when($filters['status'] ?? null, function ($query, $status) {
             $query->where('status', $status);
-        })->when($filters['mapel'] ?? null, function ($query, $mapelId) {
-            $query->whereHas('jadwalAjars', function ($q) use ($mapelId) {
-                $q->where('mapel_id', $mapelId);
-            });
-        })->when($filters['kelas'] ?? null, function ($query, $kelasId) {
-            $query->whereHas('jadwalAjars', function ($q) use ($kelasId) {
-                $q->where('kelas_id', $kelasId);
-            });
         });
     }
 

@@ -32,51 +32,30 @@ class GuruExport implements FromArray, WithHeadings, ShouldAutoSize, WithStyles
             return [
                 [
                     'Budi Hartono, S.Pd.',
-                    '198505202010011001',
+                    ' 198505202010011001',
                     'Laki-laki',
-                    'Surabaya',
-                    '1985-05-20',
                     '081234567890',
-                    'PNS',
-                    'III/b',
-                    '2010-01-01',
-                    'Aktif',
-                    'Matematika',
-                    'X IPA 1, X IPA 2',
-                    '24'
+                    'Aktif'
                 ],
                 [
                     'Siti Aminah, S.Pd.',
-                    '199009122018022002',
+                    ' 199009122018022002',
                     'Perempuan',
-                    'Sidoarjo',
-                    '1990-09-12',
                     '089876543210',
-                    'GTT',
-                    '',
-                    '2018-02-15',
-                    'Aktif',
-                    'Bahasa Indonesia',
-                    'XI IPS 1',
-                    '18'
+                    'Aktif'
                 ]
             ];
         }
 
-        $gurus = Guru::filter($this->filters)->with(['jadwalAjars.mapel', 'jadwalAjars.kelas'])->orderBy('name', 'asc')->get();
+        $gurus = Guru::filter($this->filters)->orderBy('name', 'asc')->get();
         $data = [];
         $no = 1;
         
         foreach ($gurus as $guru) {
-            $mapels = $guru->jadwalAjars->pluck('mapel.name')->unique()->join(', ');
-            $kelas = $guru->jadwalAjars->pluck('kelas.name')->unique()->join(', ');
-            
             $data[] = [
                 $no++,
                 $guru->name,
-                $guru->nik,
-                $mapels ?: '-',
-                $kelas ?: '-',
+                ' ' . $guru->nik, // Prepend space to force Excel to treat as string
                 $guru->status,
                 $guru->jabatan
             ];
@@ -95,16 +74,8 @@ class GuruExport implements FromArray, WithHeadings, ShouldAutoSize, WithStyles
                 'Nama Lengkap',
                 'NIP',
                 'Jenis Kelamin',
-                'Tempat Lahir',
-                'Tanggal Lahir',
                 'Nomor Telepon',
-                'Status Kepegawaian',
-                'Golongan Pangkat',
-                'TMT',
-                'Status',
-                'Mata Pelajaran',
-                'Kelas Pengampu',
-                'Jumlah Jam Mengajar'
+                'Status'
             ];
         }
 
@@ -112,8 +83,6 @@ class GuruExport implements FromArray, WithHeadings, ShouldAutoSize, WithStyles
             'No',
             'Nama Lengkap',
             'NIK / NIP',
-            'Mata Pelajaran',
-            'Kelas Pengampu',
             'Status',
             'Jabatan'
         ];

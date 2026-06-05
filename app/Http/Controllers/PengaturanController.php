@@ -20,11 +20,6 @@ class PengaturanController extends Controller
             'school_logo' => Setting::get('school_logo'),
             'headmaster_name' => Setting::get('headmaster_name', '-'),
             'headmaster_nip' => Setting::get('headmaster_nip', '-'),
-            'academic_year' => Setting::get('academic_year', '2025/2026'),
-            'academic_semester' => Setting::get('academic_semester', 'Ganjil'),
-            'default_time_in' => Setting::get('default_time_in', '07:00'),
-            'default_time_out' => Setting::get('default_time_out', '14:00'),
-            'tolerance_minutes' => Setting::get('tolerance_minutes', '15'),
         ];
 
         return view('admin.pengaturan', compact('settings'));
@@ -42,11 +37,6 @@ class PengaturanController extends Controller
             'school_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'headmaster_name' => 'nullable|string|max:255',
             'headmaster_nip' => 'nullable|string|max:100',
-            'academic_year' => 'required|string|max:20',
-            'academic_semester' => 'required|string|in:Ganjil,Genap',
-            'default_time_in' => 'required|string',
-            'default_time_out' => 'required|string',
-            'tolerance_minutes' => 'required|integer|min:0',
         ]);
 
         // Save normal text settings
@@ -56,11 +46,6 @@ class PengaturanController extends Controller
             'school_phone' => 'school',
             'headmaster_name' => 'school',
             'headmaster_nip' => 'school',
-            'academic_year' => 'academic',
-            'academic_semester' => 'academic',
-            'default_time_in' => 'attendance',
-            'default_time_out' => 'attendance',
-            'tolerance_minutes' => 'attendance',
         ];
 
         foreach ($keys as $key => $group) {

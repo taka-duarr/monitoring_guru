@@ -42,6 +42,8 @@
     <script src="{{ asset('js/forms.js') }}"></script>
     <!-- Alpine.js (via CDN) -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="bg-neutral-50 font-sans text-slate-800 antialiased" x-data="{ sidebarCollapsed: false, mobileSidebarOpen: false }">
 

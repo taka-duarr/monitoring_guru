@@ -85,22 +85,6 @@
             @enderror
         </div>
 
-        <!-- Jam Izin -->
-        <div class="form-group">
-            <label for="jam_izin" class="form-label">
-                Jam Mulai Izin <span class="required-indicator">*</span>
-            </label>
-            <input type="time" id="jam_izin" name="jam_izin" 
-                   class="form-control @error('jam_izin') is-invalid @enderror" 
-                   value="{{ old('jam_izin', $data->jam_izin ?? '07:00') }}" required>
-            <span class="form-helper">Default: 07:00 (Jam masuk sekolah standar).</span>
-            @error('jam_izin')
-                <span class="form-error">
-                    <i class="ti ti-alert-circle"></i>
-                    {{ $message }}
-                </span>
-            @enderror
-        </div>
 
         <!-- Judul -->
         <div class="form-group">

@@ -14,10 +14,23 @@ use PhpOffice\PhpSpreadsheet\Style\Alignment;
 
 class JadwalAjarExport implements FromCollection, WithHeadings, WithStyles, WithTitle, ShouldAutoSize
 {
-    public function __construct(protected $data) {}
+    protected $data;
+    protected $isTemplate;
+
+    public function __construct($data = null, $isTemplate = false)
+    {
+        $this->data = $data;
+        $this->isTemplate = $isTemplate;
+    }
 
     public function collection()
     {
+        if ($this->isTemplate) {
+            return collect([
+                ['Budi Santoso', 'Matematika', 'X RPL 1', 'Ruang Teori 1', 'Senin', '07:00', '08:30'],
+            ]);
+        }
+
         return $this->data->map(function ($row, $i) {
             return [
                 'no'     => $i + 1,
@@ -27,13 +40,25 @@ class JadwalAjarExport implements FromCollection, WithHeadings, WithStyles, With
                 'kelas'  => $row->kelas ?? '-',
                 'hari'   => $row->hari ?? '-',
                 'jam'    => $row->jam ?? '-',
-                'ruangan'=> $row->ruangan ?? '-',
+                'ruangan'=> $row->ruangan->name ?? '-',
             ];
         });
     }
 
     public function headings(): array
     {
+        if ($this->isTemplate) {
+            return [
+                'Nama Guru',
+                'Mata Pelajaran',
+                'Nama Kelas',
+                'Nama Ruangan',
+                'Hari',
+                'Jam Mulai',
+                'Jam Selesai',
+            ];
+        }
+
         return [
             'No',
             'Nama Guru',

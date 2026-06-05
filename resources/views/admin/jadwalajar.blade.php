@@ -14,10 +14,44 @@
             <h2 class="text-2xl font-bold tracking-tight text-primary-900">Jadwal Mengajar</h2>
             <p class="text-sm text-neutral-500">Kelola jadwal pelajaran, pembagian guru, kelas, dan ruangan belajar</p>
         </div>
-        <a href="{{ route('jadwalajar.create') }}" class="btn btn-primary d-flex align-center gap-2">
-            <i class="ti ti-plus"></i> Tambah Jadwal
-        </a>
+        <div class="d-flex gap-2">
+            <!-- Import Excel Button -->
+            <button type="button" @click="$dispatch('open-import')" class="btn btn-secondary d-flex align-center gap-2">
+                <i class="ti ti-upload"></i> Import Excel
+            </button>
+
+            <a href="{{ route('jadwalajar.create') }}" class="btn btn-primary d-flex align-center gap-2">
+                <i class="ti ti-plus"></i> Tambah Jadwal
+            </a>
+        </div>
     </div>
+
+    <!-- Alert Messages -->
+    @if(session('success'))
+        <div class="mb-4 p-4 rounded-lg bg-success-50 border border-success-100 text-success-700 text-sm d-flex align-center gap-2">
+            <i class="ti ti-circle-check text-lg"></i>
+            <div>{{ session('success') }}</div>
+        </div>
+    @endif
+    @if(session('error'))
+        <div class="mb-4 p-4 rounded-lg bg-danger-50 border border-danger-100 text-danger-700 text-sm d-flex align-center gap-2">
+            <i class="ti ti-alert-circle text-lg"></i>
+            <div>{{ session('error') }}</div>
+        </div>
+    @endif
+    @if(session('import_errors'))
+        <div class="mb-4 p-4 rounded-lg bg-danger-50 border border-danger-100 text-danger-700 text-sm">
+            <div class="font-semibold mb-1 d-flex align-center gap-2">
+                <i class="ti ti-alert-circle text-lg"></i>
+                Beberapa baris gagal di-import:
+            </div>
+            <ul class="list-disc pl-5 mt-2">
+                @foreach(session('import_errors') as $err)
+                    <li>{{ $err }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
     <!-- MAIN DATA TABLE SECTION -->
     <div class="table-wrapper card p-0 overflow-hidden" x-data="{ tableLoading: false }">
@@ -111,5 +145,68 @@
 
     <!-- Reusable Hapus Modal -->
     <x-modal-hapus />
+
+    <!-- MODAL IMPORT -->
+    <div class="modal-backdrop" 
+         x-data="{ showImport: false }"
+         x-show="showImport" 
+         @open-import.window="showImport = true"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 100; align-items: center; justify-content: center;"
+         :style="showImport ? 'display: flex;' : 'display: none;'">
+        
+        <div class="card bg-white shadow-xl" 
+             @click.away="showImport = false"
+             style="width: 100%; max-width: 500px; padding: 24px; border-radius: 12px; margin: 20px;"
+             x-show="showImport"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 scale-95"
+             x-transition:enter-end="opacity-100 scale-100"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 scale-100"
+             x-transition:leave-end="opacity-0 scale-95">
+            
+            <div class="d-flex align-center justify-between pb-3 border-b border-neutral-100 mb-4">
+                <h3 class="text-lg font-bold text-primary-900">Import Jadwal Mengajar</h3>
+                <button type="button" @click="showImport = false" class="btn btn-ghost p-1 text-neutral-400 hover:text-neutral-600">
+                    <i class="ti ti-x" style="font-size: 20px;"></i>
+                </button>
+            </div>
+            
+            <form action="{{ route('jadwalajar.import') }}" method="POST" enctype="multipart/form-data" x-data="{ importing: false }" @submit="importing = true">
+                @csrf
+                <div class="d-flex flex-column gap-4">
+                    <p class="text-sm text-neutral-600">
+                        Unggah berkas data jadwal mengajar Anda dalam format <strong>Excel (.xlsx)</strong> atau <strong>CSV</strong>. Silakan unduh template di bawah untuk melihat kolom yang wajib diisi.
+                    </p>
+
+                    <!-- Template Link -->
+                    <a href="{{ route('jadwalajar.import.template') }}" class="d-inline-flex align-center gap-2 text-sm text-primary font-semibold hover:underline" style="text-decoration: none;">
+                        <i class="ti ti-download"></i> Unduh Template Excel / CSV
+                    </a>
+                    
+                    <div class="form-group mt-2">
+                        <label class="form-label font-semibold text-neutral-700" for="file">Pilih File (.xlsx, .xls, .csv)</label>
+                        <input type="file" name="file" id="file" class="form-control" accept=".xlsx,.xls,.csv" required style="padding: 0.5rem;">
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-end gap-2 mt-6 pt-3 border-t border-neutral-100">
+                    <button type="button" @click="showImport = false" class="btn btn-secondary" :disabled="importing">Batal</button>
+                    <button type="submit" class="btn btn-primary d-flex align-center gap-2" :disabled="importing">
+                        <template x-if="importing">
+                            <span class="table-spinner" style="width: 14px; height: 14px; border-width: 2px; border-color: white; border-top-color: transparent;"></span>
+                        </template>
+                        <span x-text="importing ? 'Memproses...' : 'Proses Import'"></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 @endsection

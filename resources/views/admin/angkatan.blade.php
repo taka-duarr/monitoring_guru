@@ -101,63 +101,67 @@
     <x-modal-hapus />
 
     <!-- MODAL TAMBAH INLINE -->
-    <div class="modal-backdrop-blur" x-show="showTambah" x-transition style="display: none; position: fixed; inset: 0; z-index: 100; background-color: rgba(15, 23, 42, 0.6); align-items: center; justify-content: center; backdrop-filter: blur(4px);">
-        <div class="card shadow-lg" style="width: 100%; max-width: 500px; padding: 0; overflow: hidden; border-radius: var(--radius-lg);" @click.away="showTambah = false">
-            <div class="card-header d-flex align-center justify-between" style="background-color: var(--color-primary-900); color: white; padding: 16px 24px;">
-                <h3 class="card-title text-white" style="margin: 0; font-size: 16px; font-weight: 700;">Tambah Angkatan</h3>
-                <button type="button" class="btn btn-ghost text-white p-1" style="min-width: unset; height: unset; color: white !important;" @click="showTambah = false">
-                    <i class="ti ti-x" style="font-size: 20px;"></i>
-                </button>
-            </div>
-            <form action="{{ route('angkatan.store') }}" method="POST" x-data="{ loading: false }" @submit="loading = true">
-                @csrf
-                <div style="padding: 24px;">
-                    <div class="form-group mb-0">
-                        <label for="name" class="form-label">Nama / Tahun Angkatan <span class="required-indicator">*</span></label>
-                        <input type="text" id="name" name="name" class="form-control" placeholder="Contoh: Angkatan 5 atau 2024" required>
-                    </div>
-                </div>
-                <div class="d-flex justify-end gap-3" style="background-color: var(--color-neutral-50); padding: 16px 24px; border-top: 1px solid var(--color-neutral-200);">
-                    <button type="button" class="btn btn-secondary" @click="showTambah = false" :disabled="loading">Batal</button>
-                    <button type="submit" class="btn btn-primary d-flex align-center gap-2" :disabled="loading">
-                        <template x-if="loading">
-                            <span class="table-spinner" style="width: 14px; height: 14px; border-width: 2px; border-color: white; border-top-color: transparent;"></span>
-                        </template>
-                        <span x-text="loading ? 'Menyimpan...' : 'Simpan Data'"></span>
+    <div class="modal-backdrop-blur" x-show="showTambah" x-transition style="display: none; position: fixed; inset: 0; z-index: 100; background-color: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px);">
+        <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px;">
+            <div class="card shadow-lg" style="width: 100%; max-width: 500px; padding: 0; overflow: hidden; border-radius: var(--radius-lg);" @click.away="showTambah = false">
+                <div class="card-header d-flex align-center justify-between" style="background-color: var(--color-primary-900); color: white; padding: 16px 24px;">
+                    <h3 class="card-title text-white" style="margin: 0; font-size: 16px; font-weight: 700;">Tambah Angkatan</h3>
+                    <button type="button" class="btn btn-ghost text-white p-1" style="min-width: unset; height: unset; color: white !important;" @click="showTambah = false">
+                        <i class="ti ti-x" style="font-size: 20px;"></i>
                     </button>
                 </div>
-            </form>
+                <form action="{{ route('angkatan.store') }}" method="POST" x-data="{ loading: false }" @submit="loading = true">
+                    @csrf
+                    <div style="padding: 24px;">
+                        <div class="form-group mb-0">
+                            <label for="name" class="form-label">Nama / Tahun Angkatan <span class="required-indicator">*</span></label>
+                            <input type="text" id="name" name="name" class="form-control" placeholder="Contoh: Angkatan 5 atau 2024" required>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-end gap-3" style="background-color: var(--color-neutral-50); padding: 16px 24px; border-top: 1px solid var(--color-neutral-200);">
+                        <button type="button" class="btn btn-secondary" @click="showTambah = false" :disabled="loading">Batal</button>
+                        <button type="submit" class="btn btn-primary d-flex align-center gap-2" :disabled="loading">
+                            <template x-if="loading">
+                                <span class="table-spinner" style="width: 14px; height: 14px; border-width: 2px; border-color: white; border-top-color: transparent;"></span>
+                            </template>
+                            <span x-text="loading ? 'Menyimpan...' : 'Simpan Data'"></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
     <!-- MODAL EDIT INLINE -->
-    <div class="modal-backdrop-blur" x-show="showEdit" x-transition style="display: none; position: fixed; inset: 0; z-index: 100; background-color: rgba(15, 23, 42, 0.6); align-items: center; justify-content: center; backdrop-filter: blur(4px);">
-        <div class="card shadow-lg" style="width: 100%; max-width: 500px; padding: 0; overflow: hidden; border-radius: var(--radius-lg);" @click.away="showEdit = false">
-            <div class="card-header d-flex align-center justify-between" style="background-color: var(--color-primary-900); color: white; padding: 16px 24px;">
-                <h3 class="card-title text-white" style="margin: 0; font-size: 16px; font-weight: 700;">Edit Angkatan</h3>
-                <button type="button" class="btn btn-ghost text-white p-1" style="min-width: unset; height: unset; color: white !important;" @click="showEdit = false">
-                    <i class="ti ti-x" style="font-size: 20px;"></i>
-                </button>
-            </div>
-            <form :action="'/admin/angkatan/' + editId" method="POST" x-data="{ loading: false }" @submit="loading = true">
-                @csrf
-                @method('PUT')
-                <div style="padding: 24px;">
-                    <div class="form-group mb-0">
-                        <label for="edit_name" class="form-label">Nama / Tahun Angkatan <span class="required-indicator">*</span></label>
-                        <input type="text" id="edit_name" name="name" class="form-control" x-model="editName" required>
-                    </div>
-                </div>
-                <div class="d-flex justify-end gap-3" style="background-color: var(--color-neutral-50); padding: 16px 24px; border-top: 1px solid var(--color-neutral-200);">
-                    <button type="button" class="btn btn-secondary" @click="showEdit = false" :disabled="loading">Batal</button>
-                    <button type="submit" class="btn btn-primary d-flex align-center gap-2" :disabled="loading">
-                        <template x-if="loading">
-                            <span class="table-spinner" style="width: 14px; height: 14px; border-width: 2px; border-color: white; border-top-color: transparent;"></span>
-                        </template>
-                        <span x-text="loading ? 'Menyimpan...' : 'Simpan Data'"></span>
+    <div class="modal-backdrop-blur" x-show="showEdit" x-transition style="display: none; position: fixed; inset: 0; z-index: 100; background-color: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px);">
+        <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px;">
+            <div class="card shadow-lg" style="width: 100%; max-width: 500px; padding: 0; overflow: hidden; border-radius: var(--radius-lg);" @click.away="showEdit = false">
+                <div class="card-header d-flex align-center justify-between" style="background-color: var(--color-primary-900); color: white; padding: 16px 24px;">
+                    <h3 class="card-title text-white" style="margin: 0; font-size: 16px; font-weight: 700;">Edit Angkatan</h3>
+                    <button type="button" class="btn btn-ghost text-white p-1" style="min-width: unset; height: unset; color: white !important;" @click="showEdit = false">
+                        <i class="ti ti-x" style="font-size: 20px;"></i>
                     </button>
                 </div>
-            </form>
+                <form :action="'/admin/angkatan/' + editId" method="POST" x-data="{ loading: false }" @submit="loading = true">
+                    @csrf
+                    @method('PUT')
+                    <div style="padding: 24px;">
+                        <div class="form-group mb-0">
+                            <label for="edit_name" class="form-label">Nama / Tahun Angkatan <span class="required-indicator">*</span></label>
+                            <input type="text" id="edit_name" name="name" class="form-control" x-model="editName" required>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-end gap-3" style="background-color: var(--color-neutral-50); padding: 16px 24px; border-top: 1px solid var(--color-neutral-200);">
+                        <button type="button" class="btn btn-secondary" @click="showEdit = false" :disabled="loading">Batal</button>
+                        <button type="submit" class="btn btn-primary d-flex align-center gap-2" :disabled="loading">
+                            <template x-if="loading">
+                                <span class="table-spinner" style="width: 14px; height: 14px; border-width: 2px; border-color: white; border-top-color: transparent;"></span>
+                            </template>
+                            <span x-text="loading ? 'Menyimpan...' : 'Simpan Data'"></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 

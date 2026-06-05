@@ -82,8 +82,20 @@
                             </td>
                             <td class="col-actions col-center">
                                 <div class="action-buttons-group">
+                                    @if(!$row->approval)
+                                        <!-- Approve Button -->
+                                        <x-tooltip text="Setujui Izin">
+                                            <form action="{{ route('izin.approve', $row->id) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                <button type="submit" class="btn btn-ghost action-edit text-success" onclick="return confirm('Anda yakin ingin menyetujui izin ini?')">
+                                                    <i class="ti ti-check"></i>
+                                                </button>
+                                            </form>
+                                        </x-tooltip>
+                                    @endif
+
                                     <!-- Edit Record -->
-                                    <x-tooltip text="Edit / Setujui">
+                                    <x-tooltip text="Edit Data">
                                         <a href="{{ route('izin.edit', $row->id) }}" class="btn btn-ghost action-edit">
                                             <i class="ti ti-pencil"></i>
                                         </a>

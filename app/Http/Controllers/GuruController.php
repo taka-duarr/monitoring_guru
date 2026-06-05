@@ -42,22 +42,15 @@ class GuruController extends Controller
 
         // 4. Fetch data with relationships loaded to optimize N+1 queries
         $data = Guru::filter($filters)
-            ->with(['jadwalAjars.mapel', 'jadwalAjars.kelas'])
             ->orderBy($sort, $dir)
             ->paginate($perPage)
             ->appends($request->query());
-
-        // 5. Gather data for dropdown filters
-        $allMapels = Mapel::orderBy('name', 'asc')->get();
-        $allKelas = Kelas::orderBy('name', 'asc')->get();
 
         // 6. Calculate active filter count
         $activeFilterCount = collect($filters)->filter()->count();
 
         return view('admin.guru', compact(
             'data',
-            'allMapels',
-            'allKelas',
             'filters',
             'sort',
             'dir',
@@ -72,11 +65,9 @@ class GuruController extends Controller
     public function export(Request $request)
     {
         $format = $request->query('format', 'pdf');
-        $filters = $request->only(['search', 'status', 'mapel', 'kelas']);
+        $filters = $request->only(['search', 'status']);
 
-        $gurus = Guru::filter($filters)
-            ->with(['jadwalAjars.mapel', 'jadwalAjars.kelas'])
-            ->get();
+        $gurus = Guru::filter($filters)->get();
 
         if ($format === 'excel') {
             if (class_exists(\Maatwebsite\Excel\Facades\Excel::class)) {
@@ -92,16 +83,12 @@ class GuruController extends Controller
                 $file = fopen('php://output', 'w');
                 // UTF-8 BOM for Excel compatibility
                 fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
-                fputcsv($file, ['No', 'Nama Lengkap', 'NIK / NIP', 'Mata Pelajaran', 'Kelas Pengampu', 'Status', 'Jabatan']);
+                fputcsv($file, ['No', 'Nama Lengkap', 'NIK / NIP', 'Status', 'Jabatan']);
                 foreach ($gurus as $index => $guru) {
-                    $mapels = $guru->jadwalAjars->pluck('mapel.name')->unique()->join(', ');
-                    $kelas = $guru->jadwalAjars->pluck('kelas.name')->unique()->join(', ');
                     fputcsv($file, [
                         $index + 1,
                         $guru->name,
-                        $guru->nik,
-                        $mapels ?: '-',
-                        $kelas ?: '-',
+                        ' ' . $guru->nik,
                         $guru->status,
                         $guru->jabatan
                     ]);
@@ -126,9 +113,7 @@ class GuruController extends Controller
      */
     public function create()
     {
-        $mapels = Mapel::orderBy('name', 'asc')->get();
-        $kelas = Kelas::orderBy('name', 'asc')->get();
-        return view('guru.create', compact('mapels', 'kelas'));
+        return view('guru.create');
     }
 
     /**
@@ -137,12 +122,12 @@ class GuruController extends Controller
     public function store(\App\Http\Requests\GuruRequest $request)
     {
         $data = $request->only([
-            'name', 'nik', 'jenis_kelamin', 'tempat_lahir', 'tanggal_lahir',
-            'no_telp', 'status_kepegawaian', 'golongan', 'tmt', 'status', 'jumlah_jam'
+            'name', 'nik', 'jenis_kelamin',
+            'no_telp', 'status'
         ]);
 
         $data['jabatan'] = 'guru';
-        $data['password'] = Hash::make($request->nik); // default password is NIP (nik)
+        $data['password'] = Hash::make($request->nik); // default password is NIK
 
         // Handle profile photo upload if exists
         if ($request->hasFile('foto')) {
@@ -150,23 +135,7 @@ class GuruController extends Controller
             $data['foto'] = $path;
         }
 
-        // Create the Guru
-        $guru = Guru::create($data);
-
-        // Sync Mata Pelajaran & Kelas via jadwal_ajars
-        $ruangan = \App\Models\Ruangan::query()->first();
-        foreach ($request->kelas_ids as $kelasId) {
-            \App\Models\JadwalAjar::create([
-                'id' => \Illuminate\Support\Str::uuid(),
-                'guru_id' => $guru->id,
-                'mapel_id' => $request->mapel_id,
-                'kelas_id' => $kelasId,
-                'ruangan_id' => $ruangan ? $ruangan->id : null,
-                'hari' => 'Senin',
-                'jam_mulai' => '07:00',
-                'jam_selesai' => '08:00',
-            ]);
-        }
+        Guru::create($data);
 
         return redirect()->route('guru.index')->with('success', 'Data guru berhasil ditambahkan.');
     }
@@ -177,14 +146,7 @@ class GuruController extends Controller
     public function edit($id)
     {
         $data = Guru::findOrFail($id);
-        $mapels = Mapel::orderBy('name', 'asc')->get();
-        $kelas = Kelas::orderBy('name', 'asc')->get();
-
-        // Get currently assigned mapel and kelas IDs
-        $assignedMapelId = $data->jadwalAjars->first()->mapel_id ?? null;
-        $assignedKelasIds = $data->jadwalAjars->pluck('kelas_id')->unique()->toArray();
-
-        return view('guru.edit', compact('data', 'mapels', 'kelas', 'assignedMapelId', 'assignedKelasIds'));
+        return view('guru.edit', compact('data'));
     }
 
     /**
@@ -195,11 +157,11 @@ class GuruController extends Controller
         $record = Guru::findOrFail($id);
 
         $data = $request->only([
-            'name', 'nik', 'jenis_kelamin', 'tempat_lahir', 'tanggal_lahir',
-            'no_telp', 'status_kepegawaian', 'golongan', 'tmt', 'status', 'jumlah_jam'
+            'name', 'nik', 'jenis_kelamin',
+            'no_telp', 'status'
         ]);
 
-        // If NIK (NIP) changed, update password to reflect new NIK
+        // If NIK changed, update password to reflect new NIK
         if ($request->nik !== $record->nik) {
             $data['password'] = Hash::make($request->nik);
         }
@@ -211,24 +173,6 @@ class GuruController extends Controller
         }
 
         $record->update($data);
-
-        // Sync Mata Pelajaran & Kelas via jadwal_ajars
-        // Clear existing jadwal_ajars to avoid duplicates or leftovers (using forceDelete to clean database)
-        $record->jadwalAjars()->forceDelete();
-
-        $ruangan = \App\Models\Ruangan::query()->first();
-        foreach ($request->kelas_ids as $kelasId) {
-            \App\Models\JadwalAjar::create([
-                'id' => \Illuminate\Support\Str::uuid(),
-                'guru_id' => $record->id,
-                'mapel_id' => $request->mapel_id,
-                'kelas_id' => $kelasId,
-                'ruangan_id' => $ruangan ? $ruangan->id : null,
-                'hari' => 'Senin',
-                'jam_mulai' => '07:00',
-                'jam_selesai' => '08:00',
-            ]);
-        }
 
         return redirect()->route('guru.index')->with('success', 'Data guru berhasil diperbarui.');
     }
@@ -292,21 +236,18 @@ class GuruController extends Controller
             fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
 
             fputcsv($file, [
-                'Nama Lengkap', 'NIP', 'Jenis Kelamin', 'Tempat Lahir', 'Tanggal Lahir',
-                'Nomor Telepon', 'Status Kepegawaian', 'Golongan Pangkat', 'TMT', 'Status',
-                'Mata Pelajaran', 'Kelas Pengampu', 'Jumlah Jam Mengajar'
+                'Nama Lengkap', 'NIP', 'Jenis Kelamin', 
+                'Nomor Telepon', 'Status'
             ]);
 
             fputcsv($file, [
-                'Budi Hartono, S.Pd.', '198505202010011001', 'Laki-laki', 'Surabaya', '1985-05-20',
-                '081234567890', 'PNS', 'III/b', '2010-01-01', 'Aktif',
-                'Matematika', 'X IPA 1, X IPA 2', '24'
+                'Budi Hartono, S.Pd.', ' 198505202010011001', 'Laki-laki', 
+                '081234567890', 'Aktif'
             ]);
 
             fputcsv($file, [
-                'Siti Aminah, S.Pd.', '199009122018022002', 'Perempuan', 'Sidoarjo', '1990-09-12',
-                '089876543210', 'GTT', '', '2018-02-15', 'Aktif',
-                'Bahasa Indonesia', 'XI IPS 1', '18'
+                'Siti Aminah, S.Pd.', ' 199009122018022002', 'Perempuan', 
+                '089876543210', 'Aktif'
             ]);
 
             fclose($file);

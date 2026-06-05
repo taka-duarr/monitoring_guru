@@ -89,25 +89,16 @@
         <thead>
             <tr>
                 <th style="width: 5%;">No</th>
-                <th style="width: 25%;">Nama Lengkap</th>
-                <th style="width: 15%;">NIK / NIP</th>
-                <th style="width: 20%;">Mata Pelajaran</th>
-                <th style="width: 20%;">Kelas Pengampu</th>
-                <th style="width: 15%;">Status</th>
+                <th style="width: 40%;">Nama Lengkap</th>
+                <th style="width: 35%;">NIK / NIP</th>
+                <th style="width: 20%;">Status</th>
             </tr>
-        </thead>
         <tbody>
             @foreach($gurus as $index => $guru)
-                @php
-                    $mapels = $guru->jadwalAjars->pluck('mapel.name')->unique()->join(', ');
-                    $kelas = $guru->jadwalAjars->pluck('kelas.name')->unique()->join(', ');
-                @endphp
                 <tr>
                     <td>{{ $index + 1 }}</td>
                     <td><strong>{{ $guru->name }}</strong></td>
                     <td style="font-family: monospace;">{{ $guru->nik }}</td>
-                    <td>{{ $mapels ?: '-' }}</td>
-                    <td>{{ $kelas ?: '-' }}</td>
                     <td>
                         @if(strtolower($guru->status) == 'aktif')
                             <span class="badge badge-success">Aktif</span>

@@ -79,32 +79,12 @@
                 <input type="text" name="search" value="{{ $filters['search'] ?? '' }}" placeholder="Cari nama atau NIP..." aria-label="Cari Guru">
             </div>
 
-            <!-- 2. Dropdown Filter: Mapel -->
-            <select name="mapel" class="filter-select" @change="tableLoading = true; $el.form.submit()">
-                <option value="">Semua Mapel</option>
-                @foreach($allMapels as $mapel)
-                    <option value="{{ $mapel->id }}" {{ (isset($filters['mapel']) && $filters['mapel'] == $mapel->id) ? 'selected' : '' }}>
-                        {{ $mapel->name }}
-                    </option>
-                @endforeach
-            </select>
-
-            <!-- 3. Dropdown Filter: Status -->
+            <!-- 2. Dropdown Filter: Status -->
             <select name="status" class="filter-select" @change="tableLoading = true; $el.form.submit()">
                 <option value="">Semua Status</option>
                 <option value="Aktif" {{ (isset($filters['status']) && $filters['status'] == 'Aktif') ? 'selected' : '' }}>Aktif</option>
                 <option value="Cuti" {{ (isset($filters['status']) && $filters['status'] == 'Cuti') ? 'selected' : '' }}>Cuti</option>
                 <option value="Pensiun" {{ (isset($filters['status']) && $filters['status'] == 'Pensiun') ? 'selected' : '' }}>Pensiun</option>
-            </select>
-
-            <!-- 4. Dropdown Filter: Kelas -->
-            <select name="kelas" class="filter-select" @change="tableLoading = true; $el.form.submit()">
-                <option value="">Semua Kelas</option>
-                @foreach($allKelas as $kelasItem)
-                    <option value="{{ $kelasItem->id }}" {{ (isset($filters['kelas']) && $filters['kelas'] == $kelasItem->id) ? 'selected' : '' }}>
-                        {{ $kelasItem->name }}
-                    </option>
-                @endforeach
             </select>
 
             <!-- 5. Reset Filter Button & Counter -->
@@ -210,11 +190,7 @@
                             <i class="ti {{ $sort === 'nik' ? ($dir === 'asc' ? 'ti-chevron-up' : 'ti-chevron-down') : 'ti-selector' }} sort-direction-icon"></i>
                         </th>
                         
-                        <!-- Mata Pelajaran Column -->
-                        <th class="col-mapel">Mata Pelajaran</th>
-                        
-                        <!-- Kelas Pengampu Column -->
-                        <th class="col-kelas">Kelas Pengampu</th>
+
                         
                         <!-- Status Column (Sortable) -->
                         <th class="sortable col-status {{ $sort === 'status' ? 'active-sort' : '' }} col-center"
@@ -229,11 +205,6 @@
                 </thead>
                 <tbody>
                     @foreach($data as $index => $guru)
-                        @php
-                            // Fetch mapped relation data
-                            $mapelCollection = $guru->jadwalAjars->pluck('mapel.name')->unique();
-                            $kelasCollection = $guru->jadwalAjars->pluck('kelas.name')->unique()->values();
-                        @endphp
                         <tr>
                             <!-- No Column -->
                             <td class="col-no">
@@ -269,46 +240,7 @@
                                 {{ $guru->nik }}
                             </td>
                             
-                            <!-- Mata Pelajaran and Short Abbreviations Badge -->
-                            <td class="col-mapel">
-                                <div class="d-flex flex-column gap-1">
-                                    @if($mapelCollection->isEmpty())
-                                        <span class="text-muted text-xs">-</span>
-                                    @else
-                                        @foreach($mapelCollection as $mapelName)
-                                            <div class="mapel-cell">
-                                                <span class="mapel-abbr-badge" title="{{ $mapelName }}">
-                                                    {{ $guru->getMapelAbbreviation($mapelName) }}
-                                                </span>
-                                                <span class="text-sm font-medium text-neutral-800">{{ $mapelName }}</span>
-                                            </div>
-                                        @endforeach
-                                    @endif
-                                </div>
-                            </td>
-                            
-                            <!-- Kelas Pengampu (max 3 pills, collapsible indicator) -->
-                            <td class="col-kelas">
-                                @if($kelasCollection->isEmpty())
-                                    <span class="text-muted text-xs">-</span>
-                                @else
-                                    <div class="class-pill-list">
-                                        @foreach($kelasCollection->take(3) as $className)
-                                            <span class="class-pill-item">{{ $className }}</span>
-                                        @endforeach
-                                        
-                                        @if($kelasCollection->count() > 3)
-                                            @php
-                                                $remainingCount = $kelasCollection->count() - 3;
-                                                $allClassesString = $kelasCollection->join(', ');
-                                            @endphp
-                                            <x-tooltip text="{{ $allClassesString }}">
-                                                <span class="class-pill-more">+{{ $remainingCount }} lagi</span>
-                                            </x-tooltip>
-                                        @endif
-                                    </div>
-                                @endif
-                            </td>
+
                             
                             <!-- Status Badge Column -->
                             <td class="col-status col-center">
@@ -335,15 +267,7 @@
                                                         foto: '{{ $guru->foto ? asset('storage/' . $guru->foto) : '' }}',
                                                         status: '{{ $guru->status }}',
                                                         jenis_kelamin: '{{ $guru->jenis_kelamin ?? '-' }}',
-                                                        tempat_lahir: '{{ addslashes($guru->tempat_lahir ?? '-') }}',
-                                                        tanggal_lahir: '{{ $guru->tanggal_lahir ? \Carbon\Carbon::parse($guru->tanggal_lahir)->translatedFormat('d F Y') : '-' }}',
-                                                        no_telp: '{{ $guru->no_telp ?? '-' }}',
-                                                        status_kepegawaian: '{{ $guru->status_kepegawaian ?? '-' }}',
-                                                        golongan: '{{ $guru->status_kepegawaian == 'PNS' ? $guru->golongan : '-' }}',
-                                                        tmt: '{{ $guru->tmt ? \Carbon\Carbon::parse($guru->tmt)->translatedFormat('d F Y') : '-' }}',
-                                                        jumlah_jam: '{{ $guru->jumlah_jam ?? 0 }}',
-                                                        mapel: '{{ addslashes($mapelCollection->join(', ')) }}',
-                                                        kelas: '{{ addslashes($kelasCollection->join(', ')) }}'
+                                                        no_telp: '{{ $guru->no_telp ?? '-' }}'
                                                     },
                                                     editUrl: '{{ route('guru.edit', $guru->id) }}'
                                                 })">
@@ -438,7 +362,7 @@
                     </div>
 
                     <div class="mt-2 text-xs text-neutral-400">
-                        * Catatan: Data NIP guru harus 18 digit angka dan unik. Nama mapel dan kelas pengampu harus sesuai dengan data master sistem.
+                        * Catatan: Data NIP/ID guru maksimal 50 karakter dan harus unik. Nama mapel dan kelas pengampu harus sesuai dengan data master sistem.
                     </div>
                 </div>
 

@@ -110,7 +110,7 @@
                             <p class="text-sm text-slate-500 mt-1">Guru: <strong class="text-slate-700">{{ $jadwal->guru->name ?? '-' }}</strong> • Ruang: {{ $jadwal->ruangan->name ?? '-' }}</p>
                         </div>
 
-                        <button onclick="showQrModal('{{ $jadwal->id }}', '{{ $jadwal->mapel->name ?? 'Mapel' }}')" class="shrink-0 bg-amber-500 hover:bg-amber-600 text-white text-sm font-bold py-3 px-6 rounded-xl shadow-md shadow-amber-500/20 transition active:scale-[0.98] w-full sm:w-auto">
+                        <button onclick="showQrModal('{{ $jadwal->id }}', '{{ $jadwal->mapel->name ?? 'Mapel' }}', 'keluar')" class="shrink-0 bg-amber-500 hover:bg-amber-600 text-white text-sm font-bold py-3 px-6 rounded-xl shadow-md shadow-amber-500/20 transition active:scale-[0.98] w-full sm:w-auto">
                             Generate QR KELUAR
                         </button>
                     </div>
@@ -164,7 +164,7 @@
                     @if($canGenerate)
                         @if($isTimeToScan)
                             {{-- Generate QR untuk MASUK --}}
-                            <button onclick="showQrModal('{{ $jadwal->id }}', '{{ $jadwal->mapel->name ?? 'Mapel' }}')" class="shrink-0 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2.5 px-5 rounded-xl shadow-md shadow-brand-500/20 transition active:scale-[0.98]">
+                            <button onclick="showQrModal('{{ $jadwal->id }}', '{{ $jadwal->mapel->name ?? 'Mapel' }}', 'masuk')" class="shrink-0 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2.5 px-5 rounded-xl shadow-md shadow-brand-500/20 transition active:scale-[0.98]">
                                 Generate QR MASUK
                             </button>
                         @else
@@ -179,7 +179,7 @@
                                     </span>
                                 </div>
                                 {{-- Button tersembunyi, akan ditampilkan JS saat waktunya tiba --}}
-                                <button onclick="showQrModal('{{ $jadwal->id }}', '{{ $jadwal->mapel->name ?? 'Mapel' }}')"
+                                <button onclick="showQrModal('{{ $jadwal->id }}', '{{ $jadwal->mapel->name ?? 'Mapel' }}', 'masuk')"
                                         class="qr-unlocked-btn bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2.5 px-5 rounded-xl shadow-md shadow-brand-500/20 transition active:scale-[0.98]"
                                         style="display:none;">
                                     Generate QR MASUK
@@ -259,17 +259,20 @@
         let qrcodeObj = null;
         let qrIntervalId = null;
         let countdownIntervalId = null;
+        let pollIntervalId = null;
         let currentJadwalId = null;
         let currentMapelName = null;
+        let currentQrType = null;
         let countdownSeconds = 30;
 
-        function showQrModal(jadwalId, mapelName) {
+        function showQrModal(jadwalId, mapelName, type) {
             const modal = document.getElementById('qr-modal');
             const modalContent = document.getElementById('qr-modal-content');
 
             // Simpan variabel luar
             currentJadwalId = jadwalId;
             currentMapelName = mapelName;
+            currentQrType = type;
 
             // Set judul
             document.getElementById('qr-mapel-name').innerText = mapelName;
@@ -334,6 +337,30 @@
                 }
                 updateCountdownText();
             }, 1000);
+
+            // Polling status absensi ke server
+            pollIntervalId = setInterval(() => {
+                fetch(`/siswa/jadwal/${currentJadwalId}/status`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (currentQrType === 'masuk' && data.absen_masuk) {
+                            if (typeof Swal !== 'undefined') {
+                                Swal.fire('Berhasil!', 'Guru telah melakukan scan QR MASUK.', 'success').then(() => location.reload());
+                            } else {
+                                alert('Berhasil! Guru telah melakukan scan QR MASUK.');
+                                location.reload();
+                            }
+                        } else if (currentQrType === 'keluar' && data.absen_keluar) {
+                            if (typeof Swal !== 'undefined') {
+                                Swal.fire('Berhasil!', 'Guru telah melakukan scan QR KELUAR.', 'success').then(() => location.reload());
+                            } else {
+                                alert('Berhasil! Guru telah melakukan scan QR KELUAR.');
+                                location.reload();
+                            }
+                        }
+                    })
+                    .catch(err => console.error(err));
+            }, 3000);
         }
 
         // ... Sisa fungsi JS di bawah ...
@@ -345,6 +372,10 @@
             if (countdownIntervalId) {
                 clearInterval(countdownIntervalId);
                 countdownIntervalId = null;
+            }
+            if (pollIntervalId) {
+                clearInterval(pollIntervalId);
+                pollIntervalId = null;
             }
         }
 

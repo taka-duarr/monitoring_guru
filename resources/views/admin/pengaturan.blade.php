@@ -3,12 +3,12 @@
 @section('title', 'Pengaturan Sistem - SIMGURU')
 
 @section('content')
-<div class="position-relative" x-data="{ activeTab: 'profil' }">
+<div class="position-relative">
     <!-- Header Page Title -->
     <div class="d-flex align-center justify-between mb-4">
         <div>
             <h2 class="text-2xl font-bold tracking-tight text-primary-900">Pengaturan Sistem</h2>
-            <p class="text-sm text-neutral-500">Konfigurasi profil sekolah, tahun ajaran aktif, dan parameter absensi guru</p>
+            <p class="text-sm text-neutral-500">Konfigurasi profil sekolah dan tahun ajaran aktif</p>
         </div>
     </div>
 
@@ -35,30 +35,14 @@
     @endif
 
     <div class="d-flex flex-column gap-4">
-        <!-- Tabs Navigation -->
-        <div class="d-flex border-b border-neutral-200 bg-white rounded-t-lg px-4 pt-2 gap-2 shadow-xs">
-            <button type="button" 
-                    @click="activeTab = 'profil'" 
-                    class="px-4 py-3 font-medium text-sm border-b-2 transition-all d-flex align-center gap-2"
-                    :class="activeTab === 'profil' ? 'border-primary-600 text-primary-600' : 'border-transparent text-neutral-500 hover:text-neutral-700 hover:border-neutral-300'">
-                <i class="ti ti-school"></i> Profil Sekolah
-            </button>
-            <button type="button" 
-                    @click="activeTab = 'akademik'" 
-                    class="px-4 py-3 font-medium text-sm border-b-2 transition-all d-flex align-center gap-2"
-                    :class="activeTab === 'akademik' ? 'border-primary-600 text-primary-600' : 'border-transparent text-neutral-500 hover:text-neutral-700 hover:border-neutral-300'">
-                <i class="ti ti-clock"></i> Akademik & Absensi
-            </button>
-        </div>
-
         <!-- Form Card Container -->
-        <div class="card p-6 rounded-b-lg rounded-t-none mt-0 shadow-sm bg-white">
+        <div class="card p-6 rounded-lg mt-0 shadow-sm bg-white">
             <form action="{{ route('pengaturan.update') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
 
-                <!-- TAB 1: PROFIL SEKOLAH -->
-                <div x-show="activeTab === 'profil'" x-transition>
+                <!-- PROFIL SEKOLAH -->
+                <div>
                     <h3 class="text-lg font-semibold text-primary-900 mb-4 pb-2 border-b border-neutral-100">Informasi Identitas Sekolah</h3>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -108,53 +92,6 @@
                                         <span class="text-xs text-neutral-400 mt-1 d-block">Format: JPG, JPEG, PNG (Maks 2MB)</span>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- TAB 2: AKADEMIK & ABSENSI -->
-                <div x-show="activeTab === 'akademik'" x-transition style="display: none;">
-                    <h3 class="text-lg font-semibold text-primary-900 mb-4 pb-2 border-b border-neutral-100">Parameter Akademik & Jam Kerja</h3>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Left Column: Periode Akademik -->
-                        <div class="d-flex flex-column gap-4">
-                            <h4 class="font-medium text-sm text-neutral-700 uppercase tracking-wider mb-1">Periode Aktif</h4>
-                            
-                            <div class="form-group">
-                                <label class="form-label" for="academic_year">Tahun Ajaran <span class="text-danger">*</span></label>
-                                <input type="text" name="academic_year" id="academic_year" class="form-control" placeholder="Contoh: 2025/2026" value="{{ old('academic_year', $settings['academic_year']) }}" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label" for="academic_semester">Semester Aktif <span class="text-danger">*</span></label>
-                                <select name="academic_semester" id="academic_semester" class="form-control" style="color: #111827; background: #ffffff;" required>
-                                    <option value="Ganjil" {{ old('academic_semester', $settings['academic_semester']) === 'Ganjil' ? 'selected' : '' }}>Ganjil</option>
-                                    <option value="Genap" {{ old('academic_semester', $settings['academic_semester']) === 'Genap' ? 'selected' : '' }}>Genap</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <!-- Right Column: Parameter Absensi -->
-                        <div class="d-flex flex-column gap-4">
-                            <h4 class="font-medium text-sm text-neutral-700 uppercase tracking-wider mb-1">Jadwal Kehadiran Standar</h4>
-                            
-                            <div class="grid grid-cols-2 gap-4">
-                                <div class="form-group">
-                                    <label class="form-label" for="default_time_in">Jam Masuk <span class="text-danger">*</span></label>
-                                    <input type="time" name="default_time_in" id="default_time_in" class="form-control" value="{{ old('default_time_in', $settings['default_time_in']) }}" required>
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="form-label" for="tolerance_minutes">Toleransi Telat (Menit) <span class="text-danger">*</span></label>
-                                    <input type="number" name="tolerance_minutes" id="tolerance_minutes" class="form-control" min="0" value="{{ old('tolerance_minutes', $settings['tolerance_minutes']) }}" required>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label" for="default_time_out">Jam Keluar <span class="text-danger">*</span></label>
-                                <input type="time" name="default_time_out" id="default_time_out" class="form-control" value="{{ old('default_time_out', $settings['default_time_out']) }}" required>
                             </div>
                         </div>
                     </div>

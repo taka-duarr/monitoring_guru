@@ -58,15 +58,10 @@
                     <li>
                         <a href="{{ route('absenmasuk.index') }}"
                            class="sidebar-submenu-item {{ request()->routeIs('absenmasuk.index') ? 'active' : '' }}">
-                            Kehadiran Masuk
+                            Rekap Kehadiran
                         </a>
                     </li>
-                    <li>
-                        <a href="{{ route('absenkeluar.index') }}"
-                           class="sidebar-submenu-item {{ request()->routeIs('absenkeluar.index') ? 'active' : '' }}">
-                            Kehadiran Keluar
-                        </a>
-                    </li>
+
                     <li>
                         <a href="{{ route('izin.index') }}"
                            class="sidebar-submenu-item {{ request()->routeIs('izin.index') ? 'active' : '' }}">
@@ -108,6 +103,28 @@
                 </a>
             </li>
 
+            <!-- Angkatan -->
+            <li class="sidebar-menu-item-wrapper">
+                <a href="{{ route('angkatan.index') }}"
+                   class="sidebar-menu-item {{ request()->routeIs('angkatan.*') ? 'active' : '' }}"
+                   :class="{ 'active': {{ request()->routeIs('angkatan.*') ? 'true' : 'false' }} }"
+                   data-tooltip="Angkatan">
+                    <i class="ti ti-hash"></i>
+                    <span class="sidebar-menu-text" x-show="!sidebarCollapsed">Angkatan</span>
+                </a>
+            </li>
+
+            <!-- Jurusan -->
+            <li class="sidebar-menu-item-wrapper">
+                <a href="{{ route('jurusan.index') }}"
+                   class="sidebar-menu-item {{ request()->routeIs('jurusan.*') ? 'active' : '' }}"
+                   :class="{ 'active': {{ request()->routeIs('jurusan.*') ? 'true' : 'false' }} }"
+                   data-tooltip="Jurusan">
+                    <i class="ti ti-git-branch"></i>
+                    <span class="sidebar-menu-text" x-show="!sidebarCollapsed">Jurusan</span>
+                </a>
+            </li>
+
             <!-- Mata Pelajaran -->
             <li class="sidebar-menu-item-wrapper">
                 <a href="{{ route('mapel.index') }}"
@@ -127,28 +144,6 @@
                    data-tooltip="Kelas">
                     <i class="ti ti-school"></i>
                     <span class="sidebar-menu-text" x-show="!sidebarCollapsed">Kelas</span>
-                </a>
-            </li>
-
-            <!-- Jurusan -->
-            <li class="sidebar-menu-item-wrapper">
-                <a href="{{ route('jurusan.index') }}"
-                   class="sidebar-menu-item {{ request()->routeIs('jurusan.*') ? 'active' : '' }}"
-                   :class="{ 'active': {{ request()->routeIs('jurusan.*') ? 'true' : 'false' }} }"
-                   data-tooltip="Jurusan">
-                    <i class="ti ti-git-branch"></i>
-                    <span class="sidebar-menu-text" x-show="!sidebarCollapsed">Jurusan</span>
-                </a>
-            </li>
-
-            <!-- Angkatan -->
-            <li class="sidebar-menu-item-wrapper">
-                <a href="{{ route('angkatan.index') }}"
-                   class="sidebar-menu-item {{ request()->routeIs('angkatan.*') ? 'active' : '' }}"
-                   :class="{ 'active': {{ request()->routeIs('angkatan.*') ? 'true' : 'false' }} }"
-                   data-tooltip="Angkatan">
-                    <i class="ti ti-hash"></i>
-                    <span class="sidebar-menu-text" x-show="!sidebarCollapsed">Angkatan</span>
                 </a>
             </li>
 

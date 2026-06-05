@@ -63,37 +63,17 @@ class GuruImport implements ToCollection, WithHeadingRow
 
                 // Create User
                 $user = User::create([
-                    'id' => (string) Str::uuid(),
-                    'name' => trim($row['nama_lengkap']),
-                    'nik' => $nip,
-                    'jabatan' => 'guru',
-                    'status' => trim($row['status'] ?? 'Aktif'),
-                    'jenis_kelamin' => trim($row['jenis_kelamin']),
-                    'tempat_lahir' => trim($row['tempat_lahir'] ?? null),
-                    'tanggal_lahir' => $row['parsed_tanggal_lahir'],
-                    'no_telp' => trim($row['nomor_telepon'] ?? null),
-                    'status_kepegawaian' => trim($row['status_kepegawaian']),
-                    'golongan' => trim($row['golongan_pangkat'] ?? null),
-                    'tmt' => $row['parsed_tmt'],
-                    'jumlah_jam' => intval($row['jumlah_jam']),
-                    'password' => Hash::make($nip), // Default password is NIP
+                    'id'                 => (string) Str::uuid(),
+                    'name'               => trim($row['nama_lengkap']),
+                    'nik'                => $nip,
+                    'jabatan'            => 'guru',
+                    'status'             => trim($row['status'] ?? 'Aktif'),
+                    'jenis_kelamin'      => trim($row['jenis_kelamin']),
+                    'no_telp'            => trim($row['nomor_telepon'] ?? null),
+                    'password'           => Hash::make($nip), // Default password is NIP
                 ]);
 
-                // Create basic schedule for each class
-                if (isset($row['matched_kelas_ids']) && isset($row['matched_mapel_id'])) {
-                    foreach ($row['matched_kelas_ids'] as $kelasId) {
-                        JadwalAjar::create([
-                            'id' => (string) Str::uuid(),
-                            'guru_id' => $user->id,
-                            'mapel_id' => $row['matched_mapel_id'],
-                            'kelas_id' => $kelasId,
-                            'ruangan_id' => $firstRuangan ? $firstRuangan->id : null,
-                            'hari' => 'Senin',
-                            'jam_mulai' => '07:00',
-                            'jam_selesai' => '08:00',
-                        ]);
-                    }
-                }
+
             }
         });
     }
@@ -114,13 +94,10 @@ class GuruImport implements ToCollection, WithHeadingRow
         // 2. NIP validation
         $nip = trim($row['nip'] ?? '');
         if (empty($nip)) {
-            $this->addError($rowNum, 'NIP wajib diisi.');
+            $this->addError($rowNum, 'NIP/ID wajib diisi.');
             $validationFailed = true;
-        } elseif (!is_numeric($nip)) {
-            $this->addError($rowNum, 'NIP harus berupa angka.');
-            $validationFailed = true;
-        } elseif (strlen($nip) !== 18) {
-            $this->addError($rowNum, 'NIP harus tepat 18 digit.');
+        } elseif (strlen($nip) > 50) {
+            $this->addError($rowNum, 'NIP/ID maksimal 50 karakter.');
             $validationFailed = true;
         } elseif (in_array($nip, $checkedNips)) {
             $this->addError($rowNum, "NIP '$nip' duplikat di dalam berkas Excel.");
@@ -144,114 +121,14 @@ class GuruImport implements ToCollection, WithHeadingRow
             $validationFailed = true;
         }
 
-        // 4. Status Kepegawaian validation
-        $statusKepegawaian = trim($row['status_kepegawaian'] ?? '');
-        if (empty($statusKepegawaian)) {
-            $this->addError($rowNum, 'Status Kepegawaian wajib diisi (PNS / GTT / GTY / Honorer).');
-            $validationFailed = true;
-        } elseif (!in_array($statusKepegawaian, ['PNS', 'GTT', 'GTY', 'Honorer'])) {
-            $this->addError($rowNum, "Status Kepegawaian tidak valid: '$statusKepegawaian'. Harus PNS, GTT, GTY, atau Honorer.");
-            $validationFailed = true;
-        }
 
-        // 5. Golongan validation
-        $golongan = null;
-        if (isset($row['golongan_pangkat'])) {
-            $golongan = trim($row['golongan_pangkat']);
-        } elseif (isset($row['golongan'])) {
-            $golongan = trim($row['golongan']);
-        }
-        
-        if ($statusKepegawaian === 'PNS' && empty($golongan)) {
-            $this->addError($rowNum, 'Golongan/Pangkat wajib diisi jika status kepegawaian adalah PNS.');
-            $validationFailed = true;
-        }
-        $row['golongan_pangkat'] = $golongan;
-
-        // 6. Status Keaktifan validation
         $status = isset($row['status']) ? trim($row['status']) : 'Aktif';
         if (!in_array($status, ['Aktif', 'Cuti', 'Pensiun'])) {
             $this->addError($rowNum, "Status Keaktifan tidak valid: '$status'. Harus Aktif, Cuti, atau Pensiun.");
             $validationFailed = true;
         }
 
-        // 7. Jumlah Jam Mengajar validation
-        $jumlahJam = null;
-        if (isset($row['jumlah_jam_mengajar'])) {
-            $jumlahJam = trim($row['jumlah_jam_mengajar']);
-        } elseif (isset($row['jumlah_jam'])) {
-            $jumlahJam = trim($row['jumlah_jam']);
-        }
 
-        if (is_null($jumlahJam) || $jumlahJam === '') {
-            $this->addError($rowNum, 'Jumlah Jam Mengajar wajib diisi.');
-            $validationFailed = true;
-        } elseif (!is_numeric($jumlahJam) || intval($jumlahJam) < 0 || intval($jumlahJam) > 48) {
-            $this->addError($rowNum, 'Jumlah Jam Mengajar harus berupa angka antara 0 hingga 48.');
-            $validationFailed = true;
-        }
-        $row['jumlah_jam'] = $jumlahJam;
-
-        // 8. Mata Pelajaran validation & matching
-        $mapelName = trim($row['mata_pelajaran'] ?? '');
-        if (empty($mapelName)) {
-            $this->addError($rowNum, 'Mata Pelajaran wajib diisi.');
-            $validationFailed = true;
-        } else {
-            // Case-insensitive match from the loaded mapels
-            $matchedMapelId = null;
-            foreach ($allMapels as $name => $id) {
-                if (strcasecmp($name, $mapelName) === 0) {
-                    $matchedMapelId = $id;
-                    break;
-                }
-            }
-
-            if (!$matchedMapelId) {
-                $this->addError($rowNum, "Mata Pelajaran '$mapelName' tidak ditemukan di master data.");
-                $validationFailed = true;
-            } else {
-                $row['matched_mapel_id'] = $matchedMapelId;
-            }
-        }
-
-        // 9. Kelas Pengampu validation & matching
-        $kelasInput = trim($row['kelas_pengampu'] ?? '');
-        if (empty($kelasInput)) {
-            $this->addError($rowNum, 'Kelas Pengampu wajib diisi.');
-            $validationFailed = true;
-        } else {
-            $classNames = array_map('trim', explode(',', $kelasInput));
-            $matchedKelasIds = [];
-            $notFoundClasses = [];
-
-            foreach ($classNames as $className) {
-                $matchedId = null;
-                foreach ($allKelas as $name => $id) {
-                    if (strcasecmp($name, $className) === 0) {
-                        $matchedId = $id;
-                        break;
-                    }
-                }
-
-                if ($matchedId) {
-                    $matchedKelasIds[] = $matchedId;
-                } else {
-                    $notFoundClasses[] = $className;
-                }
-            }
-
-            if (!empty($notFoundClasses)) {
-                $this->addError($rowNum, "Kelas berikut tidak ditemukan di master data: '" . implode("', '", $notFoundClasses) . "'");
-                $validationFailed = true;
-            } else {
-                $row['matched_kelas_ids'] = $matchedKelasIds;
-            }
-        }
-
-        // Parse Birth Date & TMT
-        $row['parsed_tanggal_lahir'] = $this->transformDate($row['tanggal_lahir'] ?? null);
-        $row['parsed_tmt'] = $this->transformDate($row['tmt'] ?? null);
 
         return !$validationFailed;
     }

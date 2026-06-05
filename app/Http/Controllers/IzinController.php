@@ -30,7 +30,6 @@ class IzinController extends Controller
             'guru_id' => 'required|exists:users,id',
             'jadwal_ajar_id' => 'nullable|exists:jadwal_ajars,id',
             'tanggal_izin' => 'required|date',
-            'jam_izin' => 'required|string',
             'judul' => 'required|string|max:255',
             'pesan' => 'required|string',
             'approval' => 'required|boolean',
@@ -60,7 +59,6 @@ class IzinController extends Controller
             'guru_id' => 'required|exists:users,id',
             'jadwal_ajar_id' => 'nullable|exists:jadwal_ajars,id',
             'tanggal_izin' => 'required|date',
-            'jam_izin' => 'required|string',
             'judul' => 'required|string|max:255',
             'pesan' => 'required|string',
             'approval' => 'required|boolean',
@@ -76,6 +74,13 @@ class IzinController extends Controller
     {
         Izin::destroy($id);
         return redirect()->route('izin.index')->with('success', 'Data berhasil dihapus');
+    }
+
+    public function approve($id)
+    {
+        $izin = Izin::findOrFail($id);
+        $izin->update(['approval' => true]);
+        return redirect()->back()->with('success', 'Pengajuan izin berhasil disetujui');
     }
 }
 

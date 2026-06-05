@@ -37,6 +37,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
 
     // Nested routes for Murid
     Route::get('kelas/{kelas}/murid', [MuridController::class, 'index'])->name('kelas.murid.index');
+    Route::get('kelas/{kelas}/murid/import/template', [MuridController::class, 'downloadTemplate'])->name('kelas.murid.import.template');
+    Route::post('kelas/{kelas}/murid/import', [MuridController::class, 'import'])->name('kelas.murid.import');
     Route::post('kelas/{kelas}/murid', [MuridController::class, 'store'])->name('kelas.murid.store');
     Route::put('kelas/{kelas}/murid/{murid}', [MuridController::class, 'update'])->name('kelas.murid.update');
     Route::delete('kelas/{kelas}/murid/{murid}', [MuridController::class, 'destroy'])->name('kelas.murid.destroy');
@@ -50,6 +52,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('jurusan/import/template', [App\Http\Controllers\JurusanController::class, 'downloadTemplate'])->name('jurusan.import.template');
     Route::post('jurusan/import', [App\Http\Controllers\JurusanController::class, 'import'])->name('jurusan.import');
     Route::resource('jurusan', App\Http\Controllers\JurusanController::class);
+    Route::get('jadwalajar/export', [App\Http\Controllers\JadwalAjarController::class, 'export'])->name('jadwalajar.export');
+    Route::get('jadwalajar/import/template', [App\Http\Controllers\JadwalAjarController::class, 'downloadTemplate'])->name('jadwalajar.import.template');
+    Route::post('jadwalajar/import', [App\Http\Controllers\JadwalAjarController::class, 'import'])->name('jadwalajar.import');
     Route::resource('jadwalajar', App\Http\Controllers\JadwalAjarController::class);
     
     // Absen Masuk & Murid Read-only
@@ -67,8 +72,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('ruangan/import/template', [App\Http\Controllers\RuanganController::class, 'downloadTemplate'])->name('ruangan.import.template');
     Route::post('ruangan/import', [App\Http\Controllers\RuanganController::class, 'import'])->name('ruangan.import');
     Route::resource('ruangan', App\Http\Controllers\RuanganController::class);
+    Route::post('izin/{id}/approve', [App\Http\Controllers\IzinController::class, 'approve'])->name('izin.approve');
     Route::resource('izin', App\Http\Controllers\IzinController::class);
-    Route::resource('absenkeluar', App\Http\Controllers\AbsenKeluarController::class);
+
     Route::resource('statuskelas', App\Http\Controllers\StatusKelasController::class);
 
     // Laporan
@@ -93,6 +99,8 @@ Route::middleware(['auth', 'role:guru'])->prefix('guru')->group(function () {
     Route::get('/izin', [App\Http\Controllers\GuruPortalController::class, 'izin'])->name('guru.izin');
     Route::post('/izin', [App\Http\Controllers\GuruPortalController::class, 'storeIzin'])->name('guru.store_izin');
     Route::get('/riwayat-mapel/{mapel_id}', [App\Http\Controllers\GuruPortalController::class, 'riwayatMapel'])->name('guru.riwayat_mapel');
+    Route::get('/absen-murid/{absen_masuk_id}', [App\Http\Controllers\GuruPortalController::class, 'absenMurid'])->name('guru.absen_murid');
+    Route::post('/absen-murid/{absen_masuk_id}', [App\Http\Controllers\GuruPortalController::class, 'storeAbsenMurid'])->name('guru.store_absen_murid');
 });
 
 // ==========================================
@@ -104,4 +112,5 @@ Route::get('/siswa', function () {
 
 Route::middleware(['siswa'])->prefix('siswa')->group(function () {
     Route::get('/dashboard', [App\Http\Controllers\SiswaPortalController::class, 'dashboard'])->name('siswa.dashboard');
+    Route::get('/jadwal/{id}/status', [App\Http\Controllers\SiswaPortalController::class, 'checkStatus'])->name('siswa.check_status');
 });
