@@ -2,7 +2,7 @@
     $segments = request()->segments();
     $breadcrumbs = [];
     $accumulatedUrl = '';
-    
+
     // Custom friendly names for segments
     $segmentNames = [
         'admin' => 'Admin',
@@ -130,12 +130,17 @@
         <div class="position-relative" x-data="{ open: false }" @click.away="open = false">
             <button @click="open = !open" class="d-flex align-center gap-2 p-1" style="background: transparent; border: none; cursor: pointer; border-radius: var(--radius-md); outline: none;">
                 @php
-                    $userName = Auth::user()->name ?? 'User';
+                    $user = Auth::user();
+                    $userName = $user->name ?? 'User';
                     $userInitials = collect(explode(' ', $userName))->map(fn($n) => substr($n, 0, 1))->take(2)->join('');
                     $colorHashIndex = (ord(substr($userName, 0, 1)) % 9) + 1;
                 @endphp
-                <div class="avatar avatar-md avatar-bg-{{ $colorHashIndex }}">
-                    {{ $userInitials }}
+                <div class="avatar avatar-md avatar-bg-{{ $colorHashIndex }}" style="overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                    @if($user->foto && file_exists(public_path('storage/' . $user->foto)))
+                        <img src="{{ asset('storage/' . $user->foto) }}" alt="{{ $userName }}" class="w-full h-full object-cover">
+                    @else
+                        {{ $userInitials }}
+                    @endif
                 </div>
                 <div class="text-left d-none d-sm-block">
                     <p class="mb-0 text-sm font-semibold" style="line-height: 1.2; color: var(--color-neutral-800);">{{ $userName }}</p>
@@ -159,11 +164,11 @@
                 <div class="px-2 py-1 mb-1 text-xs text-muted" style="border-bottom: 1px solid var(--color-neutral-100);">
                     Kelola Akun
                 </div>
-                <a href="#" class="d-flex align-center gap-2 px-2 py-2 text-sm text-neutral-700 hover:bg-neutral-50 rounded" style="border-radius: var(--radius-sm); text-decoration: none; color: var(--color-neutral-700);">
+                <a href="{{ route('admin.profile.index') }}" class="d-flex align-center gap-2 px-2 py-2 text-sm text-neutral-700 hover:bg-neutral-50 rounded" style="border-radius: var(--radius-sm); text-decoration: none; color: var(--color-neutral-700);">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px; flex-shrink: 0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                     Profil Saya
                 </a>
-                <a href="#" class="d-flex align-center gap-2 px-2 py-2 text-sm text-neutral-700 hover:bg-neutral-50 rounded" style="border-radius: var(--radius-sm); text-decoration: none; color: var(--color-neutral-700);">
+                <a href="{{ route('pengaturan.index') }}" class="d-flex align-center gap-2 px-2 py-2 text-sm text-neutral-700 hover:bg-neutral-50 rounded" style="border-radius: var(--radius-sm); text-decoration: none; color: var(--color-neutral-700);">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px; flex-shrink: 0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                     Pengaturan
                 </a>

@@ -16,15 +16,15 @@
 @if($kelas)
     {{-- Data Ringkasan --}}
     @php
-        $totalJadwal = count($jadwals);
-        $selesaiJadwal = $jadwals->filter(fn($j) => $j->absen_masuk !== null && $j->absen_keluar !== null)->count();
-        $belumJadwal = $jadwals->filter(fn($j) => $j->absen_masuk === null)->count();
+        $totalJadwal = count($allJadwals);
+        $selesaiJadwal = $allJadwals->filter(fn($j) => $j->absen_masuk !== null && $j->absen_keluar !== null)->count();
+        $belumJadwal = $allJadwals->filter(fn($j) => $j->absen_masuk === null)->count();
 
-        $nextJadwal = $jadwals->first(fn($j) => $j->absen_masuk === null);
+        $nextJadwal = $allJadwals->first(fn($j) => $j->absen_masuk === null);
         $nextJamMulai = $nextJadwal ? $nextJadwal->jam_mulai : null;
 
         // Pisahkan kelas aktif vs kelas lainnya
-        $ongoingClasses = $jadwals->filter(fn($j) => $j->absen_masuk !== null && $j->absen_keluar === null);
+        $ongoingClasses = $allJadwals->filter(fn($j) => $j->absen_masuk !== null && $j->absen_keluar === null);
         $otherClasses = $jadwals->filter(fn($j) => !($j->absen_masuk !== null && $j->absen_keluar === null));
     @endphp
 
@@ -87,7 +87,7 @@
     @if($ongoingClasses->isNotEmpty())
         <div class="mb-6">
             <h3 class="font-bold text-xs text-slate-400 uppercase tracking-wider mb-3">Kelas Sedang Berlangsung</h3>
-            <div class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 @foreach($ongoingClasses as $jadwal)
                     @php
                         $statusText = 'Sedang Belajar';
@@ -95,24 +95,28 @@
                         $borderClass = 'border-amber-400 ring-2 ring-amber-400/20';
                     @endphp
                     
-                    <div class="bg-white rounded-2xl p-5 shadow-lg border-2 {{ $borderClass }} flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative overflow-hidden transition-all duration-300 hover:shadow-xl">
+                    <div class="bg-white rounded-2xl p-5 shadow-lg border-2 {{ $borderClass }} relative overflow-hidden transition-all duration-300 hover:shadow-xl flex flex-col justify-between h-full">
                         <div class="absolute top-0 left-0 w-1.5 h-full bg-amber-500"></div>
 
-                        <div>
-                            <div class="flex items-center gap-2 mb-2">
-                                <span class="inline-block px-2.5 py-1 bg-brand-50 text-brand-700 text-[10px] font-bold uppercase tracking-wider rounded-md">{{ substr($jadwal->jam_mulai, 0, 5) }} - {{ substr($jadwal->jam_selesai, 0, 5) }}</span>
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 {{ $statusColor }} text-[10px] font-bold uppercase tracking-wider rounded-md">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
-                                    {{ $statusText }}
-                                </span>
+                        <div class="flex-1 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="inline-block px-2.5 py-1 bg-brand-50 text-brand-700 text-[10px] font-bold uppercase tracking-wider rounded-md">{{ substr($jadwal->jam_mulai, 0, 5) }} - {{ substr($jadwal->jam_selesai, 0, 5) }}</span>
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 {{ $statusColor }} text-[10px] font-bold uppercase tracking-wider rounded-md">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
+                                        {{ $statusText }}
+                                    </span>
+                                </div>
+                                <h4 class="font-bold text-xl text-slate-800 leading-tight">{{ $jadwal->mapel->name ?? 'Mapel Tidak Diketahui' }}</h4>
+                                <p class="text-sm text-slate-500 mt-1">Guru: <strong class="text-slate-700">{{ $jadwal->guru->name ?? '-' }}</strong> • Ruang: {{ $jadwal->ruangan->name ?? '-' }}</p>
                             </div>
-                            <h4 class="font-bold text-xl text-slate-800 leading-tight">{{ $jadwal->mapel->name ?? 'Mapel Tidak Diketahui' }}</h4>
-                            <p class="text-sm text-slate-500 mt-1">Guru: <strong class="text-slate-700">{{ $jadwal->guru->name ?? '-' }}</strong> • Ruang: {{ $jadwal->ruangan->name ?? '-' }}</p>
                         </div>
 
-                        <button onclick="showQrModal('{{ $jadwal->id }}', '{{ $jadwal->mapel->name ?? 'Mapel' }}', 'keluar')" class="shrink-0 bg-amber-500 hover:bg-amber-600 text-white text-sm font-bold py-3 px-6 rounded-xl shadow-md shadow-amber-500/20 transition active:scale-[0.98] w-full sm:w-auto">
-                            Generate QR KELUAR
-                        </button>
+                        <div class="mt-4">
+                            <button onclick="showQrModal('{{ $jadwal->id }}', '{{ $jadwal->mapel->name ?? 'Mapel' }}', 'keluar')" class="bg-amber-500 hover:bg-amber-600 text-white text-sm font-bold py-3 px-6 rounded-xl shadow-md shadow-amber-500/20 transition active:scale-[0.98] w-full">
+                                Generate QR KELUAR
+                            </button>
+                        </div>
                     </div>
                 @endforeach
             </div>
@@ -122,7 +126,7 @@
     {{-- 2. SEKSI JADWAL LAINNYA --}}
     <div>
         <h3 class="font-bold text-xs text-slate-400 uppercase tracking-wider mb-3">Jadwal Kelas Hari Ini</h3>
-        <div class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             @forelse($otherClasses as $jadwal)
                 @php
                     $hasMasuk = $jadwal->absen_masuk !== null;
@@ -145,58 +149,62 @@
                         $canGenerate = true;
                     }
                 @endphp
-                <div class="bg-white rounded-2xl p-5 shadow-sm border {{ $borderClass }} flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative overflow-hidden transition-all hover:shadow-md">
+                <div class="bg-white rounded-2xl p-5 shadow-sm border {{ $borderClass }} relative overflow-hidden transition-all hover:shadow-md flex flex-col justify-between h-full">
                     @if(!$hasMasuk)
                         <div class="absolute top-0 left-0 w-1.5 h-full bg-blue-500"></div>
                     @elseif($hasMasuk && $hasKeluar)
                         <div class="absolute top-0 left-0 w-1.5 h-full bg-emerald-500"></div>
                     @endif
                     
-                    <div>
-                        <div class="flex items-center gap-2 mb-2">
-                           <span class="inline-block px-2.5 py-1 bg-brand-50 text-brand-700 text-[10px] font-bold uppercase tracking-wider rounded-md">{{ substr($jadwal->jam_mulai, 0, 5) }} - {{ substr($jadwal->jam_selesai, 0, 5) }}</span>
-                           <span class="inline-block px-2.5 py-1 {{ $statusColor }} text-[10px] font-bold uppercase tracking-wider rounded-md">{{ $statusText }}</span>
+                    <div class="flex-1 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center gap-2 mb-2">
+                               <span class="inline-block px-2.5 py-1 bg-brand-50 text-brand-700 text-[10px] font-bold uppercase tracking-wider rounded-md">{{ substr($jadwal->jam_mulai, 0, 5) }} - {{ substr($jadwal->jam_selesai, 0, 5) }}</span>
+                               <span class="inline-block px-2.5 py-1 {{ $statusColor }} text-[10px] font-bold uppercase tracking-wider rounded-md">{{ $statusText }}</span>
+                            </div>
+                            <h4 class="font-bold text-lg text-slate-800 leading-tight">{{ $jadwal->mapel->name ?? 'Mapel Tidak Diketahui' }}</h4>
+                            <p class="text-sm text-slate-500 mt-1">Guru: {{ $jadwal->guru->name ?? '-' }} • Ruang: {{ $jadwal->ruangan->name ?? '-' }}</p>
                         </div>
-                        <h4 class="font-bold text-lg text-slate-800">{{ $jadwal->mapel->name ?? 'Mapel Tidak Diketahui' }}</h4>
-                        <p class="text-sm text-slate-500 mt-1">Guru: {{ $jadwal->guru->name ?? '-' }} • Ruang: {{ $jadwal->ruangan->name ?? '-' }}</p>
                     </div>
                    
-                    @if($canGenerate)
-                        @if($isTimeToScan)
-                            {{-- Generate QR untuk MASUK --}}
-                            <button onclick="showQrModal('{{ $jadwal->id }}', '{{ $jadwal->mapel->name ?? 'Mapel' }}', 'masuk')" class="shrink-0 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2.5 px-5 rounded-xl shadow-md shadow-brand-500/20 transition active:scale-[0.98]">
-                                Generate QR MASUK
-                            </button>
-                        @else
-                            {{-- Belum jam mengajar, tombol locked dengan countdown --}}
-                            <div class="shrink-0 relative" data-unlock-time="{{ $jadwal->jam_mulai }}">
-                                <div class="bg-slate-100 border border-slate-200 text-slate-400 text-center py-2.5 px-5 rounded-xl text-sm font-semibold cursor-not-allowed select-none flex items-center gap-2 qr-locked-btn">
-                                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                                    </svg>
-                                    <span>Terbuka pukul <strong class="text-slate-500">{{ substr($jadwal->jam_mulai, 0, 5) }}</strong>
-                                        &nbsp;(<span class="qr-unlock-countdown text-xs font-mono text-slate-500">--:--</span>)
-                                    </span>
-                                </div>
-                                {{-- Button tersembunyi, akan ditampilkan JS saat waktunya tiba --}}
-                                <button onclick="showQrModal('{{ $jadwal->id }}', '{{ $jadwal->mapel->name ?? 'Mapel' }}', 'masuk')"
-                                        class="qr-unlocked-btn bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2.5 px-5 rounded-xl shadow-md shadow-brand-500/20 transition active:scale-[0.98]"
-                                        style="display:none;">
+                    <div class="mt-4">
+                        @if($canGenerate)
+                            @if($isTimeToScan)
+                                {{-- Generate QR untuk MASUK --}}
+                                <button onclick="showQrModal('{{ $jadwal->id }}', '{{ $jadwal->mapel->name ?? 'Mapel' }}', 'masuk')" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2.5 px-5 rounded-xl shadow-md shadow-brand-500/20 transition active:scale-[0.98]">
                                     Generate QR MASUK
                                 </button>
+                            @else
+                                {{-- Belum jam mengajar, tombol locked dengan countdown --}}
+                                <div class="relative w-full" data-unlock-time="{{ $jadwal->jam_mulai }}">
+                                    <div class="w-full bg-slate-100 border border-slate-200 text-slate-400 text-center py-2.5 px-5 rounded-xl text-sm font-semibold cursor-not-allowed select-none flex items-center justify-center gap-2 qr-locked-btn">
+                                        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                        </svg>
+                                        <span>Terbuka <strong class="text-slate-500">{{ substr($jadwal->jam_mulai, 0, 5) }}</strong>
+                                            &nbsp;(<span class="qr-unlock-countdown text-xs font-mono text-slate-500">--:--</span>)
+                                        </span>
+                                    </div>
+                                    {{-- Button tersembunyi, akan ditampilkan JS saat waktunya tiba --}}
+                                    <button onclick="showQrModal('{{ $jadwal->id }}', '{{ $jadwal->mapel->name ?? 'Mapel' }}', 'masuk')"
+                                            class="qr-unlocked-btn w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2.5 px-5 rounded-xl shadow-md shadow-brand-500/20 transition active:scale-[0.98]"
+                                            style="display:none;">
+                                        Generate QR MASUK
+                                    </button>
+                                </div>
+                            @endif
+                        @else
+                            {{-- Selesai --}}
+                            <div class="text-emerald-600 font-bold flex items-center justify-center gap-1.5 py-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <span>Selesai</span>
                             </div>
                         @endif
-                    @else
-                        {{-- Selesai --}}
-                        <div class="shrink-0 text-emerald-600 font-bold flex items-center gap-1.5">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            <span>Selesai</span>
-                        </div>
-                    @endif
+                    </div>
                 </div>
             @empty
                 @if($ongoingClasses->isEmpty())
-                    <div class="bg-white rounded-3xl p-8 text-center shadow-sm border border-slate-100 mt-8">
+                    <div class="bg-white rounded-3xl p-8 text-center shadow-sm border border-slate-100 col-span-full">
                         <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-400 mb-4 mx-auto">
                             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         </div>
@@ -205,6 +213,10 @@
                     </div>
                 @endif
             @endforelse
+        </div>
+        <!-- Pagination Links -->
+        <div class="mt-6 flex justify-center">
+            {{ $jadwals->links() }}
         </div>
     </div>
 
