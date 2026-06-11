@@ -14,14 +14,35 @@ class SiswaPortalController extends Controller
         
         $hariIni = \Carbon\Carbon::now()->locale('id')->isoFormat('dddd');
         
-        $jadwals = [];
+        $allJadwals = collect([]);
+        $jadwals = new \Illuminate\Pagination\LengthAwarePaginator(collect([]), 0, 6, 1);
         $today = \Carbon\Carbon::today()->toDateString();
+        
         if ($kelas) {
-            $jadwals = \App\Models\JadwalAjar::with(['guru', 'mapel', 'ruangan'])
+            $allJadwals = \App\Models\JadwalAjar::with(['guru', 'mapel', 'ruangan'])
                         ->where('kelas_id', $kelas->id)
                         ->where('hari', $hariIni)
                         ->orderBy('jam_mulai', 'asc')
                         ->get();
+
+            foreach ($allJadwals as $jadwal) {
+                $absen = \App\Models\AbsenMasuk::where('jadwal_ajar_id', $jadwal->id)
+                            ->where('tanggal', $today)
+                            ->first();
+                
+                $jadwal->absen_masuk = $absen;
+                $jadwal->absen_keluar = null;
+                
+                if ($absen) {
+                    $jadwal->absen_keluar = \App\Models\AbsenKeluar::where('absen_masuk_id', $absen->id)->first();
+                }
+            }
+
+            $jadwals = \App\Models\JadwalAjar::with(['guru', 'mapel', 'ruangan'])
+                        ->where('kelas_id', $kelas->id)
+                        ->where('hari', $hariIni)
+                        ->orderBy('jam_mulai', 'asc')
+                        ->paginate(6);
 
             foreach ($jadwals as $jadwal) {
                 $absen = \App\Models\AbsenMasuk::where('jadwal_ajar_id', $jadwal->id)
@@ -37,7 +58,7 @@ class SiswaPortalController extends Controller
             }
         }
         
-        return view('siswa.dashboard', compact('ketua', 'kelas', 'jadwals', 'hariIni'));
+        return view('siswa.dashboard', compact('ketua', 'kelas', 'allJadwals', 'jadwals', 'hariIni'));
     }
 
     public function checkStatus($id)

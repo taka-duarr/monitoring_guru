@@ -16,16 +16,36 @@ class GuruPortalController extends Controller
         // Ambil nama hari dalam bahasa Indonesia
         $hariIni = \Carbon\Carbon::now()->locale('id')->isoFormat('dddd');
         
-        // Ambil jadwal khusus guru ini dan khusus hari ini, urutkan berdasarkan jam mulai
-        $jadwals = \App\Models\JadwalAjar::with(['mapel', 'kelas', 'ruangan'])
+        $today = \Carbon\Carbon::today()->toDateString();
+
+        // Ambil semua jadwal khusus guru ini dan khusus hari ini, urutkan berdasarkan jam mulai (untuk ringkasan)
+        $allJadwals = \App\Models\JadwalAjar::with(['mapel', 'kelas', 'ruangan'])
             ->where('guru_id', $guru->id)
             ->where('hari', $hariIni)
             ->orderBy('jam_mulai', 'asc')
             ->get();
 
-        $today = \Carbon\Carbon::today()->toDateString();
+        foreach ($allJadwals as $jadwal) {
+            $absen = \App\Models\AbsenMasuk::where('jadwal_ajar_id', $jadwal->id)
+                        ->where('tanggal', $today)
+                        ->first();
+            
+            $jadwal->absen_masuk = $absen;
+            $jadwal->absen_keluar = null;
+            
+            if ($absen) {
+                $jadwal->absen_keluar = \App\Models\AbsenKeluar::where('absen_masuk_id', $absen->id)->first();
+            }
+        }
+
+        // Ambil jadwal terpaginasi (maksimal 6 data per halaman)
+        $jadwals = \App\Models\JadwalAjar::with(['mapel', 'kelas', 'ruangan'])
+            ->where('guru_id', $guru->id)
+            ->where('hari', $hariIni)
+            ->orderBy('jam_mulai', 'asc')
+            ->paginate(6);
         
-        // Looping untuk menyuntikkan data absensi ke setiap jadwal
+        // Looping untuk menyuntikkan data absensi ke setiap jadwal terpaginasi
         foreach ($jadwals as $jadwal) {
             $absen = \App\Models\AbsenMasuk::where('jadwal_ajar_id', $jadwal->id)
                         ->where('tanggal', $today)
@@ -39,7 +59,7 @@ class GuruPortalController extends Controller
             }
         }
 
-        return view('guru.dashboard', compact('jadwals', 'hariIni'));
+        return view('guru.dashboard', compact('allJadwals', 'jadwals', 'hariIni'));
     }
 
     public function scan()

@@ -87,6 +87,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     // Pengaturan
     Route::get('pengaturan', [App\Http\Controllers\PengaturanController::class, 'index'])->name('pengaturan.index');
     Route::put('pengaturan', [App\Http\Controllers\PengaturanController::class, 'update'])->name('pengaturan.update');
+
+    // Profil Saya
+    Route::get('/profil', [App\Http\Controllers\ProfileController::class, 'index'])->name('admin.profile.index');
+    Route::put('/profil', [App\Http\Controllers\ProfileController::class, 'update'])->name('admin.profile.update');
 });
 
 // ==========================================
@@ -101,6 +105,10 @@ Route::middleware(['auth', 'role:guru'])->prefix('guru')->group(function () {
     Route::get('/riwayat-mapel/{mapel_id}', [App\Http\Controllers\GuruPortalController::class, 'riwayatMapel'])->name('guru.riwayat_mapel');
     Route::get('/absen-murid/{absen_masuk_id}', [App\Http\Controllers\GuruPortalController::class, 'absenMurid'])->name('guru.absen_murid');
     Route::post('/absen-murid/{absen_masuk_id}', [App\Http\Controllers\GuruPortalController::class, 'storeAbsenMurid'])->name('guru.store_absen_murid');
+
+    // Profil Saya
+    Route::get('/profil', [App\Http\Controllers\ProfileController::class, 'index'])->name('guru.profile.index');
+    Route::put('/profil', [App\Http\Controllers\ProfileController::class, 'update'])->name('guru.profile.update');
 });
 
 // ==========================================
@@ -113,4 +121,8 @@ Route::get('/siswa', function () {
 Route::middleware(['siswa'])->prefix('siswa')->group(function () {
     Route::get('/dashboard', [App\Http\Controllers\SiswaPortalController::class, 'dashboard'])->name('siswa.dashboard');
     Route::get('/jadwal/{id}/status', [App\Http\Controllers\SiswaPortalController::class, 'checkStatus'])->name('siswa.check_status');
+
+    // Profil Saya
+    Route::get('/profil', [App\Http\Controllers\ProfileController::class, 'index'])->name('siswa.profile.index');
+    Route::put('/profil', [App\Http\Controllers\ProfileController::class, 'update'])->name('siswa.profile.update');
 });
