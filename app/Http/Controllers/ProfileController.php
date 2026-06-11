@@ -32,12 +32,22 @@ class ProfileController extends Controller
             'foto' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
         ];
 
-        // Password hanya divalidasi jika diisi
-        if ($request->filled('password')) {
-            $rules['password'] = ['required', 'string', 'min:6', 'confirmed'];
-        }
+        $messages = [
+            'name.required' => 'Nama wajib diisi.',
+            'name.string' => 'Nama harus berupa teks.',
+            'name.max' => 'Nama tidak boleh lebih dari 255 karakter.',
+            'no_telp.string' => 'Nomor telepon harus berupa teks.',
+            'no_telp.max' => 'Nomor telepon tidak boleh lebih dari 20 karakter.',
+            'foto.image' => 'Berkas harus berupa gambar.',
+            'foto.mimes' => 'Format foto harus berupa jpeg, png, jpg, gif, atau svg.',
+            'foto.max' => 'Ukuran foto tidak boleh lebih dari 2048 kilobytes (2 MB).',
+            'password.required' => 'Password wajib diisi.',
+            'password.string' => 'Password harus berupa teks.',
+            'password.min' => 'Password minimal harus 6 karakter.',
+            'password.confirmed' => 'Konfirmasi password tidak cocok.',
+        ];
 
-        $request->validate($rules);
+        $request->validate($rules, $messages);
 
         // Update data
         $user->name = $request->input('name');
