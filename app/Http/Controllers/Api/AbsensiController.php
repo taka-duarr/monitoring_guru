@@ -122,7 +122,11 @@ class AbsensiController extends Controller
             return response()->json(['success' => false, 'message' => 'Data absen guru tidak ditemukan'], 404);
         }
 
-        $murids = \App\Models\Murid::where('kelas_id', $absenMasuk->kelas_id)->orderBy('no_absen')->orderBy('name')->get();
+        $murids = \App\Models\Murid::where('kelas_id', $absenMasuk->kelas_id)
+            ->where('status', 'aktif')
+            ->orderBy('no_absen')
+            ->orderBy('name')
+            ->get();
         $absenMurids = \App\Models\AbsenMurid::where('absen_masuk_id', $absen_masuk_id)->get()->keyBy('murid_id');
 
         $data = $murids->map(function ($murid) use ($absenMurids) {

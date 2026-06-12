@@ -13,7 +13,17 @@
     </p>
 </div>
 
-@if($kelas)
+@if($kelas && !$kelas->is_active)
+    <div class="bg-warning-50 border border-warning-200 rounded-3xl p-8 text-center shadow-sm">
+        <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center text-warning-500 mb-4 mx-auto shadow-sm">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        </div>
+        <h3 class="font-bold text-slate-800 text-lg mb-2">Kelas Telah Lulus / Nonaktif</h3>
+        <p class="text-slate-500 text-sm max-w-md mx-auto">
+            Kelas <strong>{{ $kelas->name }}</strong> sudah tidak aktif. Data absen tidak dapat ditampilkan.
+        </p>
+    </div>
+@elseif($kelas && $kelas->is_active)
     {{-- Data Ringkasan --}}
     @php
         $totalJadwal = count($allJadwals);

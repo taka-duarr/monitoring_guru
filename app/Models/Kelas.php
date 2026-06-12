@@ -16,6 +16,7 @@ class Kelas extends Model
         'name',
         'angkatan_id',
         'grade',
+        'is_active',
     ];
 
     public function jurusan() { return $this->belongsTo(Jurusan::class, 'jurusan_id'); }

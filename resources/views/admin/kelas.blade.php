@@ -106,9 +106,10 @@
                     <tr>
                         <th class="col-no">No</th>
                         <th>Nama Kelas</th>
-                        <th>Angkatan</th>
-                        <th>Kelas</th>
+                        <th>Tingkat (Grade)</th>
                         <th>Jurusan</th>
+                        <th>Angkatan</th>
+                        <th>Status</th>
                         <th class="col-actions col-center">Aksi</th>
                     </tr>
                 </thead>
@@ -122,9 +123,6 @@
                                 <span class="font-bold text-primary-900">{{ $row->name }}</span>
                             </td>
                             <td>
-                                {{ $row->angkatan->name ?? '-' }}
-                            </td>
-                            <td>
                                 Kelas {{ $row->grade }}
                             </td>
                             <td>
@@ -132,6 +130,18 @@
                                     <span class="class-pill-item">{{ $row->jurusan->name }}</span>
                                 @else
                                     <span class="text-neutral-400 text-xs">-</span>
+                                @endif
+                            </td>
+                            <td>
+                                <span class="badge bg-neutral-50 text-neutral-600 border border-neutral-200">
+                                    {{ $row->angkatan ? $row->angkatan->name : '-' }}
+                                </span>
+                            </td>
+                            <td>
+                                @if($row->is_active)
+                                    <span class="badge bg-success-50 text-success-700 border border-success-200">Aktif</span>
+                                @else
+                                    <span class="badge bg-danger-50 text-danger-700 border border-danger-200">Nonaktif / Lulus</span>
                                 @endif
                             </td>
                             <td class="col-actions col-center">

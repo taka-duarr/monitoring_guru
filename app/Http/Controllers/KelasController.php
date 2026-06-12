@@ -28,6 +28,7 @@ class KelasController extends Controller
             'name' => 'required|string|max:255',
             'angkatan_id' => 'nullable|exists:angkatans,id',
             'grade' => 'required|in:10,11,12',
+            'is_active' => 'required|boolean',
         ]);
 
         Kelas::create([
@@ -36,6 +37,7 @@ class KelasController extends Controller
             'name' => $request->name,
             'angkatan_id' => $request->angkatan_id,
             'grade' => $request->grade,
+            'is_active' => $request->is_active,
         ]);
 
         return redirect()->route('kelas.index')->with('success', 'Data berhasil ditambahkan');
@@ -57,6 +59,7 @@ class KelasController extends Controller
             'name' => 'required|string|max:255',
             'angkatan_id' => 'nullable|exists:angkatans,id',
             'grade' => 'required|in:10,11,12',
+            'is_active' => 'required|boolean',
         ]);
 
         $kelas->update([
@@ -64,6 +67,7 @@ class KelasController extends Controller
             'name' => $request->name,
             'angkatan_id' => $request->angkatan_id,
             'grade' => $request->grade,
+            'is_active' => $request->is_active,
         ]);
         return redirect()->route('kelas.index')->with('success', 'Data berhasil diubah');
     }

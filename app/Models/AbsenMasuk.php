@@ -12,10 +12,10 @@ class AbsenMasuk extends Model
     
     protected $guarded = [];
 
-    public function guru() { return $this->belongsTo(User::class, 'guru_id'); }
-    public function jadwalAjar() { return $this->belongsTo(JadwalAjar::class, 'jadwal_ajar_id'); }
-    public function kelas() { return $this->belongsTo(Kelas::class, 'kelas_id'); }
-    public function ruangan() { return $this->belongsTo(Ruangan::class, 'ruangan_id'); }
+    public function guru() { return $this->belongsTo(User::class, 'guru_id')->withTrashed(); }
+    public function jadwalAjar() { return $this->belongsTo(JadwalAjar::class, 'jadwal_ajar_id')->withTrashed(); }
+    public function kelas() { return $this->belongsTo(Kelas::class, 'kelas_id')->withTrashed(); }
+    public function ruangan() { return $this->belongsTo(Ruangan::class, 'ruangan_id')->withTrashed(); }
     public function absenKeluar() { return $this->hasOne(AbsenKeluar::class, 'absen_masuk_id'); }
     public function absenMurids() { return $this->hasMany(AbsenMurid::class, 'absen_masuk_id'); }
 }

@@ -18,7 +18,7 @@ class SiswaPortalController extends Controller
         $jadwals = new \Illuminate\Pagination\LengthAwarePaginator(collect([]), 0, 6, 1);
         $today = \Carbon\Carbon::today()->toDateString();
         
-        if ($kelas) {
+        if ($kelas && $kelas->is_active) {
             $allJadwals = \App\Models\JadwalAjar::with(['guru', 'mapel', 'ruangan'])
                         ->where('kelas_id', $kelas->id)
                         ->where('hari', $hariIni)

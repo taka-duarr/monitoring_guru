@@ -15,7 +15,8 @@
     editId: '', 
     editNoAbsen: '', 
     editNis: '', 
-    editName: '' 
+    editName: '',
+    editStatus: ''
 }" class="position-relative">
 
     <!-- Header Page Title -->
@@ -104,6 +105,7 @@
                         <th class="col-no">No Absen</th>
                         <th>NIS</th>
                         <th>Nama Lengkap</th>
+                        <th>Status</th>
                         <th class="col-actions col-center">Aksi</th>
                     </tr>
                 </thead>
@@ -119,6 +121,17 @@
                             <td>
                                 <span class="font-bold text-neutral-800">{{ $row->name }}</span>
                             </td>
+                            <td>
+                                @if($row->status == 'aktif')
+                                    <span class="badge bg-success-50 text-success-700 border border-success-200" style="padding: 4px 8px; border-radius: 12px; font-size: 11px;">Aktif</span>
+                                @elseif($row->status == 'lulus')
+                                    <span class="badge bg-primary-50 text-primary-700 border border-primary-200" style="padding: 4px 8px; border-radius: 12px; font-size: 11px;">Lulus</span>
+                                @elseif($row->status == 'pindah')
+                                    <span class="badge bg-warning-50 text-warning-700 border border-warning-200" style="padding: 4px 8px; border-radius: 12px; font-size: 11px;">Pindah</span>
+                                @else
+                                    <span class="badge bg-danger-50 text-danger-700 border border-danger-200" style="padding: 4px 8px; border-radius: 12px; font-size: 11px;">{{ ucfirst($row->status) }}</span>
+                                @endif
+                            </td>
                             <td class="col-actions col-center">
                                 <div class="action-buttons-group">
                                     <!-- Edit Record -->
@@ -128,7 +141,8 @@
                                                         editId = '{{ $row->id }}'; 
                                                         editNoAbsen = '{{ $row->no_absen }}'; 
                                                         editNis = '{{ $row->nis }}'; 
-                                                        editName = '{{ addslashes($row->name) }}'">
+                                                        editName = '{{ addslashes($row->name) }}';
+                                                        editStatus = '{{ $row->status }}'">
                                             <i class="ti ti-pencil"></i>
                                         </button>
                                     </x-tooltip>
@@ -230,6 +244,17 @@
                         <div class="form-group mb-0">
                             <label for="edit_name" class="form-label">Nama Lengkap <span class="required-indicator">*</span></label>
                             <input type="text" id="edit_name" name="name" class="form-control" x-model="editName" required>
+                        </div>
+
+                        <!-- Status -->
+                        <div class="form-group mb-0">
+                            <label for="edit_status" class="form-label">Status <span class="required-indicator">*</span></label>
+                            <select id="edit_status" name="status" class="form-select" x-model="editStatus" required>
+                                <option value="aktif">Aktif</option>
+                                <option value="lulus">Lulus</option>
+                                <option value="pindah">Pindah</option>
+                                <option value="keluar">Keluar / Drop Out</option>
+                            </select>
                         </div>
                     </div>
                     <div class="d-flex justify-end gap-2 mt-6 pt-3" style="border-top: 1px solid var(--color-neutral-100); margin-top: 24px; padding-top: 16px;">

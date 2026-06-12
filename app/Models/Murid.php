@@ -17,6 +17,7 @@ class Murid extends Model
         'nis',
         'name',
         'no_absen',
+        'status',
     ];
 
     public function kelas() { return $this->belongsTo(Kelas::class, 'kelas_id'); }

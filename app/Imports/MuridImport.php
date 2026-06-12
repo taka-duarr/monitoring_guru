@@ -58,6 +58,7 @@ class MuridImport implements ToCollection, WithHeadingRow
                     'nis' => trim($row['nis']),
                     'name' => trim($row['nama_murid']),
                     'no_absen' => !empty($row['no_absen']) ? (int) $row['no_absen'] : null,
+                    'status' => 'aktif',
                 ]);
             }
         });
@@ -91,8 +92,9 @@ class MuridImport implements ToCollection, WithHeadingRow
                 $checkedNis[] = $nis;
                 
                 // Check uniqueness in database (NIS must be unique across all students)
-                if (Murid::where('nis', $nis)->exists()) {
-                    $this->addError($rowNum, "NIS '$nis' sudah terdaftar di sistem.");
+                // We use withTrashed() because if a student was soft-deleted, their NIS is still in the DB and will cause a unique constraint violation.
+                if (Murid::withTrashed()->where('nis', $nis)->exists()) {
+                    $this->addError($rowNum, "NIS '$nis' sudah terdaftar di sistem (mungkin di kelas lain atau sudah dihapus/lulus).");
                     $validationFailed = true;
                 }
             }

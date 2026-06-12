@@ -22,6 +22,9 @@ class GuruPortalController extends Controller
         $allJadwals = \App\Models\JadwalAjar::with(['mapel', 'kelas', 'ruangan'])
             ->where('guru_id', $guru->id)
             ->where('hari', $hariIni)
+            ->whereHas('kelas', function($q) {
+                $q->where('is_active', true);
+            })
             ->orderBy('jam_mulai', 'asc')
             ->get();
 
@@ -42,6 +45,9 @@ class GuruPortalController extends Controller
         $jadwals = \App\Models\JadwalAjar::with(['mapel', 'kelas', 'ruangan'])
             ->where('guru_id', $guru->id)
             ->where('hari', $hariIni)
+            ->whereHas('kelas', function($q) {
+                $q->where('is_active', true);
+            })
             ->orderBy('jam_mulai', 'asc')
             ->paginate(6);
         
@@ -128,7 +134,11 @@ class GuruPortalController extends Controller
             abort(403, 'Akses ditolak.');
         }
 
-        $murids = \App\Models\Murid::where('kelas_id', $absenMasuk->kelas_id)->orderBy('no_absen')->orderBy('name')->get();
+        $murids = \App\Models\Murid::where('kelas_id', $absenMasuk->kelas_id)
+            ->where('status', 'aktif')
+            ->orderBy('no_absen')
+            ->orderBy('name')
+            ->get();
         $absenMurids = \App\Models\AbsenMurid::where('absen_masuk_id', $absen_masuk_id)->get()->keyBy('murid_id');
 
         return view('guru.absen_murid', compact('absenMasuk', 'murids', 'absenMurids'));

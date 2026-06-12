@@ -104,6 +104,23 @@
             @enderror
         </div>
 
+        <!-- Status Aktif -->
+        <div class="form-group">
+            <label for="is_active" class="form-label">
+                Status Kelas <span class="required-indicator">*</span>
+            </label>
+            <select id="is_active" name="is_active" class="form-select @error('is_active') is-invalid @enderror" required>
+                <option value="1" {{ old('is_active', isset($data) ? $data->is_active : 1) == 1 ? 'selected' : '' }}>Aktif</option>
+                <option value="0" {{ old('is_active', isset($data) ? $data->is_active : 1) == 0 ? 'selected' : '' }}>Nonaktif / Lulus</option>
+            </select>
+            @error('is_active')
+                <span class="form-error">
+                    <i class="ti ti-alert-circle"></i>
+                    {{ $message }}
+                </span>
+            @enderror
+        </div>
+
         <!-- FORM ACTION BUTTONS -->
         <div class="d-flex justify-end gap-3 mt-8 border-t border-neutral-200 pt-5">
             <a href="{{ route('kelas.index') }}" class="btn btn-secondary d-flex align-center gap-2" :disabled="loading" style="text-decoration: none;">

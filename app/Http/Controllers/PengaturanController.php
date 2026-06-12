@@ -20,6 +20,9 @@ class PengaturanController extends Controller
             'school_logo' => Setting::get('school_logo'),
             'headmaster_name' => Setting::get('headmaster_name', '-'),
             'headmaster_nip' => Setting::get('headmaster_nip', '-'),
+            'academic_year_name' => Setting::get('academic_year_name', '2023/2024 Genap'),
+            'academic_year_start' => Setting::get('academic_year_start', \Carbon\Carbon::now()->startOfYear()->format('Y-m-d')),
+            'academic_year_end' => Setting::get('academic_year_end', \Carbon\Carbon::now()->endOfYear()->format('Y-m-d')),
         ];
 
         return view('admin.pengaturan', compact('settings'));
@@ -37,6 +40,9 @@ class PengaturanController extends Controller
             'school_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'headmaster_name' => 'nullable|string|max:255',
             'headmaster_nip' => 'nullable|string|max:100',
+            'academic_year_name' => 'required|string|max:255',
+            'academic_year_start' => 'required|date',
+            'academic_year_end' => 'required|date|after_or_equal:academic_year_start',
         ]);
 
         // Save normal text settings
@@ -46,6 +52,9 @@ class PengaturanController extends Controller
             'school_phone' => 'school',
             'headmaster_name' => 'school',
             'headmaster_nip' => 'school',
+            'academic_year_name' => 'academic',
+            'academic_year_start' => 'academic',
+            'academic_year_end' => 'academic',
         ];
 
         foreach ($keys as $key => $group) {

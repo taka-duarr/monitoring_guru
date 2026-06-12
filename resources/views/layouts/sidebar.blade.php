@@ -199,6 +199,16 @@
         <!-- Grup: Sistem -->
         <div class="sidebar-group-label" x-show="!sidebarCollapsed">Sistem</div>
         <ul class="sidebar-menu-list">
+            <!-- Kenaikan Kelas -->
+            <li class="sidebar-menu-item-wrapper">
+                <a href="{{ route('kenaikan_kelas.index') }}"
+                   class="sidebar-menu-item {{ request()->routeIs('kenaikan_kelas.*') ? 'active' : '' }}"
+                   :class="{ 'active': {{ request()->routeIs('kenaikan_kelas.*') ? 'true' : 'false' }} }"
+                   data-tooltip="Kenaikan Kelas">
+                    <i class="ti ti-arrow-up"></i>
+                    <span class="sidebar-menu-text" x-show="!sidebarCollapsed">Kenaikan Kelas</span>
+                </a>
+            </li>
             <!-- Pengaturan -->
             <li class="sidebar-menu-item-wrapper">
                 <a href="{{ route('pengaturan.index') }}"

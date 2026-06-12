@@ -14,7 +14,11 @@ class MuridController extends Controller
 {
     public function index(Kelas $kelas)
     {
-        $murids = $kelas->murids()->orderBy('no_absen', 'asc')->orderBy('name', 'asc')->get();
+        $murids = $kelas->murids()
+            ->orderByRaw("FIELD(status, 'aktif') DESC")
+            ->orderBy('no_absen', 'asc')
+            ->orderBy('name', 'asc')
+            ->get();
         return view('admin.murid.index', compact('kelas', 'murids'));
     }
 
@@ -31,6 +35,7 @@ class MuridController extends Controller
             'nis' => $request->nis,
             'name' => $request->name,
             'no_absen' => $request->no_absen,
+            'status' => 'aktif',
         ]);
 
         return redirect()->route('kelas.murid.index', $kelas->id)->with('success', 'Murid berhasil ditambahkan');
@@ -42,12 +47,14 @@ class MuridController extends Controller
             'nis' => 'required|unique:murids,nis,' . $murid->id,
             'name' => 'required|string|max:255',
             'no_absen' => 'nullable|integer',
+            'status' => 'required|in:aktif,lulus,pindah,keluar',
         ]);
 
         $murid->update([
             'nis' => $request->nis,
             'name' => $request->name,
             'no_absen' => $request->no_absen,
+            'status' => $request->status,
         ]);
 
         return redirect()->route('kelas.murid.index', $kelas->id)->with('success', 'Data murid berhasil diperbarui');
@@ -55,8 +62,8 @@ class MuridController extends Controller
 
     public function destroy(Kelas $kelas, Murid $murid)
     {
-        $murid->delete();
-        return redirect()->route('kelas.murid.index', $kelas->id)->with('success', 'Murid berhasil dihapus');
+        $murid->forceDelete();
+        return redirect()->route('kelas.murid.index', $kelas->id)->with('success', 'Murid berhasil dihapus permanen');
     }
 
     public function downloadTemplate(Kelas $kelas)

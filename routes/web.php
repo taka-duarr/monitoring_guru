@@ -88,6 +88,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('pengaturan', [App\Http\Controllers\PengaturanController::class, 'index'])->name('pengaturan.index');
     Route::put('pengaturan', [App\Http\Controllers\PengaturanController::class, 'update'])->name('pengaturan.update');
 
+    // Kenaikan Kelas
+    Route::get('/kenaikan-kelas', [App\Http\Controllers\KenaikanKelasController::class, 'index'])->name('kenaikan_kelas.index');
+    Route::post('/kenaikan-kelas/proses', [App\Http\Controllers\KenaikanKelasController::class, 'proses'])->name('kenaikan_kelas.proses');
+
     // Profil Saya
     Route::get('/profil', [App\Http\Controllers\ProfileController::class, 'index'])->name('admin.profile.index');
     Route::put('/profil', [App\Http\Controllers\ProfileController::class, 'update'])->name('admin.profile.update');
