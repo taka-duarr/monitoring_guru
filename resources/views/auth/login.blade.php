@@ -149,10 +149,8 @@
         <!-- Top logo area -->
         <div class="relative z-10">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-brand-500 flex items-center justify-center shadow-lg">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                    </svg>
+                <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-lg p-1">
+                    <img src="{{ asset('images/logo.png') }}" alt="Logo" class="w-full h-full object-contain">
                 </div>
                 <span class="text-white font-bold text-lg tracking-tight">Monitoring Guru</span>
             </div>
@@ -163,11 +161,11 @@
             <div>
                 <p class="text-brand-400 font-semibold text-sm tracking-widest uppercase mb-3">Sistem Informasi</p>
                 <h2 class="text-white font-bold text-4xl xl:text-5xl leading-tight">
-                    Pantau Kinerja<br>
-                    <span style="background: linear-gradient(90deg, #60A5FA, #93C5FD); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Guru Hari Ini</span>
+                    Sistem Absensi<br>
+                    <span style="background: linear-gradient(90deg, #60A5FA, #93C5FD); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">& Jurnal Mengajar</span>
                 </h2>
                 <p class="text-slate-400 mt-4 text-base leading-relaxed max-w-sm">
-                    Platform terpadu untuk memantau kehadiran, jadwal, dan laporan kinerja seluruh tenaga pengajar.
+                    Platform terpadu untuk pencatatan absensi, pemantauan jadwal kelas, dan laporan secara real-time.
                 </p>
             </div>
 
@@ -223,10 +221,8 @@
 
             <!-- Mobile logo -->
             <div class="flex lg:hidden items-center gap-3 mb-8 anim-1">
-                <div class="w-9 h-9 rounded-xl bg-brand-500 flex items-center justify-center">
-                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                    </svg>
+                <div class="w-10 h-10 rounded-xl bg-white p-1 flex items-center justify-center shadow-md">
+                    <img src="{{ asset('images/logo.png') }}" alt="Logo" class="w-full h-full object-contain">
                 </div>
                 <span class="text-navy-800 font-bold text-lg">Monitoring Guru</span>
             </div>
@@ -234,7 +230,7 @@
             <!-- Heading -->
             <div class="mb-8 anim-1">
                 <h1 class="text-3xl font-bold text-slate-900">Selamat Datang 👋</h1>
-                <p class="text-slate-500 mt-2 text-sm leading-relaxed">Masuk menggunakan NIK dan kata sandi Anda untuk mengakses sistem.</p>
+                <p class="text-slate-500 mt-2 text-sm leading-relaxed">Masuk menggunakan Nomor Induk (NIP/NIK/NISN) dan kata sandi Anda.</p>
             </div>
 
             <!-- Error alert -->
@@ -266,7 +262,7 @@
 
                 <!-- NIK Field -->
                 <div class="anim-2">
-                    <label for="nik" class="block text-sm font-semibold text-slate-700 mb-1.5">Nomor Induk Kependudukan (NIK)</label>
+                    <label for="nik" class="block text-sm font-semibold text-slate-700 mb-1.5">Nomor Induk (NIP / NIK / NISN)</label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                             <svg class="w-4.5 h-4.5 text-slate-400" style="width:18px;height:18px" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -277,7 +273,7 @@
                             value="{{ old('nik') }}"
                             required autofocus
                             class="form-input w-full pl-10 pr-4 py-3 rounded-xl border text-sm text-slate-800 placeholder-slate-400 outline-none focus:border-brand-500 {{ $errors->has('nik') ? 'border-red-400 bg-red-50' : 'border-slate-200 bg-white' }}"
-                            placeholder="Masukkan NIK Anda">
+                            placeholder="Masukkan Nomor Induk Anda">
                     </div>
                     @error('nik')
                     <p class="mt-1.5 text-xs text-red-500">{{ $message }}</p>

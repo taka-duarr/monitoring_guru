@@ -123,8 +123,7 @@
         <!-- Logo & Nama Sistem -->
         <div class="sidebar-brand-wrapper">
             <div class="sidebar-logo-icon" title="SIMGURU">
-                <span x-show="!sidebarCollapsed">SG</span>
-                <span x-show="sidebarCollapsed">G</span>
+                <img src="{{ asset('images/logo.png') }}" alt="Logo" style="width: 100%; height: 100%; object-fit: contain;">
             </div>
             <div class="sidebar-brand-info" x-show="!sidebarCollapsed">
                 <span class="sidebar-brand-name">SIMGURU</span>
