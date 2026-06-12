@@ -168,7 +168,7 @@
                         <!-- Password Baru -->
                         <div class="form-group">
                             <label class="form-label" for="password" style="font-weight: 600; color: var(--color-neutral-600);">Password Baru</label>
-                            <input type="password" name="password" id="password" class="form-control @error('password') is-invalid @enderror" placeholder="Min. 6 karakter">
+                            <input type="password" name="password" id="password" class="form-control @error('password') is-invalid @enderror" placeholder="Ketik password baru">
                             @error('password')
                                 <span class="text-xs text-danger mt-1 block">{{ $message }}</span>
                             @enderror

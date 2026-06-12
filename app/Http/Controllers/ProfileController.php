@@ -43,7 +43,6 @@ class ProfileController extends Controller
             'foto.max' => 'Ukuran foto tidak boleh lebih dari 2048 kilobytes (2 MB).',
             'password.required' => 'Password wajib diisi.',
             'password.string' => 'Password harus berupa teks.',
-            'password.min' => 'Password minimal harus 6 karakter.',
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
         ];
 

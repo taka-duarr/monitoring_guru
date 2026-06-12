@@ -19,4 +19,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Rute API untuk Izin
     Route::get('/izin', [App\Http\Controllers\Api\IzinController::class, 'index']);
     Route::post('/izin', [App\Http\Controllers\Api\IzinController::class, 'store']);
+
+    // Rute API untuk Profil
+    Route::post('/profile/update', [App\Http\Controllers\Api\ProfileController::class, 'update']);
 });
