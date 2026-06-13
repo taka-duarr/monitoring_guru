@@ -97,26 +97,7 @@
                     </div>
                 </div>
 
-                <!-- PERIODE AKADEMIK -->
-                <div class="mt-8 pt-6 border-t border-neutral-100">
-                    <h3 class="text-lg font-semibold text-primary-900 mb-4 pb-2 border-b border-neutral-100">Periode Akademik Aktif</h3>
-                    <p class="text-sm text-neutral-500 mb-4">Tentukan rentang tanggal untuk tahun ajaran / semester aktif saat ini. Data di luar rentang ini akan dianggap sebagai histori.</p>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="form-group">
-                            <label class="form-label" for="academic_year_name">Nama Tahun Ajaran <span class="text-danger">*</span></label>
-                            <input type="text" name="academic_year_name" id="academic_year_name" class="form-control" value="{{ old('academic_year_name', $settings['academic_year_name']) }}" placeholder="Misal: 2023/2024 Genap" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" for="academic_year_start">Tanggal Mulai <span class="text-danger">*</span></label>
-                            <input type="date" name="academic_year_start" id="academic_year_start" class="form-control" value="{{ old('academic_year_start', $settings['academic_year_start']) }}" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" for="academic_year_end">Tanggal Selesai <span class="text-danger">*</span></label>
-                            <input type="date" name="academic_year_end" id="academic_year_end" class="form-control" value="{{ old('academic_year_end', $settings['academic_year_end']) }}" required>
-                        </div>
-                    </div>
-                </div>
+
 
                 <!-- Form Submit Footer -->
                 <div class="mt-8 pt-4 border-t border-neutral-100 d-flex justify-end gap-2">

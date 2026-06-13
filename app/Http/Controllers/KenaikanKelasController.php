@@ -36,17 +36,45 @@ class KenaikanKelasController extends Controller
         if ($request->action === 'naik_tingkat') {
             $kelasList = Kelas::whereIn('id', $kelasIds)->get();
             foreach ($kelasList as $kelas) {
-                if ($kelas->grade == 10) {
-                    $newName = preg_replace('/^X\s/', 'XI ', $kelas->name);
-                    $kelas->update(['grade' => '11', 'name' => $newName]);
-                    $count++;
-                } elseif ($kelas->grade == 11) {
-                    $newName = preg_replace('/^XI\s/', 'XII ', $kelas->name);
-                    $kelas->update(['grade' => '12', 'name' => $newName]);
+                if ($kelas->grade == 10 || $kelas->grade == 11) {
+                    $newGrade = $kelas->grade + 1;
+                    $prefixOld = $kelas->grade == 10 ? '/^X\s/' : '/^XI\s/';
+                    $prefixNew = $kelas->grade == 10 ? 'XI ' : 'XII ';
+                    $newName = preg_replace($prefixOld, $prefixNew, $kelas->name);
+
+                    // Buat kelas baru
+                    $newKelas = Kelas::create([
+                        'jurusan_id' => $kelas->jurusan_id,
+                        'angkatan_id' => $kelas->angkatan_id,
+                        'name' => $newName,
+                        'grade' => $newGrade,
+                        'ketua_id' => $kelas->ketua_id,
+                        'is_active' => true,
+                        'index' => $kelas->index,
+                    ]);
+
+                    // Pindahkan murid aktif ke kelas baru dengan cara diduplikasi (copy)
+                    $activeMurids = Murid::where('kelas_id', $kelas->id)
+                                         ->where('status', 'aktif')
+                                         ->get();
+                                         
+                    foreach ($activeMurids as $murid) {
+                        $newMurid = $murid->replicate();
+                        $newMurid->kelas_id = $newKelas->id;
+                        $newMurid->save();
+                    }
+
+                    // Ubah status murid lama di kelas lama menjadi naik_kelas
+                    Murid::where('kelas_id', $kelas->id)
+                         ->where('status', 'aktif')
+                         ->update(['status' => 'naik_kelas']);
+
+                    // Nonaktifkan kelas lama
+                    $kelas->update(['is_active' => false]);
                     $count++;
                 }
             }
-            $message = "$count Kelas berhasil dinaikkan tingkatnya.";
+            $message = "$count Kelas beserta muridnya berhasil dinaikkan tingkatnya ke kelas baru (Kelas lama dinonaktifkan).";
         } else {
             // Luluskan
             $kelasList = Kelas::whereIn('id', $kelasIds)->get();
