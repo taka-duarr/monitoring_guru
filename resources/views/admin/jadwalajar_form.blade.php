@@ -117,7 +117,7 @@
                 Hari Pelajaran <span class="required-indicator">*</span>
             </label>
             <select id="hari" name="hari" class="form-select @error('hari') is-invalid @enderror" required>
-                @foreach(['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'] as $day)
+                @foreach(['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'] as $day)
                     <option value="{{ $day }}" {{ old('hari', $data->hari ?? '') == $day ? 'selected' : '' }}>
                         {{ $day }}
                     </option>
