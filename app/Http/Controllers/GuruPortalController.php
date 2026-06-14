@@ -13,8 +13,18 @@ class GuruPortalController extends Controller
     {
         $guru = \Illuminate\Support\Facades\Auth::user();
         
-        // Ambil nama hari dalam bahasa Indonesia
-        $hariIni = \Carbon\Carbon::now()->locale('id')->isoFormat('dddd');
+        // Ambil nama hari secara eksplisit untuk menghindari masalah locale/case
+        $hariInggris = \Carbon\Carbon::now()->format('l');
+        $mapHari = [
+            'Monday'    => 'Senin',
+            'Tuesday'   => 'Selasa',
+            'Wednesday' => 'Rabu',
+            'Thursday'  => 'Kamis',
+            'Friday'    => 'Jumat',
+            'Saturday'  => 'Sabtu',
+            'Sunday'    => 'Minggu'
+        ];
+        $hariIni = $mapHari[$hariInggris];
         
         $today = \Carbon\Carbon::today()->toDateString();
 
