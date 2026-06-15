@@ -25,9 +25,16 @@ class MuridController extends Controller
     public function store(Request $request, Kelas $kelas)
     {
         $request->validate([
-            'nis' => 'required|unique:murids,nis',
+            'nis' => [
+                'required',
+                \Illuminate\Validation\Rule::unique('murids')->where(function ($query) {
+                    return $query->where('status', 'aktif');
+                })
+            ],
             'name' => 'required|string|max:255',
             'no_absen' => 'nullable|integer',
+        ], [
+            'nis.unique' => 'NIS ini sudah dipakai oleh murid lain yang berstatus aktif.',
         ]);
 
         $kelas->murids()->create([
@@ -44,10 +51,18 @@ class MuridController extends Controller
     public function update(Request $request, Kelas $kelas, Murid $murid)
     {
         $request->validate([
-            'nis' => 'required|unique:murids,nis,' . $murid->id,
+            'nis' => [
+                'required',
+                \Illuminate\Validation\Rule::unique('murids')->ignore($murid->id)->where(function ($query) use ($request) {
+                    // Hanya cek duplikat jika status murid ini aktif (atau akan diubah ke aktif)
+                    return $query->where('status', 'aktif');
+                })
+            ],
             'name' => 'required|string|max:255',
             'no_absen' => 'nullable|integer',
-            'status' => 'required|in:aktif,lulus,pindah,keluar',
+            'status' => 'required|in:aktif,lulus,pindah,keluar,naik_kelas',
+        ], [
+            'nis.unique' => 'NIS ini sudah dipakai oleh murid lain yang berstatus aktif.',
         ]);
 
         $murid->update([
