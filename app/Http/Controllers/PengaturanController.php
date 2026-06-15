@@ -14,7 +14,7 @@ class PengaturanController extends Controller
     public function index()
     {
         $settings = [
-            'school_name' => Setting::get('school_name', 'SMAN X SURABAYA'),
+            'school_name' => Setting::get('school_name', 'SMKN 2 SURABAYA'),
             'school_address' => Setting::get('school_address', 'Jl. Contoh No. 1, Surabaya, Jawa Timur'),
             'school_phone' => Setting::get('school_phone', '(031) 000-0000'),
             'school_logo' => Setting::get('school_logo'),

@@ -114,7 +114,7 @@
     </table>
 
     <div class="footer">
-        Dicetak secara otomatis oleh SIMGURU SMAN X Surabaya
+        Dicetak secara otomatis oleh SIMGURU SMKN 2 Surabaya
     </div>
 </body>
 </html>

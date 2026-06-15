@@ -16,7 +16,7 @@ class SettingSeeder extends Seeder
         $settings = [
             [
                 'key' => 'school_name',
-                'value' => 'SMAN X SURABAYA',
+                'value' => 'SMKN 2 SURABAYA',
                 'group' => 'school',
             ],
             [

@@ -9,7 +9,7 @@
         </div>
         <div class="sidebar-brand-info" x-show="!sidebarCollapsed">
             <span class="sidebar-brand-name">SIMGURU</span>
-            <span class="sidebar-brand-sub">SMAN X Surabaya</span>
+            <span class="sidebar-brand-sub">SMKN 2 Surabaya</span>
         </div>
         <!-- Close button for mobile -->
         <button class="btn btn-ghost btn-sm p-1 d-md-none text-white ml-auto"

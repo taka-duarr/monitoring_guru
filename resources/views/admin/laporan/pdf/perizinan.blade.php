@@ -44,11 +44,11 @@
             <img src="{{ public_path('storage/' . \App\Models\Setting::get('school_logo')) }}" alt="Logo" style="width: 60px; height: 60px; border-radius: 8px; flex-shrink: 0; object-fit: cover; border: none; padding: 0; margin-top: 0; margin-right: 0;">
         @else
             <div class="kop-logo">
-                {{ collect(explode(' ', \App\Models\Setting::get('school_name', 'SMAN X SURABAYA')))->map(fn($w) => substr($w, 0, 1))->take(2)->join('') }}
+                {{ collect(explode(' ', \App\Models\Setting::get('school_name', 'SMKN 2 SURABAYA')))->map(fn($w) => substr($w, 0, 1))->take(2)->join('') }}
             </div>
         @endif
         <div class="kop-text">
-            <div class="kop-sekolah">{{ \App\Models\Setting::get('school_name', 'SMAN X SURABAYA') }}</div>
+            <div class="kop-sekolah">{{ \App\Models\Setting::get('school_name', 'SMKN 2 SURABAYA') }}</div>
             <div class="kop-alamat">
                 {{ \App\Models\Setting::get('school_address', 'Jl. Contoh No. 1, Surabaya, Jawa Timur') }}
                 @if(\App\Models\Setting::get('school_phone'))
