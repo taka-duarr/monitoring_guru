@@ -110,6 +110,7 @@
                         <th>Nama Ketua Kelas</th>
                         <th>NIS / NIK</th>
                         <th>Kelas Terampu</th>
+                        <th>Angkatan</th>
                         <th class="col-actions col-center">Aksi</th>
                     </tr>
                 </thead>
@@ -127,6 +128,9 @@
                             </td>
                             <td>
                                 <span class="class-pill-item">{{ $row->kelas->name ?? '-' }}</span>
+                            </td>
+                            <td>
+                                {{ $row->kelas && $row->kelas->angkatan ? $row->kelas->angkatan->name : '-' }}
                             </td>
                             <td class="col-actions col-center">
                                 <div class="action-buttons-group">

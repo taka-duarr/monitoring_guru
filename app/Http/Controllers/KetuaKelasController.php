@@ -8,13 +8,13 @@ class KetuaKelasController extends Controller
 {
     public function index()
     {
-        $data = User::where('jabatan', 'ketuakelas')->latest()->paginate(15);
+        $data = User::where('jabatan', 'ketuakelas')->with('kelas.angkatan')->latest()->paginate(15);
         return view('admin.ketuakelas', compact('data'));
     }
 
     public function create()
     {
-        $kelass = \App\Models\Kelas::all();
+        $kelass = \App\Models\Kelas::with('angkatan')->get();
         return view('admin.ketuakelas_form', compact('kelass'));
     }
 
@@ -42,7 +42,7 @@ class KetuaKelasController extends Controller
     public function edit($id)
     {
         $data = User::where('jabatan', 'ketuakelas')->findOrFail($id);
-        $kelass = \App\Models\Kelas::all();
+        $kelass = \App\Models\Kelas::with('angkatan')->get();
         return view('admin.ketuakelas_form', compact('data', 'kelass'));
     }
 
@@ -80,7 +80,7 @@ class KetuaKelasController extends Controller
     public function export(Request $request)
     {
         $format = $request->query('format', 'pdf');
-        $ketuakelas = User::where('jabatan', 'ketuakelas')->with('kelas')->orderBy('name', 'asc')->get();
+        $ketuakelas = User::where('jabatan', 'ketuakelas')->with('kelas.angkatan')->orderBy('name', 'asc')->get();
 
         if ($format === 'excel') {
             if (class_exists(\Maatwebsite\Excel\Facades\Excel::class)) {
@@ -95,13 +95,14 @@ class KetuaKelasController extends Controller
             $callback = function() use ($ketuakelas) {
                 $file = fopen('php://output', 'w');
                 fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
-                fputcsv($file, ['No', 'Nama Lengkap', 'NIS', 'Kelas']);
+                fputcsv($file, ['No', 'Nama Lengkap', 'NIS', 'Kelas', 'Angkatan']);
                 foreach ($ketuakelas as $index => $k) {
                     fputcsv($file, [
                         $index + 1,
                         $k->name,
                         $k->nik,
-                        $k->kelas ? $k->kelas->name : '-'
+                        $k->kelas ? $k->kelas->name : '-',
+                        $k->kelas && $k->kelas->angkatan ? $k->kelas->angkatan->name : '-'
                     ]);
                 }
                 fclose($file);

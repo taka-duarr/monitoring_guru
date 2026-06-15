@@ -27,7 +27,7 @@ class KetuaKelasExport implements FromArray, WithHeadings, ShouldAutoSize, WithS
             ];
         }
 
-        $ketuakelas = User::where('jabatan', 'ketuakelas')->with('kelas')->orderBy('name', 'asc')->get();
+        $ketuakelas = User::where('jabatan', 'ketuakelas')->with('kelas.angkatan')->orderBy('name', 'asc')->get();
         $data = [];
         $no = 1;
         foreach ($ketuakelas as $k) {
@@ -35,7 +35,8 @@ class KetuaKelasExport implements FromArray, WithHeadings, ShouldAutoSize, WithS
                 $no++,
                 $k->name,
                 $k->nik,
-                $k->kelas ? $k->kelas->name : '-'
+                $k->kelas ? $k->kelas->name : '-',
+                $k->kelas && $k->kelas->angkatan ? $k->kelas->angkatan->name : '-'
             ];
         }
         return $data;
@@ -47,7 +48,8 @@ class KetuaKelasExport implements FromArray, WithHeadings, ShouldAutoSize, WithS
             'No',
             'Nama Lengkap',
             'NIS',
-            'Kelas'
+            'Kelas',
+            'Angkatan'
         ];
     }
 
