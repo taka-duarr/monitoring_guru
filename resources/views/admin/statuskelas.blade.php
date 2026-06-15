@@ -99,10 +99,7 @@
                                 {{ ($data->currentPage() - 1) * $data->perPage() + $loop->iteration }}
                             </td>
                             <td>
-                                <span class="font-bold text-neutral-900">{{ $row->name }}</span>
-                                @if($row->grade)
-                                    <span class="text-xs text-neutral-500 d-block">Tingkat {{ $row->grade }}</span>
-                                @endif
+                                <span class="font-bold text-neutral-900">{{ $row->grade ? $row->grade . ' ' : '' }}{{ $row->name }}</span>
                             </td>
                             <td>
                                 <span class="font-medium text-neutral-700">{{ $isActive ? ($status->ruangan ?? '-') : '-' }}</span>
