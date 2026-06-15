@@ -53,16 +53,21 @@ class MuridController extends Controller
         $request->validate([
             'nis' => [
                 'required',
-                \Illuminate\Validation\Rule::unique('murids')->ignore($murid->id)->where(function ($query) use ($request) {
-                    // Hanya cek duplikat jika status murid ini aktif (atau akan diubah ke aktif)
-                    return $query->where('status', 'aktif');
-                })
+                function ($attribute, $value, $fail) use ($murid) {
+                    // Jika NIS diganti, pastikan NIS yang baru belum dipakai murid aktif
+                    if ($value !== $murid->nis) {
+                        $exists = \App\Models\Murid::where('nis', $value)
+                            ->where('status', 'aktif')
+                            ->exists();
+                        if ($exists) {
+                            $fail('NIS ini sudah dipakai oleh murid lain yang berstatus aktif.');
+                        }
+                    }
+                }
             ],
             'name' => 'required|string|max:255',
             'no_absen' => 'nullable|integer',
             'status' => 'required|in:aktif,lulus,pindah,keluar,naik_kelas',
-        ], [
-            'nis.unique' => 'NIS ini sudah dipakai oleh murid lain yang berstatus aktif.',
         ]);
 
         $murid->update([
