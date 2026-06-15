@@ -69,7 +69,7 @@
                 <option value="">-- Pilih Kelas --</option>
                 @foreach($kelass as $rel)
                     <option value="{{ $rel->id }}" {{ old('kelas_id', $data->kelas_id ?? '') == $rel->id ? 'selected' : '' }}>
-                        {{ $rel->name }} {{ $rel->angkatan ? '- ' . $rel->angkatan->name : '' }}
+                        {{ $rel->name }} {{ $rel->grade ? '(Tingkat ' . $rel->grade . ')' : '' }} {{ $rel->angkatan ? '- ' . $rel->angkatan->name : '' }}
                     </option>
                 @endforeach
             </select>

@@ -95,13 +95,14 @@ class KetuaKelasController extends Controller
             $callback = function() use ($ketuakelas) {
                 $file = fopen('php://output', 'w');
                 fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
-                fputcsv($file, ['No', 'Nama Lengkap', 'NIS', 'Kelas', 'Angkatan']);
+                fputcsv($file, ['No', 'Nama Lengkap', 'NIS', 'Kelas', 'Tingkat', 'Angkatan']);
                 foreach ($ketuakelas as $index => $k) {
                     fputcsv($file, [
                         $index + 1,
                         $k->name,
                         $k->nik,
                         $k->kelas ? $k->kelas->name : '-',
+                        $k->kelas && $k->kelas->grade ? $k->kelas->grade : '-',
                         $k->kelas && $k->kelas->angkatan ? $k->kelas->angkatan->name : '-'
                     ]);
                 }

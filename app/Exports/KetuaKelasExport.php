@@ -36,6 +36,7 @@ class KetuaKelasExport implements FromArray, WithHeadings, ShouldAutoSize, WithS
                 $k->name,
                 $k->nik,
                 $k->kelas ? $k->kelas->name : '-',
+                $k->kelas && $k->kelas->grade ? $k->kelas->grade : '-',
                 $k->kelas && $k->kelas->angkatan ? $k->kelas->angkatan->name : '-'
             ];
         }
@@ -49,6 +50,7 @@ class KetuaKelasExport implements FromArray, WithHeadings, ShouldAutoSize, WithS
             'Nama Lengkap',
             'NIS',
             'Kelas',
+            'Tingkat',
             'Angkatan'
         ];
     }
