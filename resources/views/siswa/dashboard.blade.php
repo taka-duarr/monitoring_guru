@@ -247,7 +247,7 @@
                     </div>
                 </div>
 
-                <p id="qr-countdown" class="text-xs text-brand-600 font-semibold mb-6">QR diperbarui dalam 30s</p>
+
 
                 <button id="fullscreen-btn" onclick="requestFullscreenQr()" class="w-full bg-brand-600 text-white rounded-xl py-2.5 font-bold mb-2 transition hover:bg-brand-700">
                     Layar Penuh
@@ -279,8 +279,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script>
         let qrcodeObj = null;
-        let qrIntervalId = null;
-        let countdownIntervalId = null;
+
         let pollIntervalId = null;
         let currentJadwalId = null;
         let currentMapelName = null;
@@ -341,24 +340,6 @@
         function startQrTimers() {
             stopQrTimers();
 
-            countdownSeconds = 30;
-            updateCountdownText();
-
-            // Interval 30 detik untuk regenerasi QR
-            qrIntervalId = setInterval(() => {
-                renderQrCode();
-                countdownSeconds = 30;
-                updateCountdownText();
-            }, 30000);
-
-            // Interval 1 detik untuk countdown
-            countdownIntervalId = setInterval(() => {
-                countdownSeconds--;
-                if (countdownSeconds < 0) {
-                    countdownSeconds = 30;
-                }
-                updateCountdownText();
-            }, 1000);
 
             // Polling status absensi ke server
             pollIntervalId = setInterval(() => {
@@ -387,26 +368,13 @@
 
         // ... Sisa fungsi JS di bawah ...
         function stopQrTimers() {
-            if (qrIntervalId) {
-                clearInterval(qrIntervalId);
-                qrIntervalId = null;
-            }
-            if (countdownIntervalId) {
-                clearInterval(countdownIntervalId);
-                countdownIntervalId = null;
-            }
+
             if (pollIntervalId) {
                 clearInterval(pollIntervalId);
                 pollIntervalId = null;
             }
         }
 
-        function updateCountdownText() {
-            const countdownEl = document.getElementById('qr-countdown');
-            if (countdownEl) {
-                countdownEl.innerText = `QR diperbarui dalam ${countdownSeconds}s`;
-            }
-        }
 
         function requestFullscreenQr() {
             const modalContent = document.getElementById('qr-modal-content');
