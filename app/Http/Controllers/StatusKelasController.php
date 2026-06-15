@@ -8,8 +8,8 @@ class StatusKelasController extends Controller
     public function index()
     {
         $today = \Carbon\Carbon::today();
-        // Ambil SEMUA kelas agar kepala sekolah bisa melihat daftar lengkap
-        $data = \App\Models\Kelas::orderBy('name', 'asc')->paginate(20);
+        // Ambil kelas yang masih aktif agar kepala sekolah bisa melihat daftar lengkap
+        $data = \App\Models\Kelas::where('is_active', true)->orderBy('name', 'asc')->paginate(20);
         
         foreach ($data as $kelas) {
             $status = StatusKelas::where('kelas_id', $kelas->id)
