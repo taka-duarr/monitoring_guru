@@ -63,6 +63,11 @@ class KenaikanKelasController extends Controller
                         $newMurid->kelas_id = $newKelas->id;
                         $newMurid->save();
                     }
+                    
+                    // Update kelas_id pada akun User (Ketua Kelas) agar ikut pindah ke kelas baru
+                    if ($kelas->ketua_id) {
+                        \App\Models\User::where('id', $kelas->ketua_id)->update(['kelas_id' => $newKelas->id]);
+                    }
 
                     // Ubah status murid lama di kelas lama menjadi naik_kelas
                     Murid::where('kelas_id', $kelas->id)
