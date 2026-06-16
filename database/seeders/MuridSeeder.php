@@ -2,25 +2,27 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\Kelas;
+use App\Models\Murid;
 
 class MuridSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        $kelasIds = \App\Models\Kelas::pluck('id');
+        $kelasIds = Kelas::pluck('id');
+        $nis = 10000;
         
-        $nis = 1000;
+        $firstNames = ['Adi', 'Budi', 'Citra', 'Dina', 'Eko', 'Fajar', 'Gita', 'Hadi', 'Indra', 'Joko', 'Kiki', 'Lina', 'Maman', 'Nina', 'Opan'];
+        $lastNames = ['Saputra', 'Wijaya', 'Pratama', 'Lestari', 'Sari', 'Nugroho', 'Kusuma', 'Ramadhan', 'Hidayat', 'Putri'];
+
         foreach ($kelasIds as $kelasId) {
             for ($i = 1; $i <= 10; $i++) {
-                \App\Models\Murid::create([
+                $name = $firstNames[array_rand($firstNames)] . ' ' . $lastNames[array_rand($lastNames)];
+                Murid::create([
                     'kelas_id' => $kelasId,
                     'nis' => (string)$nis++,
-                    'name' => 'Siswa Dummy ' . $i . ' Kelas ' . substr($kelasId, 0, 4),
+                    'name' => $name,
                     'no_absen' => $i
                 ]);
             }

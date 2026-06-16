@@ -166,6 +166,62 @@
         @endif
     </div>
 
+    {{-- RIWAYAT SISWA DARI KELAS INI (naik kelas/lulus) --}}
+    @php
+        $riwayatMurids = $murids->filter(fn($m) => in_array($m->status, ['naik_kelas', 'lulus', 'pindah', 'keluar']));
+    @endphp
+    @if($riwayatMurids->isNotEmpty())
+    <div class="mt-6">
+        <div class="d-flex align-center gap-3 mb-3">
+            <h3 class="font-bold text-sm text-neutral-500">
+                <i class="ti ti-history"></i> Riwayat Siswa Kelas Ini
+            </h3>
+            <div class="flex-1" style="height:1px; background:var(--color-neutral-200);"></div>
+            <span class="text-xs text-neutral-400">{{ $riwayatMurids->count() }} siswa</span>
+        </div>
+        <div class="table-wrapper card p-0 overflow-hidden">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th class="col-no">No Absen</th>
+                        <th>NIS</th>
+                        <th>Nama Lengkap</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($riwayatMurids as $row)
+                    <tr>
+                        <td class="col-no font-semibold">{{ $row->no_absen ?? '-' }}</td>
+                        <td><span class="font-mono text-xs">{{ $row->nis }}</span></td>
+                        <td><span class="font-semibold text-neutral-700">{{ $row->name }}</span></td>
+                        <td>
+                            @if($row->status == 'naik_kelas')
+                                <span class="badge bg-primary-50 text-primary-700 border border-primary-200" style="padding:4px 8px;border-radius:12px;font-size:11px;">
+                                    <i class="ti ti-arrow-up-right"></i> Naik Kelas
+                                </span>
+                            @elseif($row->status == 'lulus')
+                                <span class="badge bg-success-50 text-success-700 border border-success-200" style="padding:4px 8px;border-radius:12px;font-size:11px;">
+                                    <i class="ti ti-school"></i> Lulus
+                                </span>
+                            @elseif($row->status == 'pindah')
+                                <span class="badge bg-warning-50 text-warning-700 border border-warning-200" style="padding:4px 8px;border-radius:12px;font-size:11px;">
+                                    Pindah
+                                </span>
+                            @else
+                                <span class="badge bg-danger-50 text-danger-700 border border-danger-200" style="padding:4px 8px;border-radius:12px;font-size:11px;">
+                                    {{ ucfirst($row->status) }}
+                                </span>
+                            @endif
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+    @endif
+
     <!-- Reusable Hapus Modal -->
     <x-modal-hapus />
 

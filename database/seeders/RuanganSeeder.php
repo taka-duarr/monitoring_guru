@@ -8,19 +8,20 @@ use Illuminate\Support\Str;
 
 class RuanganSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        Ruangan::create([
-            'id' => Str::uuid(),
-            'name' => 'Lab Komputer 1',
-        ]);
-
-        Ruangan::create([
-            'id' => Str::uuid(),
-            'name' => 'Lab Komputer 2',
-        ]);
+        for ($i = 1; $i <= 10; $i++) {
+            Ruangan::create([
+                'id' => Str::uuid(),
+                'name' => 'Ruang Teori ' . str_pad($i, 2, '0', STR_PAD_LEFT),
+            ]);
+        }
+        
+        for ($i = 1; $i <= 5; $i++) {
+            Ruangan::create([
+                'id' => Str::uuid(),
+                'name' => 'Lab Komputer ' . $i,
+            ]);
+        }
     }
 }

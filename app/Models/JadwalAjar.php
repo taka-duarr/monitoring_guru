@@ -16,6 +16,7 @@ class JadwalAjar extends Model
     public function mapel() { return $this->belongsTo(Mapel::class, 'mapel_id')->withTrashed(); }
     public function kelas() { return $this->belongsTo(Kelas::class, 'kelas_id')->withTrashed(); }
     public function ruangan() { return $this->belongsTo(Ruangan::class, 'ruangan_id')->withTrashed(); }
+    public function tahunAjaran() { return $this->belongsTo(TahunAjaran::class, 'tahun_ajaran_id'); }
     public function absenMasuks() { return $this->hasMany(AbsenMasuk::class, 'jadwal_ajar_id'); }
     public function izins() { return $this->hasMany(Izin::class, 'jadwal_ajar_id'); }
 }

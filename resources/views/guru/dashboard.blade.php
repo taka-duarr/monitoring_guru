@@ -1,338 +1,611 @@
 @extends('layouts.guru')
 @section('title', 'Jadwal Mengajar')
+@section('content_class', 'no-padding')
 
 @section('content')
-<div class="p-5">
-    <div class="mb-6">
-        <h2 class="text-2xl font-heading font-bold text-slate-800">Halo, {{ Auth::user()->name }}! 👋</h2>
-        <p class="text-slate-500 mt-1">Berikut adalah jadwal mengajarmu hari ini.</p>
-    </div>
 
-    {{-- Data Ringkasan --}}
+<style>
+    .dash-wrap {
+        min-height: 100vh;
+        background: #f8fafc;
+    }
+    .dash-inner { padding: 20px; }
+
+    /* Glass helper — very subtle */
+    .card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    }
+    .card-sm {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+
+    /* Stat mini cards */
+    .stat-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 14px 10px;
+        text-align: center;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+    .stat-num { font-size:24px; font-weight: 800; color: #0f172a; line-height: 1; margin: 0; }
+    .stat-lbl { font-size:12px; color: #94a3b8; margin: 4px 0 0; text-transform: uppercase; letter-spacing: .5px; }
+
+    /* Badge */
+    .badge-time {
+        background: #f1f5f9;
+        border: 1px solid #e2e8f0;
+        color: #475569;
+        font-size:12px;
+        font-weight: 700;
+        padding: 3px 10px;
+        border-radius: 99px;
+        font-family: monospace;
+        letter-spacing: .3px;
+        white-space: nowrap;
+    }
+    .badge-status-done {
+        background: #f1f5f9;
+        color: #64748b;
+        font-size:12px;
+        font-weight: 700;
+        padding: 3px 9px;
+        border-radius: 99px;
+    }
+    .badge-status-pending {
+        background: #eff6ff;
+        color: #3b82f6;
+        font-size:12px;
+        font-weight: 700;
+        padding: 3px 9px;
+        border-radius: 99px;
+    }
+
+    /* Schedule cards */
+    .sched-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 14px 16px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+        transition: box-shadow .18s, border-color .18s, transform .15s;
+        display: flex; flex-direction: column; gap: 8px;
+    }
+    .sched-card:hover {
+        border-color: #94a3b8;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.07);
+        transform: translateY(-1px);
+    }
+    .sched-card.done { background: #f8fafc; }
+
+    /* All-schedule small cards */
+    .mini-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 12px 14px;
+        text-decoration: none;
+        display: flex; flex-direction: column; gap: 5px;
+        transition: border-color .15s, box-shadow .15s, transform .12s;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+    .mini-card:hover {
+        border-color: #94a3b8;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.07);
+        transform: translateY(-1px);
+    }
+
+    /* Ongoing live card */
+    .live-card {
+        background: #fffbeb;
+        border: 1px solid #fde68a;
+        border-radius: 14px;
+        padding: 14px 16px;
+        box-shadow: 0 2px 8px rgba(234,179,8,0.08);
+        position: relative; overflow: hidden;
+    }
+    .live-bar {
+        position: absolute; top: 0; left: 0; right: 0; height: 2px;
+        background: linear-gradient(90deg, #f59e0b, #fbbf24, #f59e0b);
+        background-size: 200% 100%;
+        animation: shimmer-bar 2s linear infinite;
+    }
+
+    /* Scan button */
+    .btn-scan {
+        background: #0f172a;
+        color: #ffffff;
+        border: none;
+        border-radius: 11px;
+        padding: 10px 16px;
+        font-size:15px;
+        font-weight: 700;
+        text-decoration: none;
+        display: flex; align-items: center; justify-content: center; gap: 7px;
+        cursor: pointer;
+        transition: background .15s;
+    }
+    .btn-scan:hover { background: #1e293b; }
+    .btn-scan-ghost {
+        background: #f8fafc;
+        color: #475569;
+        border: 1px solid #e2e8f0;
+        border-radius: 11px;
+        padding: 10px 16px;
+        font-size:15px;
+        font-weight: 700;
+        text-decoration: none;
+        display: flex; align-items: center; justify-content: center; gap: 7px;
+        cursor: pointer;
+        transition: background .15s;
+    }
+    .btn-scan-ghost:hover { background: #f1f5f9; }
+    .btn-locked {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        color: #94a3b8;
+        border-radius: 11px;
+        padding: 10px 16px;
+        font-size:15px;
+        font-weight: 600;
+        display: flex; align-items: center; justify-content: center; gap: 7px;
+        cursor: not-allowed;
+    }
+
+    /* Filter select */
+    .filter-select {
+        width: 100%;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 11px;
+        padding: 9px 13px;
+        font-size:15px;
+        color: #0f172a;
+        outline: none;
+        appearance: none;
+        cursor: pointer;
+    }
+
+    /* Section divider labels */
+    .section-label {
+        font-size:12px;
+        font-weight: 700;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        margin: 0;
+    }
+
+    /* Day pill */
+    .day-pill-today {
+        background: #0f172a;
+        color: #ffffff;
+        font-size:12px;
+        font-weight: 700;
+        padding: 4px 12px;
+        border-radius: 99px;
+    }
+    .day-pill {
+        background: #f1f5f9;
+        color: #64748b;
+        border: 1px solid #e2e8f0;
+        font-size:12px;
+        font-weight: 700;
+        padding: 4px 12px;
+        border-radius: 99px;
+    }
+
+    @keyframes shimmer-bar {
+        0%   { background-position: -200% 0; }
+        100% { background-position:  200% 0; }
+    }
+    @keyframes ping-dot {
+        0%,100% { opacity:1; }
+        50%      { opacity:.4; }
+    }
+</style>
+
+<div class="dash-wrap">
+<div class="dash-inner">
+
     @php
-        $totalJadwal = count($allJadwals);
-        $selesaiJadwal = $allJadwals->filter(fn($j) => $j->absen_masuk !== null && $j->absen_keluar !== null)->count();
-        $belumJadwal = $allJadwals->filter(fn($j) => $j->absen_masuk === null)->count();
-
-        $nextJadwal = $allJadwals->first(fn($j) => $j->absen_masuk === null);
-        $nextJamMulai = $nextJadwal ? $nextJadwal->jam_mulai : null;
-
-        // Pisahkan kelas aktif vs kelas lainnya
+        $totalJadwal    = count($allJadwals);
+        $selesaiJadwal  = $allJadwals->filter(fn($j) => $j->absen_masuk !== null && $j->absen_keluar !== null)->count();
+        $belumJadwal    = $allJadwals->filter(fn($j) => $j->absen_masuk === null)->count();
+        $nextJadwal     = $allJadwals->first(fn($j) => $j->absen_masuk === null);
+        $nextJamMulai   = $nextJadwal ? $nextJadwal->jam_mulai : null;
         $ongoingClasses = $allJadwals->filter(fn($j) => $j->absen_masuk !== null && $j->absen_keluar === null);
-        $otherClasses = $jadwals->filter(fn($j) => !($j->absen_masuk !== null && $j->absen_keluar === null));
+        $otherClasses   = $jadwals->filter(fn($j) => !($j->absen_masuk !== null && $j->absen_keluar === null));
     @endphp
 
-    {{-- Panduan Penggunaan (Dismissible Card via Alpine.js) --}}
-    <div x-data="{ showTips: true }" x-show="showTips" class="bg-blue-50 border border-blue-200 rounded-2xl p-4 mb-4 flex items-start gap-3 relative transition-all" style="display: none;">
-        <span class="text-xl flex-shrink-0">💡</span>
-        <div class="flex-1 pr-6">
-            <h4 class="font-bold text-sm text-blue-800">Tips Absensi Real-Time</h4>
-            <p class="text-xs text-blue-700 mt-0.5">Mintalah Ketua Kelas menampilkan QR Code di ponselnya, lalu ketuk tombol **Scan QR MASUK / KELUAR** pada jadwal kelas yang sesuai untuk merekam kehadiran.</p>
+    {{-- ─── HEADER ─── --}}
+    <div style="margin-bottom:22px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+            <div style="width:44px;height:44px;border-radius:12px;background:#0f172a;
+                        display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <i class="ti ti-chalkboard-teacher" style="color:#ffffff;font-size:22px;"></i>
+            </div>
+            <div>
+                <h2 style="font-size:20px;font-weight:800;color:#0f172a;margin:0;letter-spacing:-.3px;">
+                    Halo, {{ Auth::user()->name }}
+                </h2>
+                <p style="color:#94a3b8;font-size:14px;margin:2px 0 0;">
+                    {{ \Carbon\Carbon::now()->locale('id')->isoFormat('dddd, D MMMM YYYY') }}
+                </p>
+            </div>
         </div>
-        <button @click="showTips = false" class="absolute top-3 right-3 text-blue-400 hover:text-blue-600 transition" aria-label="Close guide">
-            <i class="ti ti-x text-sm"></i>
-        </button>
-    </div>
 
-    {{-- Grid Panel Countdown & Summary --}}
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        {{-- Countdown Kelas Berikutnya --}}
-        <div class="bg-brand-50 border border-brand-200 rounded-2xl p-4 flex flex-col justify-between">
+        {{-- Tips dismissible --}}
+        <div x-data="{ show: true }" x-show="show" style="display:none;"
+             x-transition:leave="transition ease-in duration-150" x-transition:leave-end="opacity-0">
+            <div class="card-sm" style="padding:12px 14px;display:flex;align-items:flex-start;gap:10px;
+                                         position:relative;margin-bottom:16px;">
+                <i class="ti ti-info-circle" style="color:#64748b;font-size:20px;flex-shrink:0;margin-top:1px;"></i>
+                <div style="flex:1;">
+                    <p style="font-weight:700;font-size:14px;color:#334155;margin:0 0 2px;">Tips Absensi</p>
+                    <p style="font-size:14px;color:#64748b;margin:0;">Minta Ketua Kelas tampilkan QR, lalu tap <strong style="color:#0f172a;">Scan QR MASUK</strong> untuk mencatat kehadiran.</p>
+                </div>
+                <button @click="show=false" style="background:none;border:none;cursor:pointer;color:#cbd5e1;font-size:15px;padding:1px;position:absolute;top:10px;right:12px;">
+                    <i class="ti ti-x"></i>
+                </button>
+            </div>
+        </div>
+
+        {{-- Stats row --}}
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;">
+            <div class="stat-card">
+                <p class="stat-num">{{ $totalJadwal }}</p>
+                <p class="stat-lbl">Jadwal</p>
+            </div>
+            <div class="stat-card">
+                <p class="stat-num" style="color:#16a34a;">{{ $selesaiJadwal }}</p>
+                <p class="stat-lbl">Selesai</p>
+            </div>
+            <div class="stat-card">
+                <p class="stat-num" style="color:#64748b;">{{ $belumJadwal }}</p>
+                <p class="stat-lbl">Belum</p>
+            </div>
+        </div>
+
+        {{-- Countdown --}}
+        <div class="card" style="padding:15px 16px;">
             @if($nextJamMulai)
-                <div>
-                    <p class="text-xs font-semibold text-brand-600 uppercase tracking-wider mb-1">Kelas berikutnya</p>
-                    <div class="flex items-center gap-3">
-                        <span class="text-2xl">⏰</span>
-                        <div>
-                            <p class="text-sm text-brand-700">Dimulai pukul <strong>{{ substr($nextJamMulai, 0, 5) }}</strong></p>
-                            <p id="next-countdown" class="text-xl font-bold text-brand-800 tabular-nums">--:--:--</p>
-                        </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+                    <div>
+                        <p style="font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;
+                                   letter-spacing:1px;margin:0 0 4px;display:flex;align-items:center;gap:4px;">
+                            <i class="ti ti-clock-hour-4" style="font-size:15px;"></i> Kelas Berikutnya
+                        </p>
+                        <p style="font-size:15px;color:#334155;margin:0;">
+                            Pukul <strong style="color:#0f172a;">{{ substr($nextJamMulai, 0, 5) }}</strong>
+                        </p>
+                    </div>
+                    <div style="text-align:right;">
+                        <p id="next-countdown" style="font-size:26px;font-weight:900;color:#0f172a;
+                                                       font-family:monospace;letter-spacing:-1px;line-height:1;margin:0;">--:--:--</p>
+                        <p style="font-size:11px;color:#cbd5e1;margin:2px 0 0;text-transform:uppercase;letter-spacing:.5px;">Hitung Mundur</p>
                     </div>
                 </div>
             @else
-                <div class="flex items-center gap-3 py-2">
-                    <span class="text-2xl">Class Clear ✅</span>
-                    <p class="text-sm font-semibold text-brand-700">Tidak ada jadwal lagi hari ini</p>
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <div style="width:36px;height:36px;border-radius:10px;background:#f1f5f9;
+                                display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i class="ti ti-circle-check" style="color:#16a34a;font-size:22px;"></i>
+                    </div>
+                    <div>
+                        <p style="font-weight:700;color:#0f172a;font-size:16px;margin:0;">Semua Selesai!</p>
+                        <p style="color:#94a3b8;font-size:14px;margin:0;">Tidak ada jadwal lagi hari ini</p>
+                    </div>
                 </div>
             @endif
         </div>
-
-        {{-- Ringkasan Mengajar Hari Ini --}}
-        <div class="bg-white border border-slate-200 rounded-2xl p-4">
-            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Ringkasan Mengajar Hari Ini</p>
-            <div class="grid grid-cols-3 gap-2 text-center">
-                <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                    <p class="text-xs text-slate-500 font-medium">Jadwal</p>
-                    <p class="text-lg font-bold text-slate-800">{{ $totalJadwal }}</p>
-                </div>
-                <div class="bg-emerald-50 p-2.5 rounded-xl border border-emerald-100">
-                    <p class="text-xs text-emerald-600 font-medium">Selesai</p>
-                    <p class="text-lg font-bold text-emerald-700">{{ $selesaiJadwal }}</p>
-                </div>
-                <div class="bg-blue-50 p-2.5 rounded-xl border border-blue-100">
-                    <p class="text-xs text-blue-600 font-medium">Belum</p>
-                    <p class="text-lg font-bold text-blue-700">{{ $belumJadwal }}</p>
-                </div>
-            </div>
-        </div>
     </div>
 
-    {{-- 1. SEKSI KELAS AKTIF (HIGH LIGHTED) --}}
+    {{-- ═══════════════════════════════════════════ --}}
+    {{-- 1. KELAS BERLANGSUNG                       --}}
+    {{-- ═══════════════════════════════════════════ --}}
     @if($ongoingClasses->isNotEmpty())
-        <div class="mb-6">
-            <h3 class="font-bold text-xs text-slate-400 uppercase tracking-wider mb-3">Kelas Sedang Berlangsung</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                @foreach($ongoingClasses as $jadwal)
-                    @php
-                        $statusText = 'Sedang Mengajar';
-                        $statusColor = 'bg-amber-500 text-white animate-pulse';
-                        $borderClass = 'border-amber-400 ring-2 ring-amber-400/20';
-                    @endphp
-                    
-                    <div class="bg-white rounded-2xl p-5 shadow-lg border-2 {{ $borderClass }} relative overflow-hidden transition-all duration-300 hover:shadow-xl flex flex-col justify-between h-full">
-                        <div class="absolute top-0 left-0 w-1.5 h-full bg-amber-500"></div>
-
-                        <div class="flex-1 flex flex-col justify-between">
-                            <div>
-                                <div class="flex justify-between items-start mb-3">
-                                    <div>
-                                        <div class="flex items-center gap-2 mb-2">
-                                            <span class="inline-block px-2.5 py-1 bg-brand-50 text-brand-700 text-[10px] font-bold uppercase tracking-wider rounded-md">{{ substr($jadwal->jam_mulai, 0, 5) }} - {{ substr($jadwal->jam_selesai, 0, 5) }}</span>
-                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 {{ $statusColor }} text-[10px] font-bold uppercase tracking-wider rounded-md">
-                                                <span class="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
-                                                {{ $statusText }}
-                                            </span>
-                                        </div>
-                                        <h3 class="font-bold text-xl text-slate-800 leading-tight">
-                                            <a href="{{ route('guru.riwayat_mapel', $jadwal->mapel_id) }}" class="hover:text-brand-600 hover:underline transition">
-                                                {{ $jadwal->mapel->name ?? 'Mata Pelajaran' }}
-                                            </a>
-                                        </h3>
-                                        <p class="text-sm text-slate-500 mt-1">Kelas <strong class="text-slate-700">{{ $jadwal->kelas->name ?? '-' }}</strong> • {{ $jadwal->ruangan->name ?? 'Ruang Belum Diset' }}</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Informasi Rekaman Absensi -->
-                            <div class="flex items-center gap-4 mt-4 pt-4 border-t border-slate-100 text-sm">
-                                <div class="flex items-center gap-1.5">
-                                    <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path></svg>
-                                    <span class="text-slate-600 font-medium">Masuk: <strong class="text-slate-800">{{ $jadwal->absen_masuk->jam_masuk }}</strong></span>
-                                </div>
-                                <div class="flex items-center gap-1.5 opacity-70">
-                                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                    <span class="text-slate-500">Belum Keluar</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Action Buttons -->
-                        <div class="mt-4 flex gap-2">
-                            <a href="{{ route('guru.scan') }}"
-                               class="flex-1 bg-amber-500 hover:bg-amber-600 text-white text-center py-3 rounded-xl text-sm font-semibold transition shadow-md shadow-amber-500/20 min-h-[44px] flex items-center justify-center gap-2 active:scale-[0.98]">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h.01M16 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                Scan QR KELUAR
-                            </a>
-                            <a href="{{ route('guru.absen_murid', $jadwal->absen_masuk->id) }}"
-                               class="flex-1 bg-brand-500 hover:bg-brand-600 text-white text-center py-3 rounded-xl text-sm font-semibold transition shadow-md shadow-brand-500/20 min-h-[44px] flex items-center justify-center gap-2 active:scale-[0.98]">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                                Absen Murid
-                            </a>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
+    <div style="margin-bottom:22px;">
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px;">
+            <div style="width:6px;height:6px;border-radius:50%;background:#f59e0b;animation:ping-dot 1.4s ease-in-out infinite;"></div>
+            <p class="section-label" style="color:#92400e;">Sedang Berlangsung</p>
         </div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+            @foreach($ongoingClasses as $jadwal)
+            <div class="live-card">
+                <div class="live-bar"></div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+                    <div style="flex:1;min-width:0;">
+                        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap;">
+                            <span class="badge-time">{{ substr($jadwal->jam_mulai,0,5) }} – {{ substr($jadwal->jam_selesai,0,5) }}</span>
+                            <span style="background:#fef3c7;border:1px solid #fde68a;color:#92400e;
+                                         font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;
+                                         display:inline-flex;align-items:center;gap:3px;">
+                                <span style="width:5px;height:5px;border-radius:50%;background:#f59e0b;display:inline-block;
+                                             animation:ping-dot 1s ease-in-out infinite;"></span> LIVE
+                            </span>
+                        </div>
+                        <a href="{{ route('guru.riwayat_jadwal', $jadwal->id) }}" style="text-decoration:none;">
+                            <p style="font-size:17px;font-weight:700;color:#0f172a;margin:0 0 2px;
+                                       white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                                {{ $jadwal->mapel->name ?? 'Mata Pelajaran' }}
+                            </p>
+                        </a>
+                        <p style="font-size:13px;color:#78716c;margin:0;">
+                            Kelas {{ ($jadwal->kelas->grade ?? '') . ' ' . ($jadwal->kelas->name ?? '-') }}
+                            &nbsp;·&nbsp; {{ $jadwal->ruangan->name ?? '-' }}
+                            &nbsp;·&nbsp; Masuk: <strong style="color:#0f172a;">{{ substr($jadwal->absen_masuk->jam_masuk,0,5) }}</strong>
+                        </p>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
+                        <a href="{{ route('guru.scan') }}" class="btn-scan" style="font-size:13px;padding:7px 12px;">
+                            <i class="ti ti-qrcode" style="font-size:16px;"></i> Scan Keluar
+                        </a>
+                        <a href="{{ route('guru.absen_murid', $jadwal->absen_masuk->id) }}" class="btn-scan-ghost" style="font-size:13px;padding:7px 12px;">
+                            <i class="ti ti-users" style="font-size:16px;"></i> Absen Murid
+                        </a>
+                    </div>
+                </div>
+            </div>
+            @endforeach
+        </div>
+    </div>
     @endif
 
-    {{-- 2. SEKSI JADWAL LAINNYA --}}
-    <div>
-        <h3 class="font-bold text-xs text-slate-400 uppercase tracking-wider mb-3">Jadwal Mengajar Hari Ini</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    {{-- ═══════════════════════════════════════════ --}}
+    {{-- 2. JADWAL HARI INI                         --}}
+    {{-- ═══════════════════════════════════════════ --}}
+    <div style="margin-bottom:8px;">
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px;">
+            <div style="width:5px;height:5px;border-radius:50%;background:#cbd5e1;"></div>
+            <p class="section-label">Jadwal — {{ $hariIni }}</p>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:8px;">
             @forelse($otherClasses as $jadwal)
-                @php
-                    $hasMasuk = $jadwal->absen_masuk !== null;
-                    $hasKeluar = $jadwal->absen_keluar !== null;
+            @php
+                $hasMasuk  = $jadwal->absen_masuk !== null;
+                $hasKeluar = $jadwal->absen_keluar !== null;
+                $jamMulaiCarbon = \Carbon\Carbon::createFromFormat('H:i', substr($jadwal->jam_mulai, 0, 5));
+                $isTimeToScan   = \Carbon\Carbon::now()->gte($jamMulaiCarbon);
+                $isDone = $hasMasuk && $hasKeluar;
+                $canScan = !$isDone;
+            @endphp
 
-                    // Cek apakah sekarang sudah >= jam_mulai (toleransi 0 menit)
-                    $jamMulaiCarbon = \Carbon\Carbon::createFromFormat('H:i', substr($jadwal->jam_mulai, 0, 5));
-                    $isTimeToScan = \Carbon\Carbon::now()->gte($jamMulaiCarbon);
-
-                    // Tentukan status dan warna
-                    if ($hasMasuk && $hasKeluar) {
-                        $statusText = 'Selesai';
-                        $statusColor = 'bg-emerald-100 text-emerald-700';
-                        $borderClass = 'border-emerald-200';
-                        $canScan = false;
-                    } else {
-                        // Belum absen
-                        $statusText = 'Belum Absen';
-                        $statusColor = 'bg-blue-100 text-blue-700';
-                        $borderClass = 'border-blue-200';
-                        $canScan = true;
-                    }
-                @endphp
-
-                <div class="bg-white rounded-2xl p-5 shadow-sm border {{ $borderClass }} relative overflow-hidden transition-all hover:shadow-md flex flex-col justify-between h-full">
-                    @if(!$hasMasuk)
-                        <div class="absolute top-0 left-0 w-1.5 h-full bg-blue-500"></div>
-                    @elseif($hasMasuk && $hasKeluar)
-                        <div class="absolute top-0 left-0 w-1.5 h-full bg-emerald-500"></div>
-                    @endif
-
-                    <div class="flex-1 flex flex-col justify-between">
-                        <div>
-                            <div class="flex justify-between items-start mb-3">
-                                <div>
-                                    <div class="flex items-center gap-2 mb-2">
-                                        <span class="inline-block px-2.5 py-1 bg-brand-50 text-brand-700 text-[10px] font-bold uppercase tracking-wider rounded-md">{{ substr($jadwal->jam_mulai, 0, 5) }} - {{ substr($jadwal->jam_selesai, 0, 5) }}</span>
-                                        <span class="inline-block px-2.5 py-1 {{ $statusColor }} text-[10px] font-bold uppercase tracking-wider rounded-md">{{ $statusText }}</span>
-                                    </div>
-                                    <h3 class="font-bold text-lg text-slate-800 leading-tight">
-                                        <a href="{{ route('guru.riwayat_mapel', $jadwal->mapel_id) }}" class="hover:text-brand-600 hover:underline transition">
-                                            {{ $jadwal->mapel->name ?? 'Mata Pelajaran' }}
-                                        </a>
-                                    </h3>
-                                    <p class="text-sm text-slate-500 mt-1">Kelas {{ $jadwal->kelas->name ?? '-' }} • {{ $jadwal->ruangan->name ?? 'Ruang Belum Diset' }}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Informasi Rekaman Absensi -->
-                        @if($hasMasuk)
-                            <div class="flex items-center gap-4 mt-4 pt-4 border-t border-slate-100 text-sm">
-                                <div class="flex items-center gap-1.5">
-                                    <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path></svg>
-                                    <span class="text-slate-600 font-medium">Masuk: <strong class="text-slate-800">{{ $jadwal->absen_masuk->jam_masuk }}</strong></span>
-                                </div>
-
-                                @if($hasKeluar)
-                                    <div class="flex items-center gap-1.5">
-                                        <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013 3h4a3 3 0 013 3v1"></path></svg>
-                                        <span class="text-slate-600 font-medium">Keluar: <strong class="text-slate-800">{{ $jadwal->absen_keluar->jam_keluar }}</strong></span>
-                                    </div>
-                                @endif
-                            </div>
-                        @endif
-                    </div>
-
-                    <!-- Action Buttons -->
-                    @if($canScan)
-                        <div class="mt-4 flex gap-2">
-                            @if($isTimeToScan)
-                                {{-- Sudah waktunya: tampilkan tombol scan masuk normal --}}
-                                <a href="{{ route('guru.scan') }}"
-                                   class="flex-1 bg-brand-500 hover:bg-brand-600 text-white text-center py-3 rounded-xl text-sm font-semibold transition shadow-sm min-h-[44px] flex items-center justify-center gap-2 active:scale-[0.98]">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h.01M16 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                    Scan QR MASUK
-                                </a>
+            <div class="sched-card {{ $isDone ? 'done' : '' }}">
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+                    <div style="flex:1;min-width:0;">
+                        <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;flex-wrap:wrap;">
+                            <span class="badge-time">{{ substr($jadwal->jam_mulai,0,5) }} – {{ substr($jadwal->jam_selesai,0,5) }}</span>
+                            @if($isDone)
+                                <span class="badge-status-done">Selesai</span>
                             @else
-                                {{-- Belum waktunya: tampilkan tombol terkunci dengan countdown --}}
-                                <div class="flex-1 relative" data-unlock-time="{{ $jadwal->jam_mulai }}">
-                                    <div class="w-full bg-slate-100 border border-slate-200 text-slate-400 text-center py-3 rounded-xl text-sm font-semibold cursor-not-allowed select-none min-h-[44px] flex items-center justify-center gap-2 scan-locked-btn">
-                                        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                                        </svg>
-                                        <span>Terbuka <strong class="text-slate-500">{{ substr($jadwal->jam_mulai, 0, 5) }}</strong>
-                                            &nbsp;(<span class="scan-unlock-countdown text-xs font-mono text-slate-500">--:--</span>)
-                                        </span>
-                                    </div>
-                                    {{-- Link tersembunyi, akan ditampilkan JS saat waktunya tiba --}}
-                                    <a href="{{ route('guru.scan') }}"
-                                       class="scan-unlocked-btn w-full bg-brand-500 hover:bg-brand-600 text-white text-center py-3 rounded-xl text-sm font-semibold transition shadow-sm min-h-[44px] flex items-center justify-center gap-2 active:scale-[0.98]"
-                                       style="display:none;">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h.01M16 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                        Scan QR MASUK
-                                    </a>
-                                </div>
+                                <span class="badge-status-pending">Belum Absen</span>
                             @endif
                         </div>
+                        <a href="{{ route('guru.riwayat_jadwal', $jadwal->id) }}" style="text-decoration:none;">
+                            <h4 style="font-size:17px;font-weight:700;color:#0f172a;margin:0 0 3px;
+                                       white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                                {{ $jadwal->mapel->name ?? 'Mata Pelajaran' }}
+                            </h4>
+                        </a>
+                        <p style="font-size:14px;color:#64748b;margin:0;">
+                            Kelas {{ ($jadwal->kelas->grade ?? '') . ' ' . ($jadwal->kelas->name ?? '-') }}
+                            &nbsp;·&nbsp; {{ $jadwal->ruangan->name ?? '-' }}
+                        </p>
+                    </div>
+                </div>
+
+                @if($hasMasuk)
+                <div style="display:flex;align-items:center;gap:10px;padding:7px 11px;
+                            background:#f8fafc;border-radius:9px;font-size:14px;border:1px solid #f1f5f9;">
+                    <i class="ti ti-login" style="color:#64748b;font-size:15px;"></i>
+                    <span style="color:#334155;font-weight:600;">{{ substr($jadwal->absen_masuk->jam_masuk,0,5) }}</span>
+                    @if($hasKeluar)
+                        <i class="ti ti-arrow-right" style="color:#cbd5e1;font-size:14px;"></i>
+                        <i class="ti ti-logout" style="color:#64748b;font-size:15px;"></i>
+                        <span style="color:#334155;font-weight:600;">{{ substr($jadwal->absen_keluar->jam_keluar,0,5) }}</span>
+                    @else
+                        <span style="color:#cbd5e1;font-size:13px;margin-left:2px;">Belum keluar</span>
                     @endif
                 </div>
+                @endif
+
+                @if($canScan)
+                <div>
+                    @if($isTimeToScan)
+                    <a href="{{ route('guru.scan') }}" class="btn-scan">
+                        <i class="ti ti-qrcode" style="font-size:17px;"></i> Scan QR MASUK
+                    </a>
+                    @else
+                    <div class="relative" data-unlock-time="{{ $jadwal->jam_mulai }}">
+                        <div class="btn-locked scan-locked-btn">
+                            <i class="ti ti-lock" style="font-size:16px;"></i>
+                            <span>Terbuka pukul <strong style="color:#475569;">{{ substr($jadwal->jam_mulai,0,5) }}</strong>
+                                (<span class="scan-unlock-countdown" style="font-family:monospace;font-size:13px;">--:--</span>)
+                            </span>
+                        </div>
+                        <a href="{{ route('guru.scan') }}" class="btn-scan scan-unlocked-btn" style="display:none;">
+                            <i class="ti ti-qrcode" style="font-size:17px;"></i> Scan QR MASUK
+                        </a>
+                    </div>
+                    @endif
+                </div>
+                @endif
+            </div>
             @empty
                 @if($ongoingClasses->isEmpty())
-                    <div class="bg-white rounded-2xl p-8 text-center shadow-sm border border-slate-100 col-span-full">
-                        <svg class="w-12 h-12 text-slate-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        <p class="text-slate-500 font-medium">Hore! Tidak ada jadwal mengajar di hari {{ $hariIni }} ini.</p>
+                <div class="card" style="padding:36px 20px;text-align:center;">
+                    <div style="width:52px;height:52px;border-radius:16px;background:#f1f5f9;
+                                display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+                        <i class="ti ti-calendar-off" style="color:#94a3b8;font-size:26px;"></i>
                     </div>
+                    <p style="font-weight:700;color:#0f172a;font-size:16px;margin:0 0 4px;">Tidak ada jadwal hari {{ $hariIni }}</p>
+                    <p style="color:#94a3b8;font-size:14px;margin:0;">Nikmati harimu!</p>
+                </div>
                 @endif
             @endforelse
         </div>
-        <!-- Pagination Links -->
-        <div class="mt-6 flex justify-center">
-            {{ $jadwals->links() }}
+        <div class="mt-5 flex justify-center">{{ $jadwals->links() }}</div>
+    </div>
+
+    {{-- ═══════════════════════════════════════════ --}}
+    {{-- 3. SEMUA JADWAL + FILTER                   --}}
+    {{-- ═══════════════════════════════════════════ --}}
+    <div style="margin-top:28px;">
+
+        {{-- Filter --}}
+        <form method="GET" action="{{ route('guru.dashboard') }}"
+              class="card" style="margin-bottom:18px;overflow:hidden;">
+            <div style="display:flex;align-items:center;gap:7px;padding:10px 16px;
+                        background:#f8fafc;border-bottom:1px solid #e2e8f0;">
+                <i class="ti ti-filter" style="color:#64748b;font-size:15px;"></i>
+                <span style="font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;">Filter Data</span>
+            </div>
+            <div style="padding:14px 16px;display:flex;flex-direction:column;gap:10px;">
+                <div>
+                    <label style="display:block;font-size:12px;font-weight:700;color:#94a3b8;
+                                   text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;">Tahun Ajaran</label>
+                    <select name="tahun_ajaran_id" class="filter-select">
+                        <option value="">— Semua Tahun Ajaran —</option>
+                        @foreach($tahunAjarans as $ta)
+                            <option value="{{ $ta->id }}" {{ $selectedTahunAjaranId == $ta->id ? 'selected' : '' }}>
+                                {{ $ta->name }}{{ $ta->is_active ? ' (Aktif)' : '' }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div style="display:flex;gap:8px;">
+                    <div style="display:flex;gap:8px;align-items:center;flex:1;">
+                        <button type="submit" class="btn-scan" style="flex:1;">
+                            <i class="ti ti-filter" style="font-size:15px;"></i> Tampilkan
+                        </button>
+                        @if($selectedTahunAjaranId)
+                        <a href="{{ route('guru.dashboard') }}"
+                           style="width:40px;height:40px;flex-shrink:0;background:#f8fafc;border:1px solid #e2e8f0;
+                                  border-radius:11px;display:flex;align-items:center;justify-content:center;
+                                  color:#64748b;text-decoration:none;">
+                            <i class="ti ti-x" style="font-size:17px;"></i>
+                        </a>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        {{-- Section label --}}
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+            <p class="section-label" style="white-space:nowrap;">Semua Jadwal Mengajar</p>
+            <div style="flex:1;height:1px;background:#e2e8f0;"></div>
+            @if($selectedTahunAjaran)
+                <span style="background:#f1f5f9;border:1px solid #e2e8f0;color:#475569;
+                             font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;white-space:nowrap;">
+                    {{ $selectedTahunAjaran->name }}
+                </span>
+            @endif
+            <span style="color:#cbd5e1;font-size:12px;white-space:nowrap;">{{ $jadwalSemua->flatten()->count() }} jadwal</span>
+        </div>
+
+        @if($jadwalSemua->isEmpty())
+        <div class="card" style="padding:36px;text-align:center;">
+            <i class="ti ti-calendar-off" style="font-size:34px;color:#cbd5e1;display:block;margin-bottom:10px;"></i>
+            <p style="color:#94a3b8;font-size:16px;margin:0;">Tidak ada jadwal untuk tahun ajaran ini.</p>
+        </div>
+        @endif
+
+        <div style="display:flex;flex-direction:column;gap:20px;">
+            @php $urutan = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu']; @endphp
+            @foreach($urutan as $namaHari)
+                @if($jadwalSemua->has($namaHari))
+                    @php $kelasHari = $jadwalSemua[$namaHari]; @endphp
+                    <div>
+                        <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;">
+                            <span class="{{ $namaHari === $hariIni ? 'day-pill-today' : 'day-pill' }}">
+                                {{ $namaHari }}@if($namaHari === $hariIni)<span style="opacity:.7;margin-left:3px;">· Hari Ini</span>@endif
+                            </span>
+                            <div style="flex:1;height:1px;background:#f1f5f9;"></div>
+                            <span style="font-size:12px;color:#cbd5e1;">{{ count($kelasHari) }} kelas</span>
+                        </div>
+
+                        <div style="display:flex;flex-direction:column;gap:8px;">
+                            @foreach($kelasHari as $j)
+                            <a href="{{ route('guru.riwayat_jadwal', $j->id) }}" class="mini-card">
+                                <div style="display:flex;align-items:center;justify-content:space-between;">
+                                    <span class="badge-time">{{ substr($j->jam_mulai,0,5) }} – {{ substr($j->jam_selesai,0,5) }}</span>
+                                    <i class="ti ti-chevron-right" style="color:#cbd5e1;font-size:14px;"></i>
+                                </div>
+                                <h4 style="font-size:15px;font-weight:700;color:#0f172a;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                                    {{ $j->mapel->name ?? 'Mata Pelajaran' }}
+                                </h4>
+                                <p style="font-size:13px;color:#94a3b8;margin:0;display:flex;align-items:center;gap:3px;flex-wrap:wrap;">
+                                    <i class="ti ti-school" style="font-size:13px;"></i>
+                                    {{ ($j->kelas->grade ?? '') . ' ' . ($j->kelas->name ?? '-') }}
+                                    <span style="color:#e2e8f0;">·</span>
+                                    <i class="ti ti-door" style="font-size:13px;"></i>
+                                    {{ $j->ruangan->name ?? '-' }}
+                                </p>
+                                <div style="padding-top:5px;border-top:1px solid #f1f5f9;
+                                            font-size:12px;color:#94a3b8;display:flex;align-items:center;gap:3px;">
+                                    <i class="ti ti-history" style="font-size:13px;"></i> Lihat Riwayat
+                                </div>
+                            </a>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+            @endforeach
         </div>
     </div>
+
 </div>
+</div>
+
 @endsection
 
 @push('scripts')
 <script>
 (function () {
-    // --- Countdown card ke jadwal berikutnya ---
     var targetTime = @json($nextJamMulai);
     var el = document.getElementById('next-countdown');
     if (targetTime && el) {
-        function tickCountdown() {
-            var now = new Date();
-            var parts = targetTime.split(':');
-            var target = new Date();
-            target.setHours(parseInt(parts[0], 10), parseInt(parts[1], 10), parseInt(parts[2] || 0, 10), 0);
-            var diff = Math.floor((target - now) / 1000);
-            if (diff <= 0) {
-                el.textContent = '00:00:00';
-                el.closest('.bg-brand-50').querySelector('p.text-sm').textContent = 'Kelas dimulai sekarang!';
-                return;
-            }
-            var h = Math.floor(diff / 3600);
-            var m = Math.floor((diff % 3600) / 60);
-            var s = diff % 60;
-            el.textContent =
-                String(h).padStart(2, '0') + ':' +
-                String(m).padStart(2, '0') + ':' +
-                String(s).padStart(2, '0');
+        function tick() {
+            var now = new Date(), p = targetTime.split(':');
+            var t = new Date(); t.setHours(+p[0], +p[1], +(p[2]||0), 0);
+            var d = Math.floor((t - now) / 1000);
+            if (d <= 0) { el.textContent = '00:00:00'; return; }
+            el.textContent = [Math.floor(d/3600), Math.floor((d%3600)/60), d%60]
+                .map(n => String(n).padStart(2,'0')).join(':');
         }
-        tickCountdown();
-        setInterval(tickCountdown, 1000);
+        tick(); setInterval(tick, 1000);
     }
 
-    // --- Unlock tombol Scan QR MASUK secara real-time ---
-    var lockedContainers = document.querySelectorAll('[data-unlock-time]');
-    if (lockedContainers.length === 0) return;
-
-    function padTwo(n) { return String(n).padStart(2, '0'); }
-
-    function checkUnlock() {
+    var locked = document.querySelectorAll('[data-unlock-time]');
+    if (!locked.length) return;
+    function pad(n){ return String(n).padStart(2,'0'); }
+    function check() {
         var now = new Date();
-        lockedContainers.forEach(function (container) {
-            var unlockTime = container.getAttribute('data-unlock-time');
-            var parts = unlockTime.split(':');
-            var target = new Date();
-            target.setHours(parseInt(parts[0], 10), parseInt(parts[1], 10), 0, 0);
-
-            var diff = Math.floor((target - now) / 1000);
-
-            var lockedBtn  = container.querySelector('.scan-locked-btn');
-            var unlockedBtn = container.querySelector('.scan-unlocked-btn');
-            var countdownEl = container.querySelector('.scan-unlock-countdown');
-
-            if (diff <= 0) {
-                // Waktunya tiba — tampilkan tombol asli, sembunyikan terkunci
-                if (lockedBtn)   { lockedBtn.style.display = 'none'; }
-                if (unlockedBtn) { unlockedBtn.style.display = 'flex'; }
+        locked.forEach(function(c) {
+            var p = c.getAttribute('data-unlock-time').split(':');
+            var t = new Date(); t.setHours(+p[0], +p[1], 0, 0);
+            var d = Math.floor((t - now) / 1000);
+            var lb = c.querySelector('.scan-locked-btn');
+            var ub = c.querySelector('.scan-unlocked-btn');
+            var ce = c.querySelector('.scan-unlock-countdown');
+            if (d <= 0) {
+                if (lb) lb.style.display = 'none';
+                if (ub) ub.style.display = 'flex';
             } else {
-                // Perbarui countdown di dalam tombol terkunci
-                if (countdownEl) {
-                    var mm = Math.floor(diff / 60);
-                    var ss = diff % 60;
-                    countdownEl.textContent = padTwo(mm) + ':' + padTwo(ss);
-                }
+                if (ce) ce.textContent = pad(Math.floor(d/60)) + ':' + pad(d%60);
             }
         });
     }
-
-    checkUnlock();
-    setInterval(checkUnlock, 1000);
+    check(); setInterval(check, 1000);
 })();
 </script>
 @endpush

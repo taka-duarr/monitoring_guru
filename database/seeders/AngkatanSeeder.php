@@ -8,24 +8,15 @@ use Illuminate\Support\Str;
 
 class AngkatanSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        Angkatan::create([
-            'id' => Str::uuid(),
-            'name' => '2024',
-        ]);
+        $angkatans = ['2022', '2023', '2024', '2025', '2026'];
 
-        Angkatan::create([
-            'id' => Str::uuid(),
-            'name' => '2025',
-        ]);
-
-        Angkatan::create([
-            'id' => Str::uuid(),
-            'name' => '2026',
-        ]);
+        foreach ($angkatans as $a) {
+            Angkatan::create([
+                'id' => Str::uuid(),
+                'name' => $a,
+            ]);
+        }
     }
 }

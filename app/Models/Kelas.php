@@ -5,6 +5,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\JadwalAjar;
 
 class Kelas extends Model
 {
@@ -24,4 +25,5 @@ class Kelas extends Model
     public function ketua() { return $this->belongsTo(User::class, 'ketua_id'); }
     public function murids() { return $this->hasMany(Murid::class, 'kelas_id'); }
     public function statusKelas() { return $this->hasOne(StatusKelas::class, 'kelas_id'); }
+    public function jadwalAjars() { return $this->hasMany(JadwalAjar::class, 'kelas_id'); }
 }

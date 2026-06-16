@@ -4,29 +4,25 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\Mapel;
-use App\Models\Jurusan;
 use Illuminate\Support\Str;
 
 class MapelSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        $jurusanRPL = Jurusan::where('kode_jurusan', 'RPL')->first();
-        $jurusanTKJ = Jurusan::where('kode_jurusan', 'TKJ')->first();
+        $mapels = [
+            'Pendidikan Agama Islam', 'Pendidikan Pancasila dan Kewarganegaraan', 'Bahasa Indonesia',
+            'Matematika', 'Bahasa Inggris', 'Sejarah Indonesia', 'Pendidikan Jasmani, Olahraga, dan Kesehatan',
+            'Seni Budaya', 'Pemrograman Dasar', 'Dasar Desain Grafis', 'Komputer dan Jaringan Dasar',
+            'Sistem Komputer', 'Pemrograman Web dan Perangkat Bergerak', 'Basis Data',
+            'Administrasi Infrastruktur Jaringan', 'Teknologi Layanan Jaringan'
+        ];
 
-        Mapel::create([
-            'id' => Str::uuid(),
-            'name' => 'Pemrograman Web',
-            'jurusan_id' => $jurusanRPL ? $jurusanRPL->id : null,
-        ]);
-
-        Mapel::create([
-            'id' => Str::uuid(),
-            'name' => 'Jaringan Dasar',
-            'jurusan_id' => $jurusanTKJ ? $jurusanTKJ->id : null,
-        ]);
+        foreach ($mapels as $m) {
+            Mapel::create([
+                'id' => Str::uuid(),
+                'name' => $m,
+            ]);
+        }
     }
 }

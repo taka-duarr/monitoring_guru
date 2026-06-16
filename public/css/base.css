@@ -195,6 +195,11 @@ label {
     background-color: var(--color-neutral-100);
 }
 
+.content-area.no-padding {
+    padding: 0;
+    background: transparent;
+}
+
 .footer {
     padding: 16px var(--content-padding);
     border-top: 1px solid var(--color-neutral-200);

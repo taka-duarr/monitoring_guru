@@ -74,6 +74,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#1B2F4E">
     <title>@yield('title', 'Portal Guru')</title>
+    @php
+        $appLogo = \App\Models\Setting::get('school_logo') && file_exists(public_path('storage/' . \App\Models\Setting::get('school_logo'))) 
+            ? asset('storage/' . \App\Models\Setting::get('school_logo')) 
+            : asset('favicon.ico');
+    @endphp
+    <link rel="icon" href="{{ $appLogo }}">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
@@ -338,7 +344,7 @@
         </header>
 
         <!-- Main Content -->
-        <main class="content-area">
+        <main class="content-area @yield('content_class')">
             <x-toast />
             @yield('content')
         </main>

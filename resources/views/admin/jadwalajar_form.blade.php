@@ -27,6 +27,25 @@
         @csrf
         @if(isset($data)) @method('PUT') @endif
 
+        <!-- Tahun Ajaran -->
+        <div class="form-group">
+            <label for="tahun_ajaran_id" class="form-label">
+                Tahun Ajaran <span class="required-indicator">*</span>
+            </label>
+            <select id="tahun_ajaran_id" name="tahun_ajaran_id" class="form-select @error('tahun_ajaran_id') is-invalid @enderror" required>
+                <option value="">-- Pilih Tahun Ajaran --</option>
+                @foreach($tahunAjarans as $ta)
+                    <option value="{{ $ta->id }}"
+                        {{ old('tahun_ajaran_id', $data->tahun_ajaran_id ?? $tahunAjaranAktif?->id) == $ta->id ? 'selected' : '' }}>
+                        {{ $ta->name }}{{ $ta->is_active ? ' (Aktif)' : '' }}
+                    </option>
+                @endforeach
+            </select>
+            @error('tahun_ajaran_id')
+                <span class="form-error"><i class="ti ti-alert-circle"></i> {{ $message }}</span>
+            @enderror
+        </div>
+
         <!-- Guru Pengajar -->
         <div class="form-group">
             <label for="guru_id" class="form-label">
@@ -78,7 +97,7 @@
                 <option value="">-- Pilih Kelas --</option>
                 @foreach($kelas as $k)
                     <option value="{{ $k->id }}" {{ old('kelas_id', $data->kelas_id ?? '') == $k->id ? 'selected' : '' }}>
-                        {{ $k->name }}
+                        {{ $k->grade ? $k->grade . ' ' : '' }}{{ $k->name }} {{ $k->angkatan ? '- ' . $k->angkatan->name : '' }}
                     </option>
                 @endforeach
             </select>

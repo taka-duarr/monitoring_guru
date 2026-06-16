@@ -4,55 +4,55 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\Kelas;
-use App\Models\User;
 use App\Models\Jurusan;
 use App\Models\Angkatan;
+use App\Models\User;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
 
 class KelasSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        $jurusanRPL = Jurusan::where('kode_jurusan', 'RPL')->first();
-        $jurusanTKJ = Jurusan::where('kode_jurusan', 'TKJ')->first();
+        $jurusans = Jurusan::all();
+        $angkatans = Angkatan::orderBy('name', 'desc')->get(); // e.g. 2026, 2025, 2024
         
-        $angkatan2025 = Angkatan::where('name', '2025')->first();
-        $angkatan2026 = Angkatan::where('name', '2026')->first();
+        $grades = ['10', '11', '12'];
         
-        $ketua1 = User::where('name', 'Andi')->first();
-        $ketua2 = User::where('name', 'Siti')->first();
-
-        $kelas1 = Kelas::create([
-            'id' => Str::uuid(),
-            'name' => '10 RPL 1',
-            'grade' => '10',
-            'index' => 1,
-            'jurusan_id' => $jurusanRPL ? $jurusanRPL->id : null,
-            'angkatan_id' => $angkatan2025 ? $angkatan2025->id : null,
-            'ketua_id' => $ketua1 ? $ketua1->id : null,
-            'is_active' => true,
-        ]);
-        
-        if ($ketua1) {
-            $ketua1->update(['kelas_id' => $kelas1->id]);
-        }
-
-        $kelas2 = Kelas::create([
-            'id' => Str::uuid(),
-            'name' => '10 TKJ 1',
-            'grade' => '10',
-            'index' => 1,
-            'jurusan_id' => $jurusanTKJ ? $jurusanTKJ->id : null,
-            'angkatan_id' => $angkatan2026 ? $angkatan2026->id : null,
-            'ketua_id' => $ketua2 ? $ketua2->id : null,
-            'is_active' => false,
-        ]);
-        
-        if ($ketua2) {
-            $ketua2->update(['kelas_id' => $kelas2->id]);
+        foreach ($jurusans as $jurusan) {
+            foreach ($grades as $gradeIndex => $grade) {
+                // If angkatans has enough entries, map grade 10 to angkatan 0 (newest), grade 11 to angkatan 1, etc.
+                $angkatan = isset($angkatans[$gradeIndex]) ? $angkatans[$gradeIndex] : $angkatans->first();
+                
+                // Create 2 classes per grade per jurusan
+                for ($i = 1; $i <= 2; $i++) {
+                    $className = $jurusan->kode_jurusan . ' ' . $i;
+                    
+                    // Create a Ketua Kelas for this class
+                    $nik = '99' . rand(1000, 9999);
+                    $ketua = User::create([
+                        'id' => Str::uuid(),
+                        'name' => 'Ketua ' . $grade . ' ' . $className,
+                        'nik' => $nik,
+                        'jabatan' => 'ketuakelas',
+                        'password' => Hash::make($nik),
+                        'kelas_id' => null, // will be updated below
+                    ]);
+                    
+                    $kelas = Kelas::create([
+                        'id' => Str::uuid(),
+                        'name' => $className,
+                        'grade' => $grade,
+                        'index' => $i,
+                        'jurusan_id' => $jurusan->id,
+                        'angkatan_id' => $angkatan->id,
+                        'ketua_id' => $ketua->id,
+                        'is_active' => true,
+                    ]);
+                    
+                    $ketua->update(['kelas_id' => $kelas->id]);
+                }
+            }
         }
     }
 }

@@ -208,6 +208,16 @@
                     <span class="sidebar-menu-text" x-show="!sidebarCollapsed">Kenaikan Kelas</span>
                 </a>
             </li>
+            <!-- Tahun Ajaran -->
+            <li class="sidebar-menu-item-wrapper">
+                <a href="{{ route('tahun-ajaran.index') }}"
+                   class="sidebar-menu-item {{ request()->routeIs('tahun-ajaran.*') ? 'active' : '' }}"
+                   :class="{ 'active': {{ request()->routeIs('tahun-ajaran.*') ? 'true' : 'false' }} }"
+                   data-tooltip="Tahun Ajaran">
+                    <i class="ti ti-calendar-stats"></i>
+                    <span class="sidebar-menu-text" x-show="!sidebarCollapsed">Tahun Ajaran</span>
+                </a>
+            </li>
             <!-- Pengaturan -->
             <li class="sidebar-menu-item-wrapper">
                 <a href="{{ route('pengaturan.index') }}"

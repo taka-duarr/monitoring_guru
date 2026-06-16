@@ -95,6 +95,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#2563eb">
     <title>@yield('title', 'Portal Siswa')</title>
+    @php
+        $appLogo = \App\Models\Setting::get('school_logo') && file_exists(public_path('storage/' . \App\Models\Setting::get('school_logo'))) 
+            ? asset('storage/' . \App\Models\Setting::get('school_logo')) 
+            : asset('favicon.ico');
+    @endphp
+    <link rel="icon" href="{{ $appLogo }}">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -265,7 +271,7 @@
     </header>
 
     <!-- Main Content -->
-    <main class="flex-1 overflow-y-auto relative p-5">
+    <main class="flex-1 overflow-y-auto relative @yield('content_class')">
         <x-toast />
 
         @yield('content')

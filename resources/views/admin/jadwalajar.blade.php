@@ -53,6 +53,37 @@
         </div>
     @endif
 
+    {{-- FILTER TAHUN AJARAN --}}
+    <form method="GET" action="{{ route('jadwalajar.index') }}" class="mb-4 p-4 card d-flex align-center gap-3 flex-wrap" style="padding: 16px !important;">
+        <div style="flex:1; min-width:200px;">
+            <label class="form-label" style="margin-bottom:4px; font-size:11px; text-transform:uppercase; letter-spacing:0.05em;">Tahun Ajaran</label>
+            <select name="tahun_ajaran_id" class="form-select" style="padding: 8px 12px; font-size:13px;">
+                <option value="">-- Semua Tahun Ajaran --</option>
+                @foreach($tahunAjarans as $ta)
+                    <option value="{{ $ta->id }}" {{ request('tahun_ajaran_id') == $ta->id ? 'selected' : '' }}>
+                        {{ $ta->name }}{{ $ta->is_active ? ' (Aktif)' : '' }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+        <div class="d-flex gap-2 align-center" style="margin-top: auto;">
+            <button type="submit" class="btn btn-primary d-flex align-center gap-2" style="padding: 8px 16px;">
+                <i class="ti ti-filter"></i> Filter
+            </button>
+            @if(request('tahun_ajaran_id'))
+                <a href="{{ route('jadwalajar.index') }}" class="btn btn-secondary d-flex align-center gap-2" style="padding: 8px 16px;">
+                    <i class="ti ti-x"></i> Reset
+                </a>
+            @endif
+        </div>
+        @if($selectedTahunAjaran)
+            <div style="width:100%; font-size:12px; color: var(--color-primary-700); background: var(--color-primary-50); border: 1px solid var(--color-primary-200); border-radius:8px; padding: 6px 12px;" class="d-flex align-center gap-2">
+                <i class="ti ti-calendar-check"></i>
+                Menampilkan jadwal Tahun Ajaran: <strong>{{ $selectedTahunAjaran->name }}</strong>
+            </div>
+        @endif
+    </form>
+
     <!-- MAIN DATA TABLE SECTION -->
     <div class="table-wrapper card p-0 overflow-hidden" x-data="{ tableLoading: false }">
         <div class="table-loading-overlay" x-show="tableLoading" style="display: none;">
@@ -101,7 +132,12 @@
                                 {{ $row->mapel->name ?? '-' }}
                             </td>
                             <td>
-                                <span class="class-pill-item">{{ $row->kelas->name ?? '-' }}</span>
+                                <span class="class-pill-item">
+                                    {{ $row->kelas ? ($row->kelas->grade ? $row->kelas->grade . ' ' : '') . $row->kelas->name : '-' }}
+                                </span>
+                                @if($row->kelas && $row->kelas->angkatan)
+                                    <span class="text-xs text-neutral-500 d-block mt-1">Angkatan {{ $row->kelas->angkatan->name }}</span>
+                                @endif
                             </td>
                             <td>
                                 {{ $row->ruangan->name ?? '-' }}

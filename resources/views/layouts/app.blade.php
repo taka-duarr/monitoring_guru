@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Sistem Informasi Monitoring Guru')</title>
+    @php
+        $appLogo = \App\Models\Setting::get('school_logo') && file_exists(public_path('storage/' . \App\Models\Setting::get('school_logo'))) 
+            ? asset('storage/' . \App\Models\Setting::get('school_logo')) 
+            : asset('favicon.ico');
+    @endphp
+    <link rel="icon" href="{{ $appLogo }}">
 
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">

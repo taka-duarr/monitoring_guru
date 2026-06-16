@@ -92,6 +92,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/kenaikan-kelas', [App\Http\Controllers\KenaikanKelasController::class, 'index'])->name('kenaikan_kelas.index');
     Route::post('/kenaikan-kelas/proses', [App\Http\Controllers\KenaikanKelasController::class, 'proses'])->name('kenaikan_kelas.proses');
 
+    // Tahun Ajaran
+    Route::post('tahun-ajaran/{tahunAjaran}/aktif', [App\Http\Controllers\TahunAjaranController::class, 'setAktif'])->name('tahun-ajaran.aktif');
+    Route::resource('tahun-ajaran', App\Http\Controllers\TahunAjaranController::class);
+
     // Profil Saya
     Route::get('/profil', [App\Http\Controllers\ProfileController::class, 'index'])->name('admin.profile.index');
     Route::put('/profil', [App\Http\Controllers\ProfileController::class, 'update'])->name('admin.profile.update');
@@ -106,7 +110,8 @@ Route::middleware(['auth', 'role:guru'])->prefix('guru')->group(function () {
     Route::post('/scan', [App\Http\Controllers\AbsensiController::class, 'processQr'])->name('guru.processQr');
     Route::get('/izin', [App\Http\Controllers\GuruPortalController::class, 'izin'])->name('guru.izin');
     Route::post('/izin', [App\Http\Controllers\GuruPortalController::class, 'storeIzin'])->name('guru.store_izin');
-    Route::get('/riwayat-mapel/{mapel_id}', [App\Http\Controllers\GuruPortalController::class, 'riwayatMapel'])->name('guru.riwayat_mapel');
+    Route::get('/riwayat-jadwal/{jadwal_ajar_id}', [App\Http\Controllers\GuruPortalController::class, 'riwayatJadwal'])->name('guru.riwayat_jadwal');
+    Route::get('/riwayat', [App\Http\Controllers\GuruPortalController::class, 'riwayatGlobal'])->name('guru.riwayat');
     Route::get('/absen-murid/{absen_masuk_id}', [App\Http\Controllers\GuruPortalController::class, 'absenMurid'])->name('guru.absen_murid');
     Route::post('/absen-murid/{absen_masuk_id}', [App\Http\Controllers\GuruPortalController::class, 'storeAbsenMurid'])->name('guru.store_absen_murid');
 

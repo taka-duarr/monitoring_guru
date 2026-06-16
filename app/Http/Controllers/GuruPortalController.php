@@ -9,7 +9,7 @@ use App\Models\Izin;
 
 class GuruPortalController extends Controller
 {
-    public function dashboard()
+    public function dashboard(Request $request)
     {
         $guru = \Illuminate\Support\Facades\Auth::user();
         
@@ -27,55 +27,87 @@ class GuruPortalController extends Controller
         $hariIni = $mapHari[$hariInggris];
         
         $today = \Carbon\Carbon::today()->toDateString();
+        $tahunAjaranAktif = \App\Models\TahunAjaran::aktif();
 
-        // Ambil semua jadwal khusus guru ini dan khusus hari ini, urutkan berdasarkan jam mulai (untuk ringkasan)
-        $allJadwals = \App\Models\JadwalAjar::with(['mapel', 'kelas', 'ruangan'])
+        // Ambil semua jadwal khusus guru ini dan khusus hari ini (untuk kartu ringkasan)
+        $allJadwalsQuery = \App\Models\JadwalAjar::with(['mapel', 'kelas', 'ruangan'])
             ->where('guru_id', $guru->id)
             ->where('hari', $hariIni)
             ->whereHas('kelas', function($q) {
                 $q->where('is_active', true);
-            })
-            ->orderBy('jam_mulai', 'asc')
-            ->get();
+            });
+        
+        if ($tahunAjaranAktif) {
+            $allJadwalsQuery->where('tahun_ajaran_id', $tahunAjaranAktif->id);
+        }
+
+        $allJadwals = $allJadwalsQuery->orderBy('jam_mulai', 'asc')->get();
 
         foreach ($allJadwals as $jadwal) {
             $absen = \App\Models\AbsenMasuk::where('jadwal_ajar_id', $jadwal->id)
                         ->where('tanggal', $today)
                         ->first();
-            
             $jadwal->absen_masuk = $absen;
             $jadwal->absen_keluar = null;
-            
             if ($absen) {
                 $jadwal->absen_keluar = \App\Models\AbsenKeluar::where('absen_masuk_id', $absen->id)->first();
             }
         }
 
-        // Ambil jadwal terpaginasi (maksimal 6 data per halaman)
-        $jadwals = \App\Models\JadwalAjar::with(['mapel', 'kelas', 'ruangan'])
+        // Ambil jadwal terpaginasi hari ini (untuk kartu utama)
+        $jadwalsQuery = \App\Models\JadwalAjar::with(['mapel', 'kelas', 'ruangan'])
             ->where('guru_id', $guru->id)
             ->where('hari', $hariIni)
             ->whereHas('kelas', function($q) {
                 $q->where('is_active', true);
-            })
-            ->orderBy('jam_mulai', 'asc')
-            ->paginate(6);
+            });
+            
+        if ($tahunAjaranAktif) {
+            $jadwalsQuery->where('tahun_ajaran_id', $tahunAjaranAktif->id);
+        }
+
+        $jadwals = $jadwalsQuery->orderBy('jam_mulai', 'asc')->paginate(6);
         
-        // Looping untuk menyuntikkan data absensi ke setiap jadwal terpaginasi
         foreach ($jadwals as $jadwal) {
             $absen = \App\Models\AbsenMasuk::where('jadwal_ajar_id', $jadwal->id)
                         ->where('tanggal', $today)
                         ->first();
-            
             $jadwal->absen_masuk = $absen;
             $jadwal->absen_keluar = null;
-            
             if ($absen) {
                 $jadwal->absen_keluar = \App\Models\AbsenKeluar::where('absen_masuk_id', $absen->id)->first();
             }
         }
 
-        return view('guru.dashboard', compact('allJadwals', 'jadwals', 'hariIni'));
+        // Tahun Ajaran untuk filter "Semua Jadwal"
+        $tahunAjarans = \App\Models\TahunAjaran::orderBy('tahun_mulai', 'desc')
+            ->orderByRaw("FIELD(semester,'Genap','Ganjil')")
+            ->get();
+        $tahunAjaranAktif = \App\Models\TahunAjaran::aktif();
+        $selectedTahunAjaranId = $request->tahun_ajaran_id ?? $tahunAjaranAktif?->id;
+        $selectedTahunAjaran = $selectedTahunAjaranId
+            ? $tahunAjarans->firstWhere('id', $selectedTahunAjaranId)
+            : null;
+
+        // Ambil semua jadwal (semua hari) untuk guru ini, filter by Tahun Ajaran
+        $jadwalSemaQuery = \App\Models\JadwalAjar::with(['mapel', 'kelas', 'ruangan'])
+            ->where('guru_id', $guru->id)
+            ->whereHas('kelas', function($q) {
+                $q->where('is_active', true);
+            })
+            ->orderByRaw("FIELD(hari, 'Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu')")
+            ->orderBy('jam_mulai', 'asc');
+
+        if ($selectedTahunAjaranId) {
+            $jadwalSemaQuery->where('tahun_ajaran_id', $selectedTahunAjaranId);
+        }
+
+        $jadwalSemua = $jadwalSemaQuery->get()->groupBy('hari');
+
+        return view('guru.dashboard', compact(
+            'allJadwals', 'jadwals', 'hariIni', 'jadwalSemua',
+            'tahunAjarans', 'selectedTahunAjaran', 'selectedTahunAjaranId'
+        ));
     }
 
     public function scan()
@@ -119,21 +151,51 @@ class GuruPortalController extends Controller
         return redirect()->route('guru.dashboard')->with('success', 'Pengajuan izin berhasil dikirim! Menunggu persetujuan Admin.');
     }
 
-    public function riwayatMapel($mapel_id)
+    public function riwayatJadwal($jadwal_ajar_id)
     {
         $guru = \Illuminate\Support\Facades\Auth::user();
-        $mapel = \App\Models\Mapel::findOrFail($mapel_id);
-
-        $riwayat = \App\Models\AbsenMasuk::with(['kelas', 'ruangan'])
+        
+        $jadwal = \App\Models\JadwalAjar::with(['mapel', 'kelas.angkatan', 'ruangan', 'tahunAjaran'])
             ->where('guru_id', $guru->id)
-            ->whereHas('jadwalAjar', function ($query) use ($mapel_id) {
-                $query->where('mapel_id', $mapel_id);
-            })
+            ->findOrFail($jadwal_ajar_id);
+
+        $riwayat = \App\Models\AbsenMasuk::with(['kelas.angkatan', 'ruangan'])
+            ->where('guru_id', $guru->id)
+            ->where('jadwal_ajar_id', $jadwal_ajar_id)
             ->orderBy('tanggal', 'desc')
             ->orderBy('jam_masuk', 'desc')
             ->get();
 
-        return view('guru.riwayat_mapel', compact('mapel', 'riwayat'));
+        return view('guru.riwayat_jadwal', compact('jadwal', 'riwayat'));
+    }
+
+
+    public function riwayatGlobal(Request $request)
+    {
+        $guru = \Illuminate\Support\Facades\Auth::user();
+
+        $tahunAjarans = \App\Models\TahunAjaran::orderBy('tahun_mulai', 'desc')
+            ->orderByRaw("FIELD(semester,'Genap','Ganjil')")
+            ->get();
+
+        $tahunAjaranAktif = \App\Models\TahunAjaran::aktif();
+        $selectedId = $request->tahun_ajaran_id ?? $tahunAjaranAktif?->id;
+
+        $query = \App\Models\AbsenMasuk::with(['kelas', 'ruangan', 'jadwalAjar.mapel', 'jadwalAjar.tahunAjaran'])
+            ->where('guru_id', $guru->id)
+            ->orderBy('tanggal', 'desc')
+            ->orderBy('jam_masuk', 'desc');
+
+        if ($selectedId) {
+            $query->whereHas('jadwalAjar', function($q) use ($selectedId) {
+                $q->where('tahun_ajaran_id', $selectedId);
+            });
+        }
+
+        $riwayat = $query->paginate(20);
+        $selectedTahunAjaran = $selectedId ? $tahunAjarans->firstWhere('id', $selectedId) : null;
+
+        return view('guru.riwayat', compact('riwayat', 'tahunAjarans', 'selectedTahunAjaran', 'selectedId'));
     }
 
     public function absenMurid($absen_masuk_id)
