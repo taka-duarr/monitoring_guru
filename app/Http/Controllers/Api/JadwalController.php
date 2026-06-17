@@ -24,20 +24,39 @@ class JadwalController extends Controller
         ];
         $hariIni = $mapHari[$hariInggris];
 
-        $query = JadwalAjar::with(['guru', 'mapel', 'kelas', 'ruangan'])->where('hari', $hariIni);
-
-        // Filter berdasarkan jabatan (role)
+        $today = \Carbon\Carbon::today()->toDateString();
         $jabatan = $user->jabatan ?? 'guru';
-        if ($jabatan === 'guru' || $jabatan === 'admin') {
-            $query->where('guru_id', $user->id);
-        } elseif ($jabatan === 'ketuakelas') {
-            $query->where('kelas_id', $user->kelas_id);
+
+        // 1. Ambil Tahun Ajaran (Aktif dan Semua)
+        $tahunAjarans = \App\Models\TahunAjaran::orderBy('tahun_mulai', 'desc')
+            ->orderByRaw("FIELD(semester,'Genap','Ganjil')")
+            ->get();
+        $tahunAjaranAktif = \App\Models\TahunAjaran::aktif();
+        $selectedTahunAjaranId = $request->tahun_ajaran_id ?? $tahunAjaranAktif?->id;
+        $selectedTahunAjaran = $selectedTahunAjaranId
+            ? $tahunAjarans->firstWhere('id', $selectedTahunAjaranId)
+            : null;
+
+        // 2. Query Jadwal Hari Ini
+        $queryHariIni = JadwalAjar::with(['guru', 'mapel', 'kelas', 'ruangan'])
+            ->where('hari', $hariIni)
+            ->whereHas('kelas', function($q) {
+                $q->where('is_active', true);
+            });
+
+        if ($selectedTahunAjaranId) {
+            $queryHariIni->where('tahun_ajaran_id', $selectedTahunAjaranId);
         }
 
-        $jadwal = $query->orderBy('jam_mulai')->get();
+        if ($jabatan === 'guru' || $jabatan === 'admin') {
+            $queryHariIni->where('guru_id', $user->id);
+        } elseif ($jabatan === 'ketuakelas') {
+            $queryHariIni->where('kelas_id', $user->kelas_id);
+        }
 
-        $today = \Carbon\Carbon::today()->toDateString();
-        foreach ($jadwal as $j) {
+        $jadwalHariIni = $queryHariIni->orderBy('jam_mulai')->get();
+
+        foreach ($jadwalHariIni as $j) {
             $absen = \App\Models\AbsenMasuk::where('jadwal_ajar_id', $j->id)
                         ->where('tanggal', $today)
                         ->first();
@@ -50,10 +69,35 @@ class JadwalController extends Controller
             }
         }
 
+        // 3. Query Semua Jadwal
+        $querySemua = JadwalAjar::with(['guru', 'mapel', 'kelas', 'ruangan'])
+            ->whereHas('kelas', function($q) {
+                $q->where('is_active', true);
+            });
+
+        if ($selectedTahunAjaranId) {
+            $querySemua->where('tahun_ajaran_id', $selectedTahunAjaranId);
+        }
+
+        if ($jabatan === 'guru' || $jabatan === 'admin') {
+            $querySemua->where('guru_id', $user->id);
+        } elseif ($jabatan === 'ketuakelas') {
+            $querySemua->where('kelas_id', $user->kelas_id);
+        }
+
+        $semuaJadwalRaw = $querySemua->orderByRaw("FIELD(hari, 'Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu')")
+            ->orderBy('jam_mulai', 'asc')
+            ->get();
+
+        $semuaJadwal = $semuaJadwalRaw->groupBy('hari');
+
         return response()->json([
-            'success' => true,
-            'hari'    => $hariIni,
-            'data'    => $jadwal
+            'success'               => true,
+            'hari'                  => $hariIni,
+            'data'                  => $jadwalHariIni,
+            'tahun_ajarans'         => $tahunAjarans,
+            'selected_tahun_ajaran' => $selectedTahunAjaranId,
+            'semua_jadwal'          => $semuaJadwal
         ]);
     }
 
