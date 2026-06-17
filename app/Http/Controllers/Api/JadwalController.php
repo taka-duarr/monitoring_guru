@@ -106,12 +106,18 @@ class JadwalController extends Controller
         $user = $request->user();
         $mapel = \App\Models\Mapel::findOrFail($mapel_id);
 
-        $riwayat = \App\Models\AbsenMasuk::with(['kelas', 'ruangan'])
-            ->where('guru_id', $user->id)
-            ->whereHas('jadwalAjar', function ($query) use ($mapel_id) {
-                $query->where('mapel_id', $mapel_id);
-            })
-            ->orderBy('tanggal', 'desc')
+        $query = \App\Models\AbsenMasuk::with(['kelas', 'ruangan', 'guru'])
+            ->whereHas('jadwalAjar', function ($q) use ($mapel_id) {
+                $q->where('mapel_id', $mapel_id);
+            });
+
+        if ($user->jabatan === 'ketuakelas') {
+            $query->where('kelas_id', $user->kelas_id);
+        } else {
+            $query->where('guru_id', $user->id);
+        }
+
+        $riwayat = $query->orderBy('tanggal', 'desc')
             ->orderBy('jam_masuk', 'desc')
             ->get()
             ->map(function ($absen) {
@@ -136,10 +142,15 @@ class JadwalController extends Controller
         $tahunAjaranAktif = \App\Models\TahunAjaran::aktif();
         $selectedId = $request->tahun_ajaran_id ?? $tahunAjaranAktif?->id;
 
-        $query = \App\Models\AbsenMasuk::with(['kelas', 'ruangan', 'jadwalAjar.mapel', 'jadwalAjar.tahunAjaran'])
-            ->where('guru_id', $user->id)
+        $query = \App\Models\AbsenMasuk::with(['kelas', 'ruangan', 'guru', 'jadwalAjar.mapel', 'jadwalAjar.tahunAjaran'])
             ->orderBy('tanggal', 'desc')
             ->orderBy('jam_masuk', 'desc');
+
+        if ($user->jabatan === 'ketuakelas') {
+            $query->where('kelas_id', $user->kelas_id);
+        } else {
+            $query->where('guru_id', $user->id);
+        }
 
         if ($selectedId) {
             $query->whereHas('jadwalAjar', function($q) use ($selectedId) {
