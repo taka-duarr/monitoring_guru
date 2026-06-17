@@ -125,4 +125,40 @@ class JadwalController extends Controller
             'data'    => $riwayat
         ]);
     }
+    public function riwayatGlobal(Request $request)
+    {
+        $user = $request->user();
+
+        $tahunAjarans = \App\Models\TahunAjaran::orderBy('tahun_mulai', 'desc')
+            ->orderByRaw("FIELD(semester,'Genap','Ganjil')")
+            ->get();
+        
+        $tahunAjaranAktif = \App\Models\TahunAjaran::aktif();
+        $selectedId = $request->tahun_ajaran_id ?? $tahunAjaranAktif?->id;
+
+        $query = \App\Models\AbsenMasuk::with(['kelas', 'ruangan', 'jadwalAjar.mapel', 'jadwalAjar.tahunAjaran'])
+            ->where('guru_id', $user->id)
+            ->orderBy('tanggal', 'desc')
+            ->orderBy('jam_masuk', 'desc');
+
+        if ($selectedId) {
+            $query->whereHas('jadwalAjar', function($q) use ($selectedId) {
+                $q->where('tahun_ajaran_id', $selectedId);
+            });
+        }
+
+        $riwayat = $query->get()->map(function ($absen) {
+            $absen->absen_keluar = \App\Models\AbsenKeluar::where('absen_masuk_id', $absen->id)->first();
+            return $absen;
+        });
+
+        $selectedTahunAjaran = $selectedId ? $tahunAjarans->firstWhere('id', $selectedId) : null;
+
+        return response()->json([
+            'success'               => true,
+            'tahun_ajarans'         => $tahunAjarans,
+            'selected_tahun_ajaran' => $selectedTahunAjaran,
+            'data'                  => $riwayat
+        ]);
+    }
 }
