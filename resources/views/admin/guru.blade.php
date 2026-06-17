@@ -313,7 +313,7 @@
     <x-modal-detail />
 
     <!-- MODAL IMPORT GURU -->
-    <div class="modal-backdrop" 
+    <div class="modal-backdrop" x-cloak
          x-show="showImportModal" 
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0"
