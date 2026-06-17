@@ -21,6 +21,14 @@ class AbsensiController extends Controller
             return response()->json(['success' => false, 'message' => 'QR Code tidak valid!'], 400);
         }
 
+        if (isset($payload['timestamp'])) {
+            $diff = time() - ($payload['timestamp'] / 1000);
+            // Toleransi 5 detik untuk delay internet/scanning (total 35 detik)
+            if ($diff > 35) {
+                return response()->json(['success' => false, 'message' => 'QR Code sudah kedaluwarsa! Silakan minta murid menampilkan QR terbaru.'], 400);
+            }
+        }
+
         $jadwalId = $payload['jadwal_id'];
         $jadwal = JadwalAjar::with(['kelas', 'mapel', 'ruangan'])->find($jadwalId);
 
