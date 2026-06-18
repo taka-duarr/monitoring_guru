@@ -88,6 +88,22 @@ class AbsensiController extends Controller
             ]);
         }
 
+        // ── Validasi Waktu (Server-Side) ──────────────────────────────────────
+        // Hanya berlaku untuk Absen MASUK
+        $jamMulai = \Carbon\Carbon::createFromFormat('H:i', substr($jadwal->jam_mulai, 0, 5));
+        $now      = \Carbon\Carbon::now();
+
+        if ($now->lt($jamMulai)) {
+            $sisaMenit = (int) $now->diffInMinutes($jamMulai, false) * -1;
+            $label     = $jamMulai->format('H:i');
+            return response()->json([
+                'success' => false,
+                'message' => "Belum bisa absen masuk. Kelas dimulai pukul {$label} " .
+                             "(masih " . abs($sisaMenit) . " menit lagi).",
+            ], 403);
+        }
+        // ─────────────────────────────────────────────────────────────────────
+
         $absenMasukBaru = AbsenMasuk::create([
             'id' => Str::uuid(),
             'guru_id' => $user->id,
