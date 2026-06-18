@@ -21,11 +21,20 @@
         <div class="d-flex align-center gap-2 flex-wrap">
             <!-- Live Search -->
             <form action="{{ route('ruangan.index') }}" method="GET" class="m-0" @submit.prevent>
-                <div style="position: relative;">
-                    <input type="text" name="search" value="{{ request('search') }}" 
-                           class="form-control live-search-input pl-10" 
-                           placeholder="Cari ruangan..." style="padding-left: 2.5rem; width: 250px;">
-                    <i class="ti ti-search text-neutral-400" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%);"></i>
+                <div class="d-flex align-center gap-2">
+                    <div style="position: relative;">
+                        <input type="text" name="search" value="{{ request('search') }}" 
+                               class="form-control live-search-input pl-10" 
+                               placeholder="Cari ruangan..." style="padding-left: 2.5rem; width: 250px;">
+                        <i class="ti ti-search text-neutral-400" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%);"></i>
+                    </div>
+                    
+                    <select name="lantai" class="form-control live-filter-input" style="width: auto;">
+                        <option value="">Semua Lantai</option>
+                        @for($i = 1; $i <= 6; $i++)
+                            <option value="{{ $i }}" {{ request('lantai') == $i ? 'selected' : '' }}>Lantai {{ $i }}</option>
+                        @endfor
+                    </select>
                 </div>
             </form>
 
@@ -119,6 +128,7 @@
                     <tr>
                         <th class="col-no">No</th>
                         <th>Nama Ruangan</th>
+                        <th class="col-center">Lantai</th>
                         <th class="col-actions col-center">Aksi</th>
                     </tr>
                 </thead>
@@ -130,6 +140,13 @@
                             </td>
                             <td>
                                 <span class="font-semibold text-neutral-800">{{ $row->name }}</span>
+                            </td>
+                            <td class="col-center text-neutral-600">
+                                @if($row->lantai)
+                                    Lantai {{ $row->lantai }}
+                                @else
+                                    <span class="text-neutral-400 italic">Belum diset</span>
+                                @endif
                             </td>
                             <td class="col-actions col-center">
                                 <div class="action-buttons-group">

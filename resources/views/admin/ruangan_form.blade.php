@@ -28,7 +28,7 @@
         @if(isset($data)) @method('PUT') @endif
 
         <!-- Nama Ruangan -->
-        <div class="form-group">
+        <div class="form-group mb-4">
             <label for="name" class="form-label">
                 Nama / Nomor Ruangan <span class="required-indicator">*</span>
             </label>
@@ -36,6 +36,25 @@
                    class="form-control @error('name') is-invalid @else @if(old('name')) is-valid @endif @enderror" 
                    value="{{ old('name', $data->name ?? '') }}" placeholder="Contoh: R. Teori 12, Lab Komputer A..." required>
             @error('name')
+                <span class="form-error">
+                    <i class="ti ti-alert-circle"></i>
+                    {{ $message }}
+                </span>
+            @enderror
+        </div>
+
+        <!-- Lantai -->
+        <div class="form-group">
+            <label for="lantai" class="form-label">
+                Lokasi Lantai <span class="text-neutral-400 font-normal">(Opsional)</span>
+            </label>
+            <select id="lantai" name="lantai" class="form-control @error('lantai') is-invalid @enderror">
+                <option value="">-- Pilih Lantai --</option>
+                @for($i = 1; $i <= 6; $i++)
+                    <option value="{{ $i }}" {{ old('lantai', $data->lantai ?? '') == $i ? 'selected' : '' }}>Lantai {{ $i }}</option>
+                @endfor
+            </select>
+            @error('lantai')
                 <span class="form-error">
                     <i class="ti ti-alert-circle"></i>
                     {{ $message }}

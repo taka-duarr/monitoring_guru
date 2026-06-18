@@ -46,9 +46,15 @@ class RuanganImport implements ToCollection, WithHeadingRow
                     continue;
                 }
 
+                $lantai = isset($row['lantai_opsional_1_6']) ? (int) $row['lantai_opsional_1_6'] : null;
+                if ($lantai < 1 || $lantai > 6) {
+                    $lantai = null;
+                }
+
                 Ruangan::create([
                     'id' => (string) Str::uuid(),
                     'name' => trim($row['nama_ruangan']),
+                    'lantai' => $lantai
                 ]);
             }
         });

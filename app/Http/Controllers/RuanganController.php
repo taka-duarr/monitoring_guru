@@ -11,6 +11,9 @@ class RuanganController extends Controller
         if ($search = $request->search) {
             $query->where('name', 'like', "%{$search}%");
         }
+        if ($lantai = $request->lantai) {
+            $query->where('lantai', $lantai);
+        }
         $data = $query->paginate(15)->appends($request->query());
         return view('admin.ruangan', compact('data'));
     }
@@ -73,11 +76,12 @@ class RuanganController extends Controller
             $callback = function() use ($ruangans) {
                 $file = fopen('php://output', 'w');
                 fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
-                fputcsv($file, ['No', 'Nama Ruangan']);
+                fputcsv($file, ['No', 'Nama Ruangan', 'Lantai']);
                 foreach ($ruangans as $index => $r) {
                     fputcsv($file, [
                         $index + 1,
-                        $r->name
+                        $r->name,
+                        $r->lantai ? $r->lantai : '-'
                     ]);
                 }
                 fclose($file);

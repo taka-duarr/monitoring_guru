@@ -22,8 +22,9 @@ class RuanganExport implements FromArray, WithHeadings, ShouldAutoSize, WithStyl
     {
         if ($this->isTemplate) {
             return [
-                ['Ruang Teori 1'],
-                ['Lab Komputer 1'],
+                ['Ruang Teori 1', '1'],
+                ['Lab Komputer 1', '2'],
+                ['Ruang Aula', ''],
             ];
         }
 
@@ -33,7 +34,8 @@ class RuanganExport implements FromArray, WithHeadings, ShouldAutoSize, WithStyl
         foreach ($ruangans as $r) {
             $data[] = [
                 $no++,
-                $r->name
+                $r->name,
+                $r->lantai ? $r->lantai : '-'
             ];
         }
         return $data;
@@ -43,13 +45,15 @@ class RuanganExport implements FromArray, WithHeadings, ShouldAutoSize, WithStyl
     {
         if ($this->isTemplate) {
             return [
-                'Nama Ruangan'
+                'Nama Ruangan',
+                'Lantai (Opsional 1-6)'
             ];
         }
 
         return [
             'No',
-            'Nama Ruangan'
+            'Nama Ruangan',
+            'Lantai'
         ];
     }
 
