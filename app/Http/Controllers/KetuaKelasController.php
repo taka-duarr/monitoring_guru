@@ -6,9 +6,16 @@ use Illuminate\Support\Facades\Hash;
 
 class KetuaKelasController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $data = User::where('jabatan', 'ketuakelas')->with('kelas.angkatan')->latest()->paginate(15);
+        $query = User::where('jabatan', 'ketuakelas')->with('kelas.angkatan')->latest();
+        if ($search = $request->search) {
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('nik', 'like', "%{$search}%");
+            });
+        }
+        $data = $query->paginate(15)->appends($request->query());
         return view('admin.ketuakelas', compact('data'));
     }
 

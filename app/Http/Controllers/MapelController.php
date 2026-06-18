@@ -5,9 +5,15 @@ use App\Models\Mapel;
 
 class MapelController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $data = Mapel::latest()->paginate(15);
+        $query = Mapel::latest();
+        if ($search = $request->search) {
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%");
+            });
+        }
+        $data = $query->paginate(15)->appends($request->query());
         return view('admin.mapel', compact('data'));
     }
 

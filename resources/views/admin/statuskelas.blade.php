@@ -38,12 +38,21 @@
             <p class="text-sm text-neutral-500">Pantau aktivitas belajar-mengajar di setiap ruangan secara real-time</p>
         </div>
         <div class="d-flex align-center gap-3">
+            {{-- Search Bar --}}
+            <form method="GET" action="{{ route('statuskelas.index') }}" class="m-0" @submit.prevent>
+                <div class="position-relative">
+                    <input type="text" name="search" value="{{ request('search') }}" 
+                           class="form-control live-search-input pl-10" 
+                           placeholder="Cari kelas..." style="padding-left: 2.5rem; width: 250px;">
+                    <i class="ti ti-search position-absolute text-neutral-400" style="left: 0.75rem; top: 50%; transform: translateY(-50%);"></i>
+                </div>
+            </form>
+
             {{-- Countdown refresh badge --}}
             <div class="d-flex align-center gap-1.5 text-xs text-neutral-500 bg-neutral-50 border border-neutral-200 px-3 py-1.5 rounded-xl">
                 <i class="ti ti-refresh" style="font-size:13px;"></i>
                 <span>Refresh dalam <span id="refresh-countdown" class="font-semibold text-neutral-700">30</span>d</span>
             </div>
-
         </div>
     </div>
 
@@ -61,8 +70,9 @@
         </div>
     @endif
 
-    <!-- MAIN DATA TABLE SECTION -->
-    <div class="table-wrapper card p-0 overflow-hidden" x-data="{ tableLoading: false }">
+    <div id="table-container">
+        <!-- MAIN DATA TABLE SECTION -->
+        <div class="table-wrapper card p-0 overflow-hidden" x-data="{ tableLoading: false }">
         <div class="table-loading-overlay" x-show="tableLoading" style="display: none;">
             <div class="table-spinner"></div>
         </div>
@@ -155,12 +165,13 @@
         @endif
     </div>
 
-    <!-- PAGINATION -->
-    @if(!$data->isEmpty())
-        <div class="mt-4">
-            {{ $data->links('vendor.pagination.custom') }}
-        </div>
-    @endif
+        <!-- PAGINATION -->
+        @if(!$data->isEmpty())
+            <div class="mt-4" id="pagination-container">
+                {{ $data->links('vendor.pagination.custom') }}
+            </div>
+        @endif
+    </div>
 
     <!-- Reusable Hapus Modal -->
     <x-modal-hapus />

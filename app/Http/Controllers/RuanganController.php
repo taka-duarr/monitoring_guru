@@ -5,9 +5,13 @@ use App\Models\Ruangan;
 
 class RuanganController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $data = Ruangan::latest()->paginate(15);
+        $query = Ruangan::latest();
+        if ($search = $request->search) {
+            $query->where('name', 'like', "%{$search}%");
+        }
+        $data = $query->paginate(15)->appends($request->query());
         return view('admin.ruangan', compact('data'));
     }
 

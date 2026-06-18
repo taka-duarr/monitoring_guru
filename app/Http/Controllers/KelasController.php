@@ -8,9 +8,13 @@ use Illuminate\Support\Str;
 
 class KelasController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $data = Kelas::latest()->paginate(15);
+        $query = Kelas::latest();
+        if ($search = $request->search) {
+            $query->where('name', 'like', "%{$search}%");
+        }
+        $data = $query->paginate(15)->appends($request->query());
         return view('admin.kelas', compact('data'));
     }
 

@@ -18,7 +18,17 @@
             <h2 class="text-2xl font-bold tracking-tight text-primary-900">Ketua Kelas</h2>
             <p class="text-sm text-neutral-500">Kelola data perwakilan murid / ketua kelas untuk masing-masing rombel</p>
         </div>
-        <div class="d-flex align-center gap-2">
+        <div class="d-flex align-center gap-2 flex-wrap">
+            <!-- Live Search -->
+            <form action="{{ route('ketuakelas.index') }}" method="GET" class="m-0" @submit.prevent>
+                <div class="position-relative">
+                    <input type="text" name="search" value="{{ request('search') }}" 
+                           class="form-control live-search-input pl-10" 
+                           placeholder="Cari ketua kelas atau NIS..." style="padding-left: 2.5rem; width: 250px;">
+                    <i class="ti ti-search position-absolute text-neutral-400" style="left: 0.75rem; top: 50%; transform: translateY(-50%);"></i>
+                </div>
+            </form>
+
             <!-- Filter Actions (Export) -->
             <div class="position-relative" @click.away="exportDropdownOpen = false">
                 <button type="button" class="btn btn-secondary d-flex align-center gap-2" @click="exportDropdownOpen = !exportDropdownOpen">
@@ -44,16 +54,17 @@
 
             <!-- Import Button -->
             <button type="button" @click="showImportModal = true" class="btn btn-secondary d-flex align-center gap-2">
-                <i class="ti ti-file-upload"></i> Import Excel
+                <i class="ti ti-file-upload"></i> Import
             </button>
 
             <a href="{{ route('ketuakelas.create') }}" class="btn btn-primary d-flex align-center gap-2">
-                <i class="ti ti-plus"></i> Tambah Ketua Kelas
+                <i class="ti ti-plus"></i> Tambah
             </a>
         </div>
     </div>
 
-    <!-- Session Alerts for Success / Error / Import Validation Errors -->
+    <div id="table-container">
+        <!-- Session Alerts for Success / Error / Import Validation Errors -->
     @if(session('success'))
         <div class="mb-4 p-4 rounded-lg bg-success-50 border border-success-100 text-success-700 text-sm d-flex align-center gap-2">
             <i class="ti ti-circle-check text-lg"></i>
@@ -164,12 +175,13 @@
         @endif
     </div>
 
-    <!-- PAGINATION -->
-    @if(!$data->isEmpty())
-        <div class="mt-4">
-            {{ $data->links('vendor.pagination.custom') }}
-        </div>
-    @endif
+        <!-- PAGINATION -->
+        @if(!$data->isEmpty())
+            <div class="mt-4" id="pagination-container">
+                {{ $data->links('vendor.pagination.custom') }}
+            </div>
+        @endif
+    </div>
 
     <!-- Reusable Hapus Modal -->
     <x-modal-hapus />

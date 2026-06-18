@@ -5,9 +5,16 @@ use App\Models\Jurusan;
 
 class JurusanController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $data = Jurusan::latest()->paginate(15);
+        $query = Jurusan::latest();
+        if ($search = $request->search) {
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('kode_jurusan', 'like', "%{$search}%");
+            });
+        }
+        $data = $query->paginate(15)->appends($request->query());
         return view('admin.jurusan', compact('data'));
     }
 

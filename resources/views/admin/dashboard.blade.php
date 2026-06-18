@@ -9,10 +9,24 @@
 @section('content')
 <div class="dashboard-wrapper">
     <!-- Header Page Title (Scannable Summary) -->
-    <div class="mb-4">
-        <h2 class="text-2xl font-bold tracking-tight text-primary-900">Ringkasan Pemantauan Hari Ini</h2>
-        <p class="text-sm text-neutral-500">Informasi kehadiran guru dan status kelas tanggal {{ date('d F Y') }}</p>
+    <div class="mb-4" style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h2 class="text-2xl font-bold tracking-tight text-primary-900">Ringkasan Pemantauan</h2>
+            <p class="text-sm text-neutral-500">Informasi kehadiran guru dan status kelas tanggal {{ \Carbon\Carbon::parse($currentFilterDate)->locale('id')->translatedFormat('d F Y') }}</p>
+        </div>
+        <div>
+            <form method="GET" action="{{ route('admin.dashboard') }}" id="dateFilterForm">
+                <input type="date" name="date" value="{{ $currentFilterDate }}" 
+                       class="form-control" style="padding: 0.5rem; border-radius: 0.5rem; border: 1px solid #e2e8f0; font-family: inherit; color: #475569; outline: none; transition: border-color 0.2s;" 
+                       onchange="document.getElementById('dateFilterForm').submit()">
+            </form>
+        </div>
     </div>
+    @php
+        $isToday = $currentFilterDate === date('Y-m-d');
+        $dayText = $isToday ? 'Hari Ini' : 'Tanggal ' . \Carbon\Carbon::parse($currentFilterDate)->translatedFormat('d M Y');
+        $dayTextLower = $isToday ? 'hari ini' : 'tanggal ' . \Carbon\Carbon::parse($currentFilterDate)->translatedFormat('d M Y');
+    @endphp
 
     <!-- ROW 1: STAT CARDS -->
     <div class="dashboard-stats-grid">
@@ -89,7 +103,7 @@
         <!-- Donut Chart Card (40%) -->
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">Distribusi Status Hari Ini</h3>
+                <h3 class="card-title">Distribusi Status {{ $dayText }}</h3>
                 <span class="text-xs text-muted">Persentase status</span>
             </div>
             <div class="chart-container">
@@ -103,7 +117,7 @@
         <!-- Table Card (60%) -->
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">Daftar Guru Tidak Hadir Hari Ini</h3>
+                <h3 class="card-title">Daftar Guru Yang Izin {{ $dayText }}</h3>
                 <span class="badge badge-neutral">{{ $tidak_hadir_hari_ini->count() }} orang</span>
             </div>
 
@@ -112,8 +126,8 @@
                     <div class="empty-state-icon">
                         <i class="ti ti-circle-check"></i>
                     </div>
-                    <span class="empty-state-title">Semua guru hadir hari ini!</span>
-                    <span class="empty-state-sub">Tidak ada ketidakhadiran yang dilaporkan.</span>
+                    <span class="empty-state-title">Tidak ada guru yang izin {{ $dayTextLower }}!</span>
+                    <span class="empty-state-sub">Semua guru hadir atau belum ada pengajuan izin.</span>
                 </div>
             @else
                 <div class="table-wrapper">
@@ -164,7 +178,7 @@
         <!-- Schedule list Card (40%) -->
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">Jadwal Kelas Kosong Hari Ini</h3>
+                <h3 class="card-title">Jadwal Kelas Kosong {{ $dayText }}</h3>
                 <span class="badge badge-danger">{{ $jadwal_kosong->count() }} kelas</span>
             </div>
 
@@ -183,7 +197,7 @@
                             <div class="schedule-item-info">
                                 <span class="schedule-item-time">Jam: {{ $jadwal->jam }}</span>
                                 <span class="schedule-item-title">{{ $jadwal->kelas }} – {{ $jadwal->mapel }}</span>
-                                <span class="schedule-item-meta">Guru tidak hadir tanpa pengganti</span>
+                                <span class="schedule-item-meta">Guru tidak hadir / belum memasuki kelas</span>
                             </div>
                             <span class="badge badge-danger schedule-item-badge">KOSONG</span>
                         </li>

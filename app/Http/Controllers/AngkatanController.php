@@ -9,9 +9,13 @@ use App\Models\Angkatan;
 
 class AngkatanController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $data = Angkatan::latest()->paginate(10);
+        $query = Angkatan::latest();
+        if ($search = $request->search) {
+            $query->where('name', 'like', "%{$search}%");
+        }
+        $data = $query->paginate(10)->appends($request->query());
         return view('admin.angkatan', compact('data'));
     }
 

@@ -10,11 +10,23 @@ class JadwalAjarController extends Controller
         $tahunAjarans = \App\Models\TahunAjaran::orderBy('tahun_mulai', 'desc')->get();
         $query = JadwalAjar::with(['guru', 'mapel', 'kelas.angkatan', 'ruangan', 'tahunAjaran'])->latest();
 
+        if ($search = $request->search) {
+            $query->where(function($q) use ($search) {
+                $q->whereHas('guru', function($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%");
+                })->orWhereHas('mapel', function($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%");
+                })->orWhereHas('kelas', function($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%");
+                });
+            });
+        }
+
         if ($request->tahun_ajaran_id) {
             $query->where('tahun_ajaran_id', $request->tahun_ajaran_id);
         }
 
-        $data = $query->paginate(15);
+        $data = $query->paginate(15)->appends($request->query());
         $selectedTahunAjaran = $request->tahun_ajaran_id
             ? $tahunAjarans->firstWhere('id', $request->tahun_ajaran_id)
             : \App\Models\TahunAjaran::aktif();

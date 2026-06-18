@@ -76,11 +76,11 @@
             <!-- 1. Search Bar with Loupe Icon -->
             <div class="search-input-wrapper">
                 <i class="ti ti-search search-icon-inside"></i>
-                <input type="text" name="search" value="{{ $filters['search'] ?? '' }}" placeholder="Cari nama atau NIP..." aria-label="Cari Guru">
+                <input type="text" name="search" value="{{ $filters['search'] ?? '' }}" class="live-search-input" placeholder="Cari nama atau NIP..." aria-label="Cari Guru">
             </div>
 
             <!-- 2. Dropdown Filter: Status -->
-            <select name="status" class="filter-select" @change="tableLoading = true; $el.form.submit()">
+            <select name="status" class="filter-select live-filter-input" @change="tableLoading = true; $el.form.submit()">
                 <option value="">Semua Status</option>
                 <option value="Aktif" {{ (isset($filters['status']) && $filters['status'] == 'Aktif') ? 'selected' : '' }}>Aktif</option>
                 <option value="Cuti" {{ (isset($filters['status']) && $filters['status'] == 'Cuti') ? 'selected' : '' }}>Cuti</option>
@@ -89,7 +89,7 @@
 
             <!-- 5. Reset Filter Button & Counter -->
             @if($activeFilterCount > 0)
-                <div class="active-filters-info">
+                <div class="active-filters-info" id="active-filter-count">
                     <span class="badge badge-info">{{ $activeFilterCount }} filter aktif</span>
                     <a href="{{ route('guru.index') }}" class="btn btn-ghost btn-sm text-primary" @click="tableLoading = true">
                         <i class="ti ti-rotate"></i> Reset
@@ -140,12 +140,14 @@
         </div>
     </div>
 
-    <!-- MAIN DATA TABLE SECTION -->
-    <div class="table-wrapper card p-0 overflow-hidden">
-        <!-- White Loading Overlay state -->
-        <div class="table-loading-overlay" x-show="tableLoading" style="display: none;">
-            <div class="table-spinner"></div>
-        </div>
+    <div id="table-container">
+        <!-- 3. DATA TABLE WRAPPER -->
+        <div class="table-wrapper card p-0 overflow-hidden position-relative">
+            
+            <!-- Loading Overlay -->
+            <div class="table-loading-overlay" x-show="tableLoading" style="display: none;">
+                <div class="table-spinner"></div>
+            </div>
 
         @if($data->isEmpty())
             <!-- Table Empty State -->
@@ -299,16 +301,16 @@
                 </tbody>
             </table>
         @endif
+        
+        <!-- PAGINATION LINKS AREA -->
+        @if(!$data->isEmpty())
+            <div class="mt-4" id="pagination-container">
+                {{ $data->links('vendor.pagination.custom') }}
+            </div>
+        @endif
     </div>
 
-    <!-- PAGINATION LINKS AREA (Using overrides custom layout) -->
-    @if(!$data->isEmpty())
-        <div class="mt-4">
-            {{ $data->links('vendor.pagination.custom') }}
-        </div>
-    @endif
-
-    <!-- Reusable Modal Components -->
+    <!-- Hapus Modal Component -->
     <x-modal-hapus />
     <x-modal-detail />
 

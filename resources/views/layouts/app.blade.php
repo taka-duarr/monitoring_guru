@@ -29,6 +29,7 @@
     <!-- Tailwind CSS (via CDN) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="{{ asset('js/forms.js') }}"></script>
+    <script src="{{ asset('js/live-search.js') }}"></script>
     <script>
         tailwind.config = {
             theme: {

@@ -57,7 +57,7 @@
     <form method="GET" action="{{ route('jadwalajar.index') }}" class="mb-4 p-4 card d-flex align-center gap-3 flex-wrap" style="padding: 16px !important;">
         <div style="flex:1; min-width:200px;">
             <label class="form-label" style="margin-bottom:4px; font-size:11px; text-transform:uppercase; letter-spacing:0.05em;">Tahun Ajaran</label>
-            <select name="tahun_ajaran_id" class="form-select" style="padding: 8px 12px; font-size:13px;">
+            <select name="tahun_ajaran_id" class="form-select live-filter-input" style="padding: 8px 12px; font-size:13px;">
                 <option value="">-- Semua Tahun Ajaran --</option>
                 @foreach($tahunAjarans as $ta)
                     <option value="{{ $ta->id }}" {{ request('tahun_ajaran_id') == $ta->id ? 'selected' : '' }}>
@@ -66,11 +66,20 @@
                 @endforeach
             </select>
         </div>
+        <div style="flex:1; min-width:200px;">
+            <label class="form-label" style="margin-bottom:4px; font-size:11px; text-transform:uppercase; letter-spacing:0.05em;">Pencarian</label>
+            <div class="position-relative">
+                <input type="text" name="search" value="{{ request('search') }}" 
+                       class="form-control live-search-input pl-10" 
+                       placeholder="Cari guru, mapel, kelas..." style="padding: 8px 12px 8px 36px; font-size:13px;">
+                <i class="ti ti-search position-absolute text-neutral-400" style="left: 0.75rem; top: 50%; transform: translateY(-50%);"></i>
+            </div>
+        </div>
         <div class="d-flex gap-2 align-center" style="margin-top: auto;">
             <button type="submit" class="btn btn-primary d-flex align-center gap-2" style="padding: 8px 16px;">
                 <i class="ti ti-filter"></i> Filter
             </button>
-            @if(request('tahun_ajaran_id'))
+            @if(request('tahun_ajaran_id') || request('search'))
                 <a href="{{ route('jadwalajar.index') }}" class="btn btn-secondary d-flex align-center gap-2" style="padding: 8px 16px;">
                     <i class="ti ti-x"></i> Reset
                 </a>
@@ -84,8 +93,9 @@
         @endif
     </form>
 
-    <!-- MAIN DATA TABLE SECTION -->
-    <div class="table-wrapper card p-0 overflow-hidden" x-data="{ tableLoading: false }">
+    <div id="table-container">
+        <!-- MAIN DATA TABLE SECTION -->
+        <div class="table-wrapper card p-0 overflow-hidden" x-data="{ tableLoading: false }">
         <div class="table-loading-overlay" x-show="tableLoading" style="display: none;">
             <div class="table-spinner"></div>
         </div>
@@ -172,12 +182,13 @@
         @endif
     </div>
 
-    <!-- PAGINATION -->
-    @if(!$data->isEmpty())
-        <div class="mt-4">
-            {{ $data->links('vendor.pagination.custom') }}
-        </div>
-    @endif
+        <!-- PAGINATION -->
+        @if(!$data->isEmpty())
+            <div class="mt-4" id="pagination-container">
+                {{ $data->links('vendor.pagination.custom') }}
+            </div>
+        @endif
+    </div>
 
     <!-- Reusable Hapus Modal -->
     <x-modal-hapus />

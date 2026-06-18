@@ -5,11 +5,17 @@ use App\Models\StatusKelas;
 
 class StatusKelasController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $today = \Carbon\Carbon::today();
         // Ambil kelas yang masih aktif agar kepala sekolah bisa melihat daftar lengkap
-        $data = \App\Models\Kelas::where('is_active', true)->orderBy('name', 'asc')->paginate(20);
+        $query = \App\Models\Kelas::where('is_active', true)->orderBy('name', 'asc');
+        
+        if ($search = $request->search) {
+            $query->where('name', 'like', "%{$search}%");
+        }
+        
+        $data = $query->paginate(20)->appends($request->query());
         
         foreach ($data as $kelas) {
             $status = StatusKelas::where('kelas_id', $kelas->id)
