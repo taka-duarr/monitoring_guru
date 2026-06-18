@@ -21,11 +21,11 @@
         <div class="d-flex align-center gap-2 flex-wrap">
             <!-- Live Search -->
             <form action="{{ route('mapel.index') }}" method="GET" class="m-0" @submit.prevent>
-                <div class="position-relative">
+                <div style="position: relative;">
                     <input type="text" name="search" value="{{ request('search') }}" 
                            class="form-control live-search-input pl-10" 
                            placeholder="Cari mapel..." style="padding-left: 2.5rem; width: 250px;">
-                    <i class="ti ti-search position-absolute text-neutral-400" style="left: 0.75rem; top: 50%; transform: translateY(-50%);"></i>
+                    <i class="ti ti-search text-neutral-400" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%);"></i>
                 </div>
             </form>
 

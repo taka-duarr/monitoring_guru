@@ -68,11 +68,11 @@
         </div>
         <div style="flex:1; min-width:200px;">
             <label class="form-label" style="margin-bottom:4px; font-size:11px; text-transform:uppercase; letter-spacing:0.05em;">Pencarian</label>
-            <div class="position-relative">
+            <div style="position: relative;">
                 <input type="text" name="search" value="{{ request('search') }}" 
                        class="form-control live-search-input pl-10" 
                        placeholder="Cari guru, mapel, kelas..." style="padding: 8px 12px 8px 36px; font-size:13px;">
-                <i class="ti ti-search position-absolute text-neutral-400" style="left: 0.75rem; top: 50%; transform: translateY(-50%);"></i>
+                <i class="ti ti-search text-neutral-400" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%);"></i>
             </div>
         </div>
         <div class="d-flex gap-2 align-center" style="margin-top: auto;">

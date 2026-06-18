@@ -74,9 +74,9 @@
             <input type="hidden" name="per_page" value="{{ $perPage }}">
 
             <!-- 1. Search Bar with Loupe Icon -->
-            <div class="search-input-wrapper">
-                <i class="ti ti-search search-icon-inside"></i>
-                <input type="text" name="search" value="{{ $filters['search'] ?? '' }}" class="live-search-input" placeholder="Cari nama atau NIP..." aria-label="Cari Guru">
+            <div style="position: relative;">
+                <input type="text" name="search" value="{{ request('search') }}" class="form-control live-search-input pl-10" placeholder="Cari guru..." style="padding-left: 2.5rem; width: 250px;">
+                <i class="ti ti-search text-neutral-400" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%);"></i>
             </div>
 
             <!-- 2. Dropdown Filter: Status -->
