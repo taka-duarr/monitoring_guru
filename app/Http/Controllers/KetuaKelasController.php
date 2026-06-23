@@ -9,14 +9,33 @@ class KetuaKelasController extends Controller
     public function index(Request $request)
     {
         $query = User::where('jabatan', 'ketuakelas')->with('kelas.angkatan')->latest();
+
         if ($search = $request->search) {
             $query->where(function($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                   ->orWhere('nik', 'like', "%{$search}%");
             });
         }
+
+        if ($request->filled('grade')) {
+            $query->whereHas('kelas', function($q) use ($request) {
+                $q->where('grade', $request->grade);
+            });
+        }
+
+        if ($request->filled('angkatan_id')) {
+            $query->whereHas('kelas', function($q) use ($request) {
+                $q->where('angkatan_id', $request->angkatan_id);
+            });
+        }
+
         $data = $query->paginate(15)->appends($request->query());
-        return view('admin.ketuakelas', compact('data'));
+        
+        $angkatans = \App\Models\Angkatan::orderBy('name')->get();
+        // Option grades: X, XI, XII dll
+        $grades = \App\Models\Kelas::select('grade')->distinct()->whereNotNull('grade')->orderBy('grade')->pluck('grade');
+
+        return view('admin.ketuakelas', compact('data', 'angkatans', 'grades'));
     }
 
     public function create()
@@ -87,7 +106,29 @@ class KetuaKelasController extends Controller
     public function export(Request $request)
     {
         $format = $request->query('format', 'pdf');
-        $ketuakelas = User::where('jabatan', 'ketuakelas')->with('kelas.angkatan')->orderBy('name', 'asc')->get();
+        
+        $query = User::where('jabatan', 'ketuakelas')->with('kelas.angkatan')->orderBy('name', 'asc');
+        
+        if ($search = $request->search) {
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('nik', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('grade')) {
+            $query->whereHas('kelas', function($q) use ($request) {
+                $q->where('grade', $request->grade);
+            });
+        }
+
+        if ($request->filled('angkatan_id')) {
+            $query->whereHas('kelas', function($q) use ($request) {
+                $q->where('angkatan_id', $request->angkatan_id);
+            });
+        }
+
+        $ketuakelas = $query->get();
 
         if ($format === 'excel') {
             if (class_exists(\Maatwebsite\Excel\Facades\Excel::class)) {

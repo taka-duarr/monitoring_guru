@@ -22,7 +22,7 @@ class AbsenMasukController extends Controller
             ->paginate(15)
             ->appends($request->query());
 
-        $allKelas = Kelas::orderBy('name')->get();
+        $allKelas = Kelas::orderBy('grade')->orderBy('name')->get();
 
         return view('admin.absenmasuk', compact('data', 'allKelas'));
     }

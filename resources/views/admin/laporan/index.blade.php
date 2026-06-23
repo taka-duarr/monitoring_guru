@@ -336,7 +336,7 @@
                             <select name="kelas_id" id="kelas_id_kehadiran" class="form-control" style="color:#111827;background-color:#ffffff;">
                                 <option value="" style="color:#111827;background:#ffffff;">Semua Kelas</option>
                                 @foreach($kelas as $k)
-                                    <option value="{{ $k->id }}" style="color:#111827;background:#ffffff;">{{ $k->name }}</option>
+                                    <option value="{{ $k->id }}" style="color:#111827;background:#ffffff;">{{ $k->grade }} {{ $k->name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -369,7 +369,7 @@
                             <select name="kelas_id" id="kelas_id_kosong" class="form-control" style="color:#111827;background-color:#ffffff;">
                                 <option value="" style="color:#111827;background:#ffffff;">Semua Kelas</option>
                                 @foreach($kelas as $k)
-                                    <option value="{{ $k->id }}" style="color:#111827;background:#ffffff;">{{ $k->name }}</option>
+                                    <option value="{{ $k->id }}" style="color:#111827;background:#ffffff;">{{ $k->grade }} {{ $k->name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -394,7 +394,7 @@
                             <select name="kelas_id" id="kelas_id_jadwal" class="form-control" style="color:#111827;background-color:#ffffff;">
                                 <option value="" style="color:#111827;background:#ffffff;">Semua Kelas</option>
                                 @foreach($kelas as $k)
-                                    <option value="{{ $k->id }}" style="color:#111827;background:#ffffff;">{{ $k->name }}</option>
+                                    <option value="{{ $k->id }}" style="color:#111827;background:#ffffff;">{{ $k->grade }} {{ $k->name }}</option>
                                 @endforeach
                             </select>
                         </div>

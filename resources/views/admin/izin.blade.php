@@ -18,6 +18,44 @@
             <i class="ti ti-plus"></i> Tambah Data
         </a>
     </div>
+    <!-- FILTER SECTION -->
+    <div class="bg-white rounded-2xl border border-slate-100 p-4 mb-6 shadow-sm">
+        <form method="GET" action="{{ route('izin.index') }}" class="flex flex-wrap gap-3 items-end">
+            {{-- Cari Nama Guru --}}
+            <div class="flex flex-col">
+                <label for="filter_guru" class="text-xs text-slate-500 mb-1 font-medium">Cari Nama Guru</label>
+                <input type="text"
+                    id="filter_guru"
+                    name="guru"
+                    value="{{ request('guru') }}"
+                    placeholder="Nama guru..."
+                    class="border border-slate-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none min-w-[180px]">
+            </div>
+
+            {{-- Tanggal Izin --}}
+            <div class="flex flex-col">
+                <label for="filter_tanggal" class="text-xs text-slate-500 mb-1 font-medium">Tanggal Izin</label>
+                <input type="date"
+                    id="filter_tanggal"
+                    name="tanggal"
+                    value="{{ request('tanggal') }}"
+                    class="border border-slate-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+            </div>
+
+            {{-- Action Buttons --}}
+            <div class="flex gap-2">
+                <button type="submit"
+                    class="px-4 py-2 text-sm font-medium rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-150">
+                    Filter
+                </button>
+                <a href="{{ route('izin.index') }}"
+                    class="px-4 py-2 text-sm font-medium rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors duration-150">
+                    Reset
+                </a>
+            </div>
+        </form>
+    </div>
+
     <!-- MAIN DATA TABLE SECTION -->
     <div class="table-wrapper card p-0 overflow-hidden" x-data="{ tableLoading: false }">
         <div class="table-loading-overlay" x-show="tableLoading" style="display: none;">

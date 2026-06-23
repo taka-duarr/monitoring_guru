@@ -63,6 +63,53 @@
         </div>
     </div>
 
+    <!-- FILTER SECTION -->
+    <div class="bg-white rounded-2xl border border-slate-100 p-4 mb-6 shadow-sm">
+        <form method="GET" action="{{ route('ketuakelas.index') }}" class="flex flex-wrap gap-3 items-end filter-form">
+            {{-- Tingkat --}}
+            <div class="flex flex-col">
+                <label for="filter_grade" class="text-xs text-slate-500 mb-1 font-medium">Tingkat</label>
+                <select id="filter_grade"
+                    name="grade"
+                    class="border border-slate-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none min-w-[120px]">
+                    <option value="">Semua</option>
+                    @foreach($grades as $g)
+                        <option value="{{ $g }}" {{ request('grade') == $g ? 'selected' : '' }}>
+                            {{ $g }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            {{-- Angkatan --}}
+            <div class="flex flex-col">
+                <label for="filter_angkatan" class="text-xs text-slate-500 mb-1 font-medium">Angkatan</label>
+                <select id="filter_angkatan"
+                    name="angkatan_id"
+                    class="border border-slate-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none min-w-[160px]">
+                    <option value="">Semua</option>
+                    @foreach($angkatans as $a)
+                        <option value="{{ $a->id }}" {{ request('angkatan_id') == $a->id ? 'selected' : '' }}>
+                            {{ $a->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            {{-- Action Buttons --}}
+            <div class="flex gap-2">
+                <button type="submit"
+                    class="px-4 py-2 text-sm font-medium rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-150">
+                    Filter
+                </button>
+                <a href="{{ route('ketuakelas.index') }}"
+                    class="px-4 py-2 text-sm font-medium rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors duration-150">
+                    Reset
+                </a>
+            </div>
+        </form>
+    </div>
+
     <div id="table-container">
         <!-- Session Alerts for Success / Error / Import Validation Errors -->
     @if(session('success'))

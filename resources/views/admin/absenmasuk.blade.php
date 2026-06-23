@@ -39,7 +39,7 @@
                     <option value="">Semua Kelas</option>
                     @foreach($allKelas as $k)
                         <option value="{{ $k->id }}" {{ request('kelas_id') == $k->id ? 'selected' : '' }}>
-                            {{ $k->name }}
+                            {{ $k->grade }} {{ $k->name }}
                         </option>
                     @endforeach
                 </select>
@@ -113,9 +113,21 @@
                                 <div class="font-medium text-neutral-800">{{ $row->kelas->name ?? '-' }}</div>
                                 <div class="text-xs text-neutral-500">{{ $row->jadwalAjar->mapel->name ?? '-' }}</div>
                             </td>
-                            <td class="font-bold text-success-600">{{ $row->jam_masuk }}</td>
-                            <td class="font-bold {{ $row->absenKeluar ? 'text-danger-500' : 'text-neutral-300' }}">
-                                {{ $row->absenKeluar->jam_keluar ?? '--:--:--' }}
+                            <td>
+                                <div class="text-xs text-neutral-500 mb-1">
+                                    Jadwal: {{ $row->jadwalAjar->jam_mulai ? substr($row->jadwalAjar->jam_mulai, 0, 5) : '-' }}
+                                </div>
+                                <div class="font-bold text-success-600">
+                                    Absen: {{ substr($row->jam_masuk, 0, 5) }}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="text-xs text-neutral-500 mb-1">
+                                    Jadwal: {{ $row->jadwalAjar->jam_selesai ? substr($row->jadwalAjar->jam_selesai, 0, 5) : '-' }}
+                                </div>
+                                <div class="font-bold {{ $row->absenKeluar ? 'text-danger-500' : 'text-neutral-300' }}">
+                                    Absen: {{ $row->absenKeluar ? substr($row->absenKeluar->jam_keluar, 0, 5) : '--:--' }}
+                                </div>
                             </td>
                             <td class="col-center">
                                 @if($row->absenKeluar)

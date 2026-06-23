@@ -9,11 +9,22 @@ use App\Models\JadwalAjar;
 
 class IzinController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $data = Izin::with(['guru', 'jadwalAjar.mapel', 'jadwalAjar.guru', 'jadwalAjar.kelas'])
-            ->latest()
-            ->paginate(15);
+        $query = Izin::with(['guru', 'jadwalAjar.mapel', 'jadwalAjar.guru', 'jadwalAjar.kelas']);
+
+        if ($request->filled('guru')) {
+            $query->whereHas('guru', function ($q) use ($request) {
+                $q->where('name', 'LIKE', '%' . $request->guru . '%');
+            });
+        }
+
+        if ($request->filled('tanggal')) {
+            $query->where('tanggal_izin', $request->tanggal);
+        }
+
+        $data = $query->latest()->paginate(15)->appends($request->query());
+        
         return view('admin.izin', compact('data'));
     }
 
