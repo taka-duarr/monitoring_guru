@@ -131,7 +131,7 @@
         <!-- Footer -->
         <footer class="footer">
             <div class="d-flex align-center justify-between">
-                <span class="text-xs text-muted">Sistem Informasi Monitoring Guru &copy; {{ date('Y') }}</span>
+                <span class="text-xs text-muted">Sistem Informasi Monitoring Guru &copy; {{ date('Y') }} - Teknik Informatika ITATS</span>
                 <span class="text-xs text-muted font-semibold">v1.0.0</span>
             </div>
         </footer>

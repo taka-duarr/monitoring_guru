@@ -345,8 +345,14 @@
 
         <!-- Main Content -->
         <main class="content-area @yield('content_class')">
-            <x-toast />
+            <!-- Main Content Yield -->
             @yield('content')
+
+            <!-- Footer -->
+            <footer class="mt-auto px-5 py-4 border-t border-slate-100 flex items-center justify-between">
+                <span class="text-xs text-slate-500">Sistem Informasi Monitoring Guru &copy; {{ date('Y') }} - Teknik Informatika ITATS</span>
+                <span class="text-xs text-slate-500 font-semibold">v1.0.0</span>
+            </footer>
         </main>
     </div>
 

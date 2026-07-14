@@ -24,7 +24,13 @@ class ProfileController extends Controller
         $user->name = $request->name;
         
         if ($request->has('no_telp')) {
-            $user->no_telp = $request->no_telp;
+            $phone = preg_replace('/[^0-9]/', '', $request->no_telp);
+            if (str_starts_with($phone, '620')) {
+                $phone = '62' . substr($phone, 3);
+            } elseif (str_starts_with($phone, '0')) {
+                $phone = '62' . substr($phone, 1);
+            }
+            $user->no_telp = $phone;
         }
 
         if ($request->filled('password')) {

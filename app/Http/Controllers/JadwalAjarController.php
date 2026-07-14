@@ -22,14 +22,23 @@ class JadwalAjarController extends Controller
             });
         }
 
-        if ($request->tahun_ajaran_id) {
-            $query->where('tahun_ajaran_id', $request->tahun_ajaran_id);
+        $tahun_ajaran_id = $request->input('tahun_ajaran_id');
+
+        // Default to active school year on initial load
+        if (!$request->has('tahun_ajaran_id')) {
+            $aktif = \App\Models\TahunAjaran::aktif();
+            $tahun_ajaran_id = $aktif ? $aktif->id : null;
+            $request->merge(['tahun_ajaran_id' => $tahun_ajaran_id]);
+        }
+
+        if ($tahun_ajaran_id) {
+            $query->where('tahun_ajaran_id', $tahun_ajaran_id);
         }
 
         $data = $query->paginate(15)->appends($request->query());
-        $selectedTahunAjaran = $request->tahun_ajaran_id
-            ? $tahunAjarans->firstWhere('id', $request->tahun_ajaran_id)
-            : \App\Models\TahunAjaran::aktif();
+        $selectedTahunAjaran = $tahun_ajaran_id
+            ? $tahunAjarans->firstWhere('id', $tahun_ajaran_id)
+            : null;
 
         return view('admin.jadwalajar', compact('data', 'tahunAjarans', 'selectedTahunAjaran'));
     }

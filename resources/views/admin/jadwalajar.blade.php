@@ -76,9 +76,7 @@
             </div>
         </div>
         <div class="d-flex gap-2 align-center" style="margin-top: auto;">
-            <button type="submit" class="btn btn-primary d-flex align-center gap-2" style="padding: 8px 16px;">
-                <i class="ti ti-filter"></i> Filter
-            </button>
+
             @if(request('tahun_ajaran_id') || request('search'))
                 <a href="{{ route('jadwalajar.index') }}" class="btn btn-secondary d-flex align-center gap-2" style="padding: 8px 16px;">
                     <i class="ti ti-x"></i> Reset

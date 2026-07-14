@@ -50,7 +50,17 @@ class ProfileController extends Controller
 
         // Update data
         $user->name = $request->input('name');
-        $user->no_telp = $request->input('no_telp');
+        
+        $phone = $request->input('no_telp');
+        if ($phone) {
+            $phone = preg_replace('/[^0-9]/', '', $phone);
+            if (str_starts_with($phone, '620')) {
+                $phone = '62' . substr($phone, 3);
+            } elseif (str_starts_with($phone, '0')) {
+                $phone = '62' . substr($phone, 1);
+            }
+        }
+        $user->no_telp = $phone;
 
         if ($request->filled('password')) {
             $user->password = Hash::make($request->input('password'));
