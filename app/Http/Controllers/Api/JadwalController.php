@@ -131,8 +131,41 @@ class JadwalController extends Controller
             ->get()
             ->map(function ($absen) {
                 $absen->absen_keluar = \App\Models\AbsenKeluar::where('absen_masuk_id', $absen->id)->first();
+                $absen->is_izin = false;
                 return $absen;
             });
+
+        $izinQuery = \App\Models\Izin::with(['guru', 'jadwalAjar.kelas', 'jadwalAjar.ruangan'])
+            ->where('approval', true)
+            ->where(function($q) use ($mapel_id) {
+                $q->whereNull('jadwal_ajar_id')->orWhereHas('jadwalAjar', function ($q2) use ($mapel_id) {
+                    $q2->where('mapel_id', $mapel_id);
+                });
+            });
+
+        if ($user->jabatan !== 'ketuakelas') {
+            $izinQuery->where('guru_id', $user->id);
+        }
+
+        $izins = $izinQuery->get()->filter(function($i) use ($user) {
+            if ($user->jabatan === 'ketuakelas' && $i->jadwal_ajar_id && $i->jadwalAjar && $i->jadwalAjar->kelas_id != $user->kelas_id) return false;
+            return true;
+        })->map(function($i) {
+            return [
+                'id' => 'izin_'.$i->id,
+                'tanggal' => $i->tanggal_izin,
+                'jam_masuk' => '-',
+                'absen_keluar' => ['jam_keluar' => '-'],
+                'is_izin' => true,
+                'izin_judul' => $i->judul,
+                'izin_pesan' => $i->pesan,
+                'kelas' => $i->jadwal_ajar_id ? $i->jadwalAjar->kelas : ['name' => 'Semua Kelas'],
+                'ruangan' => $i->jadwal_ajar_id ? $i->jadwalAjar->ruangan : ['name' => '-'],
+                'guru' => $i->guru,
+            ];
+        });
+
+        $riwayat = collect($riwayat)->concat($izins)->sortByDesc('tanggal')->values();
 
         return response()->json([
             'success' => true,
@@ -169,8 +202,45 @@ class JadwalController extends Controller
 
         $riwayat = $query->get()->map(function ($absen) {
             $absen->absen_keluar = \App\Models\AbsenKeluar::where('absen_masuk_id', $absen->id)->first();
+            $absen->is_izin = false;
             return $absen;
         });
+
+        $izinQuery = \App\Models\Izin::with(['guru', 'jadwalAjar.mapel', 'jadwalAjar.kelas', 'jadwalAjar.ruangan', 'jadwalAjar.tahunAjaran'])
+            ->where('approval', true);
+
+        if ($user->jabatan !== 'ketuakelas') {
+            $izinQuery->where('guru_id', $user->id);
+        }
+        
+        if ($selectedId) {
+            $izinQuery->where(function($q) use ($selectedId) {
+                $q->whereNull('jadwal_ajar_id')->orWhereHas('jadwalAjar', function ($q2) use ($selectedId) {
+                    $q2->where('tahun_ajaran_id', $selectedId);
+                });
+            });
+        }
+        
+        $izins = $izinQuery->get()->filter(function($i) use ($user) {
+            if ($user->jabatan === 'ketuakelas' && $i->jadwal_ajar_id && $i->jadwalAjar && $i->jadwalAjar->kelas_id != $user->kelas_id) return false;
+            return true;
+        })->map(function($i) {
+            return [
+                'id' => 'izin_'.$i->id,
+                'tanggal' => $i->tanggal_izin,
+                'jam_masuk' => '-',
+                'absen_keluar' => ['jam_keluar' => '-'],
+                'is_izin' => true,
+                'izin_judul' => $i->judul,
+                'izin_pesan' => $i->pesan,
+                'kelas' => $i->jadwal_ajar_id ? $i->jadwalAjar->kelas : ['name' => 'Semua Kelas'],
+                'ruangan' => $i->jadwal_ajar_id ? $i->jadwalAjar->ruangan : ['name' => '-'],
+                'guru' => $i->guru,
+                'jadwalAjar' => $i->jadwal_ajar_id ? $i->jadwalAjar : ['mapel' => ['name' => 'Semua Mapel']],
+            ];
+        });
+        
+        $riwayat = collect($riwayat)->concat($izins)->sortByDesc('tanggal')->values();
 
         $selectedTahunAjaran = $selectedId ? $tahunAjarans->firstWhere('id', $selectedId) : null;
 
