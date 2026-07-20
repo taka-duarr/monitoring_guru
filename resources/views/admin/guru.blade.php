@@ -241,13 +241,17 @@
                             <td class="col-nip">
                                 <div>{{ $guru->nik }}</div>
                                 @if($guru->device_id)
-                                    <span class="text-xs text-primary-600 d-flex align-center gap-1 mt-1" style="font-size: 11px;">
-                                        <i class="ti ti-device-mobile"></i> Terikat
-                                    </span>
+                                    <div class="mt-1">
+                                        <span class="badge" style="background-color: #E0E7FF; color: #4338CA; font-size: 10px; padding: 2px 6px;">
+                                            <i class="ti ti-lock"></i> Terikat Device
+                                        </span>
+                                    </div>
                                 @else
-                                    <span class="text-xs text-neutral-400 d-flex align-center gap-1 mt-1" style="font-size: 11px;">
-                                        <i class="ti ti-device-mobile"></i> Belum Terikat
-                                    </span>
+                                    <div class="mt-1">
+                                        <span class="badge" style="background-color: #F1F5F9; color: #64748B; font-size: 10px; padding: 2px 6px;">
+                                            <i class="ti ti-lock-open"></i> Belum Terikat
+                                        </span>
+                                    </div>
                                 @endif
                             </td>
                             
