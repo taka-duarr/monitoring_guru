@@ -32,6 +32,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('guru/export', [App\Http\Controllers\GuruController::class, 'export'])->name('guru.export');
     Route::get('guru/import/template', [App\Http\Controllers\GuruController::class, 'downloadTemplate'])->name('guru.import.template');
     Route::post('guru/import', [App\Http\Controllers\GuruController::class, 'import'])->name('guru.import');
+    Route::post('guru/{guru}/reset-device', [App\Http\Controllers\GuruController::class, 'resetDevice'])->name('guru.reset-device');
     Route::resource('guru', App\Http\Controllers\GuruController::class);
     Route::resource('users', UserController::class);
 

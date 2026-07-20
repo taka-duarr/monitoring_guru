@@ -178,6 +178,17 @@ class GuruController extends Controller
     }
 
     /**
+     * Reset the device binding for the specified teacher.
+     */
+    public function resetDevice($id)
+    {
+        $guru = Guru::findOrFail($id);
+        $guru->update(['device_id' => null]);
+        
+        return redirect()->route('guru.index')->with('success', 'Perangkat berhasil di-reset. Guru dapat login dengan perangkat baru.');
+    }
+
+    /**
      * Remove the specified teacher.
      */
     public function destroy($id)

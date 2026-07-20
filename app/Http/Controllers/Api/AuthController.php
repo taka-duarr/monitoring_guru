@@ -13,7 +13,8 @@ class AuthController extends Controller
     {
         $request->validate([
             'nik'      => 'required',
-            'password' => 'required'
+            'password' => 'required',
+            'device_id'=> 'nullable|string'
         ]);
 
         $user = User::where('nik', $request->nik)->first();
@@ -23,6 +24,30 @@ class AuthController extends Controller
                 'success' => false,
                 'message' => 'NIK atau password salah'
             ], 401);
+        }
+
+        // Device Binding Check (Only for Guru)
+        if ($user->jabatan === 'guru') {
+            $incomingDeviceId = $request->input('device_id');
+            
+            if (!$incomingDeviceId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal mendeteksi perangkat (Device ID tidak ditemukan)'
+                ], 400);
+            }
+
+            if (empty($user->device_id)) {
+                // First time login, bind device
+                $user->device_id = $incomingDeviceId;
+                $user->save();
+            } else if ($user->device_id !== $incomingDeviceId) {
+                // Different device
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Akun ini sudah terikat pada perangkat lain. Hubungi admin untuk mereset perangkat.'
+                ], 403);
+            }
         }
 
         $roleMap = [

@@ -239,7 +239,12 @@
                             
                             <!-- NIP Monospace Column -->
                             <td class="col-nip">
-                                {{ $guru->nik }}
+                                <div>{{ $guru->nik }}</div>
+                                @if($guru->device_id)
+                                    <span class="text-xs text-primary-600 d-flex align-center gap-1 mt-1" style="font-size: 11px;">
+                                        <i class="ti ti-device-mobile"></i> Terikat
+                                    </span>
+                                @endif
                             </td>
                             
 
@@ -283,6 +288,18 @@
                                             <i class="ti ti-pencil"></i>
                                         </a>
                                     </x-tooltip>
+                                    
+                                    <!-- Reset Device -->
+                                    @if($guru->device_id)
+                                        <x-tooltip text="Reset Perangkat">
+                                            <form action="{{ route('guru.reset-device', $guru->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin mereset kuncian perangkat untuk guru ini?')">
+                                                @csrf
+                                                <button type="submit" class="btn btn-ghost action-edit text-warning-600">
+                                                    <i class="ti ti-device-mobile-x"></i>
+                                                </button>
+                                            </form>
+                                        </x-tooltip>
+                                    @endif
                                     
                                     <!-- Delete Button (triggers modal) -->
                                     <x-tooltip text="Hapus Guru">
