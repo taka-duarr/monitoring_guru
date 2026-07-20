@@ -47,7 +47,7 @@
             <tbody>
                 @foreach($murids as $row)
                     @php
-                        $status = 'hadir';
+                        $status = 'masuk';
                         if ($absenMurids->has($row->id)) {
                             $status = $absenMurids[$row->id]->status;
                         }
@@ -63,8 +63,14 @@
                             <span class="font-medium text-neutral-800">{{ $row->name }}</span>
                         </td>
                         <td class="col-center">
-                            @if(strtolower($status) == 'hadir')
-                                <span class="badge badge-success">Hadir</span>
+                            @if(strtolower($status) == 'masuk' || strtolower($status) == 'hadir')
+                                <span class="badge badge-success">Masuk</span>
+                            @elseif(strtolower($status) == 'izin')
+                                <span class="badge bg-primary-50 text-primary-700 border border-primary-200" style="padding:4px 8px;border-radius:12px;font-size:11px;">Izin</span>
+                            @elseif(strtolower($status) == 'sakit')
+                                <span class="badge bg-warning-50 text-warning-700 border border-warning-200" style="padding:4px 8px;border-radius:12px;font-size:11px;">Sakit</span>
+                            @elseif(strtolower($status) == 'terlambat')
+                                <span class="badge" style="background:#FEF3C7; color:#D97706; border: 1px solid #FDE68A; padding:4px 8px;border-radius:12px;font-size:11px;">Terlambat</span>
                             @else
                                 <span class="badge badge-danger">Alpa</span>
                             @endif

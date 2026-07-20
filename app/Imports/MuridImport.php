@@ -6,10 +6,14 @@ use App\Models\Murid;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
+use PhpOffice\PhpSpreadsheet\Cell\Cell;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\Cell\DefaultValueBinder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
-class MuridImport implements ToCollection, WithHeadingRow
+class MuridImport extends DefaultValueBinder implements ToCollection, WithHeadingRow, WithCustomValueBinder
 {
     protected $errors = [];
     protected $kelasId;
@@ -17,6 +21,17 @@ class MuridImport implements ToCollection, WithHeadingRow
     public function __construct($kelasId)
     {
         $this->kelasId = $kelasId;
+    }
+
+    /**
+     * Bind value to a cell to ensure strings are read correctly.
+     */
+    public function bindValue(Cell $cell, $value)
+    {
+        // Treat all values as string to avoid automatic date/number conversion 
+        // which might break NIS containing '/' and '.'
+        $cell->setValueExplicit((string) $value, DataType::TYPE_STRING);
+        return true;
     }
 
     /**

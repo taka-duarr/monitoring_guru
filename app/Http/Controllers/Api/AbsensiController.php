@@ -154,7 +154,7 @@ class AbsensiController extends Controller
         $absenMurids = \App\Models\AbsenMurid::where('absen_masuk_id', $absen_masuk_id)->get()->keyBy('murid_id');
 
         $data = $murids->map(function ($murid) use ($absenMurids) {
-            $status = 'hadir'; // default
+            $status = 'masuk'; // default
             if ($absenMurids->has($murid->id)) {
                 $status = $absenMurids[$murid->id]->status;
             }
