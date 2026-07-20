@@ -216,9 +216,9 @@
 
     @php
         $totalJadwal    = count($allJadwals);
-        $selesaiJadwal  = $allJadwals->filter(fn($j) => $j->absen_masuk !== null && $j->absen_keluar !== null)->count();
-        $belumJadwal    = $allJadwals->filter(fn($j) => $j->absen_masuk === null)->count();
-        $nextJadwal     = $allJadwals->first(fn($j) => $j->absen_masuk === null);
+        $selesaiJadwal  = $allJadwals->filter(fn($j) => ($j->absen_masuk !== null && $j->absen_keluar !== null) || !empty($j->izin_guru))->count();
+        $belumJadwal    = $allJadwals->filter(fn($j) => $j->absen_masuk === null && empty($j->izin_guru))->count();
+        $nextJadwal     = $allJadwals->first(fn($j) => $j->absen_masuk === null && empty($j->izin_guru));
         $nextJamMulai   = $nextJadwal ? $nextJadwal->jam_mulai : null;
         $ongoingClasses = $allJadwals->filter(fn($j) => $j->absen_masuk !== null && $j->absen_keluar === null);
         $otherClasses   = $jadwals->filter(fn($j) => !($j->absen_masuk !== null && $j->absen_keluar === null));
@@ -385,6 +385,8 @@
                             <span class="badge-time">{{ substr($jadwal->jam_mulai,0,5) }} – {{ substr($jadwal->jam_selesai,0,5) }}</span>
                             @if($isDone)
                                 <span class="badge-status-done">Selesai</span>
+                            @elseif(isset($jadwal->izin_guru) && $jadwal->izin_guru)
+                                <span style="background:#fef3c7;color:#d97706;font-size:12px;font-weight:700;padding:2px 9px;border-radius:99px;">Izin Diterima</span>
                             @else
                                 <span class="badge-status-pending">Belum Absen</span>
                             @endif
@@ -417,7 +419,12 @@
                 </div>
                 @endif
 
-                @if($canScan)
+                @if(isset($jadwal->izin_guru) && $jadwal->izin_guru)
+                <div style="padding:10px 14px;background:#fffbeb;border:1px solid #fde68a;border-radius:10px;margin-top:10px;">
+                    <p style="margin:0;font-size:13px;color:#b45309;font-weight:600;"><i class="ti ti-info-circle"></i> Anda Sedang Izin</p>
+                    <p style="margin:4px 0 0;font-size:12px;color:#92400e;">{{ $jadwal->izin_guru->judul }} - {{ $jadwal->izin_guru->pesan }}</p>
+                </div>
+                @elseif($canScan)
                 <div>
                     @if($isTimeToScan)
                     <a href="{{ route('guru.scan') }}" class="btn-scan">

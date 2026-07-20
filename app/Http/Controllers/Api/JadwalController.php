@@ -67,6 +67,15 @@ class JadwalController extends Controller
             if ($absen) {
                 $j->absen_keluar = \App\Models\AbsenKeluar::where('absen_masuk_id', $absen->id)->first();
             }
+
+            $izin = \App\Models\Izin::where('guru_id', $j->guru_id)
+                        ->where('tanggal_izin', $today)
+                        ->where('approval', true)
+                        ->where(function($q) use ($j) {
+                            $q->whereNull('jadwal_ajar_id')->orWhere('jadwal_ajar_id', $j->id);
+                        })
+                        ->first();
+            $j->izin_guru = $izin;
         }
 
         // 3. Query Semua Jadwal

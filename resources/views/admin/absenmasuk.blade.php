@@ -118,7 +118,7 @@
                                     Jadwal: {{ $row->jadwalAjar->jam_mulai ? substr($row->jadwalAjar->jam_mulai, 0, 5) : '-' }}
                                 </div>
                                 <div class="font-bold text-success-600">
-                                    Absen: {{ substr($row->jam_masuk, 0, 5) }}
+                                    Presensi: {{ substr($row->jam_masuk, 0, 5) }}
                                 </div>
                             </td>
                             <td>
@@ -126,7 +126,7 @@
                                     Jadwal: {{ $row->jadwalAjar->jam_selesai ? substr($row->jadwalAjar->jam_selesai, 0, 5) : '-' }}
                                 </div>
                                 <div class="font-bold {{ $row->absenKeluar ? 'text-danger-500' : 'text-neutral-300' }}">
-                                    Absen: {{ $row->absenKeluar ? substr($row->absenKeluar->jam_keluar, 0, 5) : '--:--' }}
+                                    Presensi: {{ $row->absenKeluar ? substr($row->absenKeluar->jam_keluar, 0, 5) : '--:--' }}
                                 </div>
                             </td>
                             <td class="col-center">

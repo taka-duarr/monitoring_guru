@@ -20,12 +20,21 @@ class AuthController extends Controller
         ]);
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
-            $request->session()->regenerate();
             $role = Auth::user()->jabatan;
+
+            if ($role === 'guru') {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+                return back()->withErrors([
+                    'nik' => 'Akses ditolak. Guru hanya dapat login melalui aplikasi mobile.',
+                ])->onlyInput('nik');
+            }
+
+            $request->session()->regenerate();
+            
             if ($role === 'admin') {
                 return redirect()->intended('/admin/dashboard');
-            } elseif ($role === 'guru') {
-                return redirect()->intended('/guru/dashboard');
             } elseif ($role === 'ketuakelas') {
                 return redirect()->intended('/siswa/dashboard');
             }

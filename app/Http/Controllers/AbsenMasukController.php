@@ -51,13 +51,29 @@ class AbsenMasukController extends Controller
     public function update(Request $request, $id)
     {
         $record = AbsenMasuk::findOrFail($id);
-        $data = $request->except(['_token', '_method']);
+        $data = $request->except(['_token', '_method', 'jam_keluar']);
         if (isset($data['password']) && $data['password']) {
             $data['password'] = bcrypt($data['password']);
         } else {
             unset($data['password']);
         }
         $record->update($data);
+
+        if ($request->filled('jam_keluar')) {
+            if ($record->absenKeluar) {
+                $record->absenKeluar->update(['jam_keluar' => $request->jam_keluar]);
+            } else {
+                $record->absenKeluar()->create([
+                    'jam_keluar' => $request->jam_keluar,
+                    'tanggal' => $record->tanggal,
+                ]);
+            }
+        } elseif ($request->has('jam_keluar') && empty($request->jam_keluar)) {
+            if ($record->absenKeluar) {
+                $record->absenKeluar->delete();
+            }
+        }
+
         return redirect()->route('absenmasuk.index')->with('success', 'Data berhasil diubah');
     }
 

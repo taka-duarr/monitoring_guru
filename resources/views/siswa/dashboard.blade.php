@@ -59,9 +59,9 @@
 
 @php
     $totalJadwal    = count($allJadwals);
-    $selesaiJadwal  = $allJadwals->filter(fn($j) => $j->absen_masuk !== null && $j->absen_keluar !== null)->count();
-    $belumJadwal    = $allJadwals->filter(fn($j) => $j->absen_masuk === null)->count();
-    $nextJadwal     = $allJadwals->first(fn($j) => $j->absen_masuk === null);
+    $selesaiJadwal  = $allJadwals->filter(fn($j) => ($j->absen_masuk !== null && $j->absen_keluar !== null) || !empty($j->izin_guru))->count();
+    $belumJadwal    = $allJadwals->filter(fn($j) => $j->absen_masuk === null && empty($j->izin_guru))->count();
+    $nextJadwal     = $allJadwals->first(fn($j) => $j->absen_masuk === null && empty($j->izin_guru));
     $nextJamMulai   = $nextJadwal ? $nextJadwal->jam_mulai : null;
     $ongoingClasses = $allJadwals->filter(fn($j) => $j->absen_masuk !== null && $j->absen_keluar === null);
     $otherClasses   = $jadwals->filter(fn($j) => !($j->absen_masuk !== null && $j->absen_keluar === null));
@@ -223,6 +223,8 @@
                         <span class="s-badge-t">{{ substr($jadwal->jam_mulai,0,5) }} – {{ substr($jadwal->jam_selesai,0,5) }}</span>
                         @if($isDone)
                             <span style="background:#f1f5f9;color:#64748b;font-size:12px;font-weight:700;padding:2px 9px;border-radius:99px;">Selesai</span>
+                        @elseif(isset($jadwal->izin_guru) && $jadwal->izin_guru)
+                            <span style="background:#fef3c7;color:#d97706;font-size:12px;font-weight:700;padding:2px 9px;border-radius:99px;">Guru Izin</span>
                         @else
                             <span style="background:#eff6ff;color:#3b82f6;font-size:12px;font-weight:700;padding:2px 9px;border-radius:99px;">Belum Absen</span>
                         @endif
@@ -254,7 +256,12 @@
             </div>
             @endif
 
-            @if($canGenerate)
+            @if(isset($jadwal->izin_guru) && $jadwal->izin_guru)
+            <div style="padding:10px 14px;background:#fffbeb;border:1px solid #fde68a;border-radius:10px;margin-top:10px;">
+                <p style="margin:0;font-size:13px;color:#b45309;font-weight:600;"><i class="ti ti-info-circle"></i> Guru Sedang Izin</p>
+                <p style="margin:4px 0 0;font-size:12px;color:#92400e;">{{ $jadwal->izin_guru->judul }} - {{ $jadwal->izin_guru->pesan }}</p>
+            </div>
+            @elseif($canGenerate)
             <div>
                 @if($isTimeToScan)
                     <button onclick="showQrModal('{{ $jadwal->id }}', '{{ addslashes($jadwal->mapel->name ?? 'Mapel') }}', 'masuk')"

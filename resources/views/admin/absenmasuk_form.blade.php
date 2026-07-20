@@ -59,6 +59,25 @@
             @enderror
         </div>
 
+        @if(isset($data))
+        <!-- Jam Keluar (Edit Only) -->
+        <div class="form-group mt-4">
+            <label for="jam_keluar" class="form-label">
+                Jam Keluar
+            </label>
+            <input type="time" id="jam_keluar" name="jam_keluar" 
+                   class="form-control @error('jam_keluar') is-invalid @else @if(old('jam_keluar')) is-valid @endif @enderror" 
+                   value="{{ old('jam_keluar', $data->absenKeluar->jam_keluar ?? '') }}">
+            <span class="text-xs text-neutral-500 mt-1 d-block">Kosongkan jika guru belum melakukan absensi keluar (checkout).</span>
+            @error('jam_keluar')
+                <span class="form-error">
+                    <i class="ti ti-alert-circle"></i>
+                    {{ $message }}
+                </span>
+            @enderror
+        </div>
+        @endif
+
         <!-- FORM ACTION BUTTONS -->
         <div class="d-flex justify-end gap-3 mt-8 border-t border-neutral-200 pt-5">
             <a href="{{ route('absenmasuk.index') }}" class="btn btn-secondary d-flex align-center gap-2" :disabled="loading" style="text-decoration: none;">

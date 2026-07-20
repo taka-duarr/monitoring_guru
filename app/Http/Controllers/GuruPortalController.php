@@ -52,6 +52,14 @@ class GuruPortalController extends Controller
             if ($absen) {
                 $jadwal->absen_keluar = \App\Models\AbsenKeluar::where('absen_masuk_id', $absen->id)->first();
             }
+            $izin = \App\Models\Izin::where('guru_id', $guru->id)
+                        ->where('tanggal_izin', $today)
+                        ->where('approval', true)
+                        ->where(function($q) use ($jadwal) {
+                            $q->whereNull('jadwal_ajar_id')->orWhere('jadwal_ajar_id', $jadwal->id);
+                        })
+                        ->first();
+            $jadwal->izin_guru = $izin;
         }
 
         // Ambil jadwal terpaginasi hari ini (untuk kartu utama)
@@ -77,6 +85,14 @@ class GuruPortalController extends Controller
             if ($absen) {
                 $jadwal->absen_keluar = \App\Models\AbsenKeluar::where('absen_masuk_id', $absen->id)->first();
             }
+            $izin = \App\Models\Izin::where('guru_id', $guru->id)
+                        ->where('tanggal_izin', $today)
+                        ->where('approval', true)
+                        ->where(function($q) use ($jadwal) {
+                            $q->whereNull('jadwal_ajar_id')->orWhere('jadwal_ajar_id', $jadwal->id);
+                        })
+                        ->first();
+            $jadwal->izin_guru = $izin;
         }
 
         // Tahun Ajaran untuk filter "Semua Jadwal"

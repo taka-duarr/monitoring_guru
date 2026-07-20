@@ -50,6 +50,14 @@ class SiswaPortalController extends Controller
                 if ($absen) {
                     $jadwal->absen_keluar = \App\Models\AbsenKeluar::where('absen_masuk_id', $absen->id)->first();
                 }
+                $izin = \App\Models\Izin::where('guru_id', $jadwal->guru_id)
+                            ->where('tanggal_izin', $today)
+                            ->where('approval', true)
+                            ->where(function($q) use ($jadwal) {
+                                $q->whereNull('jadwal_ajar_id')->orWhere('jadwal_ajar_id', $jadwal->id);
+                            })
+                            ->first();
+                $jadwal->izin_guru = $izin;
             }
 
             $jadwalsQuery = \App\Models\JadwalAjar::with(['guru', 'mapel', 'ruangan'])
@@ -69,6 +77,14 @@ class SiswaPortalController extends Controller
                 if ($absen) {
                     $jadwal->absen_keluar = \App\Models\AbsenKeluar::where('absen_masuk_id', $absen->id)->first();
                 }
+                $izin = \App\Models\Izin::where('guru_id', $jadwal->guru_id)
+                            ->where('tanggal_izin', $today)
+                            ->where('approval', true)
+                            ->where(function($q) use ($jadwal) {
+                                $q->whereNull('jadwal_ajar_id')->orWhere('jadwal_ajar_id', $jadwal->id);
+                            })
+                            ->first();
+                $jadwal->izin_guru = $izin;
             }
 
             // Semua jadwal (semua hari) filter by tahun ajaran

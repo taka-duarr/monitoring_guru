@@ -151,7 +151,7 @@ class LaporanController extends Controller
     private function queryKehadiran(Request $req, Carbon $mulai, Carbon $akhir, string $periodeLabel): array
     {
         $query = AbsenMasuk::with(['guru', 'kelas', 'jadwalAjar.mapel', 'absenKeluar'])
-            ->whereBetween('created_at', [$mulai, $akhir]);
+            ->whereBetween('tanggal', [$mulai->toDateString(), $akhir->toDateString()]);
 
         if ($req->guru_id) {
             $query->where('guru_id', $req->guru_id);
@@ -162,22 +162,64 @@ class LaporanController extends Controller
 
         $raw = $query->get();
 
-        $data = $raw->map(fn ($a) => (object)[
-            'nama_guru'   => $a->guru?->name ?? '-',
-            'nik'         => $a->guru?->nik  ?? '-',
-            'tanggal'     => $a->created_at?->toDateString(),
-            'jam_masuk'   => $a->created_at?->format('H:i'),
-            'jam_keluar'  => $a->absenKeluar?->created_at?->format('H:i') ?? '-',
-            'kelas'       => $a->kelas?->name ?? '-',
-            'mapel'       => $a->jadwalAjar?->mapel?->name ?? '-',
-            'status'      => 'Hadir',
-            'keterangan'  => '-',
-        ]);
+        $data = collect();
+        foreach($raw as $a) {
+            $data->push((object)[
+                'nama_guru'   => $a->guru?->name ?? '-',
+                'nik'         => $a->guru?->nik  ?? '-',
+                'tanggal'     => $a->tanggal,
+                'jam_masuk'   => substr($a->jam_masuk, 0, 5),
+                'jam_keluar'  => $a->absenKeluar ? substr($a->absenKeluar->jam_keluar, 0, 5) : '-',
+                'kelas'       => $a->kelas?->name ?? '-',
+                'mapel'       => $a->jadwalAjar?->mapel?->name ?? '-',
+                'status'      => 'Hadir',
+                'keterangan'  => '-',
+            ]);
+        }
 
-        $guruLabel  = $req->guru_id  ? (Guru::find($req->guru_id)?->name ?? '') : '';
-        $kelasLabel = $req->kelas_id ? (Kelas::find($req->kelas_id)?->name ?? '') : '';
+        // Ambil data Izin
+        $izinQuery = Izin::with(['guru', 'jadwalAjar.kelas', 'jadwalAjar.mapel'])
+            ->where('approval', true)
+            ->whereBetween('tanggal_izin', [$mulai->toDateString(), $akhir->toDateString()]);
+            
+        if ($req->guru_id) {
+            $izinQuery->where('guru_id', $req->guru_id);
+        }
+        
+        $izins = $izinQuery->get();
+        foreach($izins as $i) {
+            // Filter by kelas if requested (since izin might be tied to a jadwal_ajar or all day)
+            if ($req->kelas_id && $i->jadwal_ajar_id && $i->jadwalAjar && $i->jadwalAjar->kelas_id != $req->kelas_id) {
+                continue;
+            }
+            if ($req->kelas_id && !$i->jadwal_ajar_id) {
+                // If it's an all-day leave, we should include it but maybe the class is generic.
+                // We'll just list it.
+            }
 
-        $namaLaporan = 'Rekap Kehadiran' . ($guruLabel ? " – {$guruLabel}" : '') . " ({$periodeLabel})";
+            $data->push((object)[
+                'nama_guru'   => $i->guru?->name ?? '-',
+                'nik'         => $i->guru?->nik  ?? '-',
+                'tanggal'     => $i->tanggal_izin,
+                'jam_masuk'   => '-',
+                'jam_keluar'  => '-',
+                'kelas'       => $i->jadwal_ajar_id ? ($i->jadwalAjar?->kelas?->name ?? '-') : 'Semua Kelas',
+                'mapel'       => $i->jadwal_ajar_id ? ($i->jadwalAjar?->mapel?->name ?? '-') : '-',
+                'status'      => 'Izin',
+                'keterangan'  => $i->judul . ' - ' . $i->pesan,
+            ]);
+        }
+        
+        // Urutkan berdasarkan tanggal dan nama guru
+        $data = $data->sortBy([
+            ['tanggal', 'desc'],
+            ['nama_guru', 'asc']
+        ])->values();
+
+        $guruLabel  = $req->guru_id  ? (\App\Models\User::find($req->guru_id)?->name ?? '') : '';
+        $kelasLabel = $req->kelas_id ? (\App\Models\Kelas::find($req->kelas_id)?->name ?? '') : '';
+
+        $namaLaporan = 'Rekap Kehadiran' . ($guruLabel ? " — {$guruLabel}" : '') . " ({$periodeLabel})";
 
         $viewData = compact('data', 'periodeLabel', 'guruLabel', 'kelasLabel');
 
