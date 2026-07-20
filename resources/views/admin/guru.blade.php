@@ -192,8 +192,8 @@
                             <i class="ti {{ $sort === 'nik' ? ($dir === 'asc' ? 'ti-chevron-up' : 'ti-chevron-down') : 'ti-selector' }} sort-direction-icon"></i>
                         </th>
                         
-
-                        
+                        <!-- Device Column -->
+                        <th class="col-center">Device</th>
                         <!-- Status Column (Sortable) -->
                         <th class="sortable col-status {{ $sort === 'status' ? 'active-sort' : '' }} col-center"
                             @click="tableLoading = true; window.location.href='{{ request()->fullUrlWithQuery(['sort' => 'status', 'dir' => $sortStatusDir]) }}'">
@@ -240,14 +240,20 @@
                             <!-- NIP Monospace Column -->
                             <td class="col-nip">
                                 <div>{{ $guru->nik }}</div>
+                            </td>
+                            
+                            <!-- Device Status Column -->
+                            <td class="col-center">
                                 @if($guru->device_id)
-                                    <div class="mt-1">
-                                        <span class="badge" style="background-color: #E0E7FF; color: #4338CA; font-size: 10px; padding: 2px 6px;">
-                                            <i class="ti ti-lock"></i> Terikat Device
-                                        </span>
+                                    <div>
+                                        <x-tooltip text="{{ $guru->device_id }}">
+                                            <span class="badge" style="background-color: #E0E7FF; color: #4338CA; font-size: 10px; padding: 2px 6px; cursor: help;">
+                                                <i class="ti ti-lock"></i> {{ \Illuminate\Support\Str::limit($guru->device_id, 20) }}
+                                            </span>
+                                        </x-tooltip>
                                     </div>
                                 @else
-                                    <div class="mt-1">
+                                    <div>
                                         <span class="badge" style="background-color: #F1F5F9; color: #64748B; font-size: 10px; padding: 2px 6px;">
                                             <i class="ti ti-lock-open"></i> Belum Terikat
                                         </span>
