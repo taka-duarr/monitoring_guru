@@ -244,6 +244,10 @@
                                     <span class="text-xs text-primary-600 d-flex align-center gap-1 mt-1" style="font-size: 11px;">
                                         <i class="ti ti-device-mobile"></i> Terikat
                                     </span>
+                                @else
+                                    <span class="text-xs text-neutral-400 d-flex align-center gap-1 mt-1" style="font-size: 11px;">
+                                        <i class="ti ti-device-mobile"></i> Belum Terikat
+                                    </span>
                                 @endif
                             </td>
                             
